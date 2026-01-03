@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'core/theme/app_theme.dart';
 import 'features/alarm/service/medication_alarm_service.dart';
+import 'features/booking/presentation/pages/booking_screen.dart';
 import 'features/dashboard/dashboard.dart';
 
 
@@ -38,12 +39,12 @@ class _VirtualPharmacistAppState extends State<VirtualPharmacistApp> with Widget
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _listenToAlarms();
-
-    // ⬅️ تأخير العمليات الثقيلة بعد بناء الـ UI
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeHeavyOperations();
-    });
+    // _listenToAlarms();
+    //
+    // // ⬅️ تأخير العمليات الثقيلة بعد بناء الـ UI
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _initializeHeavyOperations();
+    // });
   }
 
   @override
@@ -115,9 +116,9 @@ class _VirtualPharmacistAppState extends State<VirtualPharmacistApp> with Widget
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light,
           navigatorKey: navigatorKey,
-          home: const PatientHomeScreen(),
-          routes: AppRoutes.routes,
-          onGenerateRoute: AppRoutes.onGenerateRoute,
+          home: const BookingScreen(),
+      //    routes: AppRoutes.routes,
+       //   onGenerateRoute: AppRoutes.onGenerateRoute,
         );
       },
     );

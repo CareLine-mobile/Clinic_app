@@ -372,6 +372,8 @@ class _AppTextFieldState extends State<AppTextField> {
       ],
     );
   }
+
+
 }
 
 // Factory constructors for common use cases
