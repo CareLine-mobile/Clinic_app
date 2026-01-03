@@ -38,13 +38,15 @@ dependencies:
 
   # State Management
   provider: ^6.1.1
+
+  flutter_bloc:
   # OR riverpod: ^2.4.9
 
   # Local Database
   sqflite: ^2.3.0
   path_provider: ^2.1.1
   shared_preferences: ^2.2.2
-
+  flutter_secure_storage:
   # Notifications
   alarm: ^5.1.5
   flutter_local_notifications: ^17.0.0
