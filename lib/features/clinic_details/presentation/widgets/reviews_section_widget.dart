@@ -5,9 +5,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/utils/app_size.dart';
 import '../../data/clinic_details_model.dart';
+import '../../domain/entites/clinic_entities.dart';
 
 class ReviewsSectionWidget extends StatelessWidget {
-  final List<ReviewModel> reviews;
+  final List<Review> reviews;
   final double averageRating;
   final int totalReviews;
 
@@ -172,7 +173,7 @@ class ReviewsSectionWidget extends StatelessWidget {
 }
 
 class _ReviewCard extends StatelessWidget {
-  final ReviewModel review;
+  final Review review;
 
   const _ReviewCard({required this.review});
 

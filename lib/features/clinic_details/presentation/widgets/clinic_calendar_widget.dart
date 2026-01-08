@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/utils/app_size.dart';
 import 'package:intl/intl.dart';
 import '../../data/clinic_details_model.dart';
+import '../../domain/entites/clinic_entities.dart';
 
 
 
@@ -150,10 +151,10 @@ class _ClinicCalendarWidgetState extends State<ClinicCalendarWidget> {
 // ==================== doctor_list_widget.dart ====================
 
 class DoctorListWidget extends StatelessWidget {
-  final List<DoctorModel> doctors;
+  final List<Doctor> doctors;
   final DateTime selectedDate;
-  final DoctorModel? selectedDoctor;
-  final Function(DoctorModel) onDoctorSelected;
+  final Doctor? selectedDoctor;
+  final Function(Doctor) onDoctorSelected;
   final Color accentColor;
 
   const DoctorListWidget({
@@ -165,7 +166,7 @@ class DoctorListWidget extends StatelessWidget {
     required this.accentColor,
   }) : super(key: key);
 
-  List<DoctorModel> _getAvailableDoctors() {
+  List<Doctor> _getAvailableDoctors() {
     // Filter doctors who have available slots for selected date
     return doctors.where((doctor) {
       return doctor.availableSlots.any((slot) =>
@@ -239,7 +240,7 @@ class DoctorListWidget extends StatelessWidget {
 
 // ==================== doctor_card.dart ====================
 class DoctorCard extends StatelessWidget {
-  final DoctorModel doctor;
+  final Doctor doctor;
   final DateTime selectedDate;
   final bool isSelected;
   final VoidCallback onTap;

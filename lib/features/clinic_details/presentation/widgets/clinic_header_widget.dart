@@ -5,6 +5,7 @@ import 'package:clinic_app/features/clinic_details/data/clinic_details_model.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/utils/app_size.dart';
+import '../../domain/entites/clinic_entities.dart';
 
 class ClinicHeaderWidget extends StatefulWidget {
   final List<String> imageUrls;
@@ -155,7 +156,6 @@ class _ClinicHeaderWidgetState extends State<ClinicHeaderWidget> {
   }
 }
 
-// ==================== clinic_statistics_widget.dart ====================
 class ClinicStatisticsWidget extends StatelessWidget {
   final ClinicStatistics statistics;
   final Color accentColor;
@@ -169,6 +169,7 @@ class ClinicStatisticsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // نفترض وجود كلاسات الأحجام الخاصة بك، يمكنك استبدالها بـ SizedBox عادي
     final vSize = AppSizeVertical.instance;
     final hSize = AppSizeHorizontal.instance;
 
@@ -184,48 +185,76 @@ class ClinicStatisticsWidget extends StatelessWidget {
             ),
           ),
           SizedBox(height: vSize.s16),
-          Row(
-            children: [
-              Expanded(
-                child: _StatCard(
-                  icon: Icons.people_outline,
-                  label: 'إجمالي الزيارات',
-                  value: statistics.totalVisits.toString(),
-                  color: accentColor,
+
+          // تحديد ارتفاع ثابت للشبكة بالكامل لضمان تناسق الـ Expanded
+          // يمكنك تعديل الارتفاع (300) حسب حاجتك وتصميم الشاشة
+          SizedBox(
+            height: 320.h,
+            child: Row(
+              children: [
+                // --- العمود الأول (يمين) ---
+                Expanded(
+                  child: Column(
+                    children: [
+                      // الكارت الكبير (الزيارات)
+                      Expanded(
+                        flex: 3, // نسبة الارتفاع 60%
+                        child: _StatCard(
+                          icon: Icons.people_outline,
+                          label: 'الزيارات',
+                          value: statistics.totalVisits.toString(),
+                          color: accentColor,
+                          isBig: true, // مؤشر لتعديل الحجم الداخلي إن لزم
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      // الكارت الصغير (الأطباء)
+                      Expanded(
+                        flex: 2, // نسبة الارتفاع 40%
+                        child: _StatCard(
+                          icon: Icons.medical_services_outlined,
+                          label: 'الأطباء',
+                          value: statistics.totalDoctors.toString(),
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(width: hSize.s12),
-              Expanded(
-                child: _StatCard(
-                  icon: Icons.event_available,
-                  label: 'الحجوزات',
-                  value: statistics.totalBookings.toString(),
-                  color: Colors.blue,
+
+                SizedBox(width: 12.w), // مسافة بين العمودين
+
+                // --- العمود الثاني (يسار) ---
+                Expanded(
+                  child: Column(
+                    children: [
+                      // الكارت الصغير (الحجوزات) - عكس العمود الأول
+                      Expanded(
+                        flex: 2, // نسبة الارتفاع 40%
+                        child: _StatCard(
+                          icon: Icons.event_available,
+                          label: 'الحجوزات',
+                          value: statistics.totalBookings.toString(),
+                          color: Colors.blue,
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      // الكارت الكبير (الرضا)
+                      Expanded(
+                        flex: 3, // نسبة الارتفاع 60%
+                        child: _StatCard(
+                          icon: Icons.thumb_up_outlined,
+                          label: 'الرضا',
+                          value: '${statistics.satisfactionRate}%',
+                          color: Colors.orange,
+                          isBig: true,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: vSize.s12),
-          Row(
-            children: [
-              Expanded(
-                child: _StatCard(
-                  icon: Icons.medical_services_outlined,
-                  label: 'الأطباء',
-                  value: statistics.totalDoctors.toString(),
-                  color: Colors.green,
-                ),
-              ),
-              SizedBox(width: hSize.s12),
-              Expanded(
-                child: _StatCard(
-                  icon: Icons.thumb_up_outlined,
-                  label: 'رضا المرضى',
-                  value: '${statistics.satisfactionRate}%',
-                  color: Colors.orange,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -238,48 +267,98 @@ class _StatCard extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
+  final bool isBig; // اختياري: إذا أردت تغيير حجم الأيقونة بناء على حجم الكارت
 
   const _StatCard({
     required this.icon,
     required this.label,
     required this.value,
     required this.color,
+    this.isBig = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final vSize = AppSizeVertical.instance;
-    final hSize = AppSizeHorizontal.instance;
 
-    return Container(
-      padding: EdgeInsets.all(hSize.s16),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(hSize.s12),
-        border: Border.all(color: theme.dividerColor),
-      ),
+    return _StyledContainer(
+      // جعلنا الكارت يملأ المساحة المتاحة له بالكامل
+      width: double.infinity,
+      height: double.infinity,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center, // توسيط المحتوى عمودياً
         children: [
-          Icon(icon, size: 32.r, color: color),
-          SizedBox(height: vSize.s8),
+          FittedBox(
+            child: Container(
+              padding: EdgeInsets.all(isBig ? 14.r : 10.r), // تكبير الـ padding للكارت الكبير
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                icon,
+                size: isBig ? 30.r : 24.r, // تكبير الأيقونة للكارت الكبير
+                color: color,
+              ),
+            ),
+          ),
+          SizedBox(height: isBig ? 12.h : 8.h),
           Text(
             value,
-            style: theme.textTheme.titleLarge?.copyWith(
+            style: theme.textTheme.displaySmall?.copyWith(
               fontWeight: FontWeight.bold,
+              fontSize: isBig ? 24.sp : 20.sp, // تحكم في حجم الخط
               color: color,
             ),
           ),
-          SizedBox(height: vSize.s4),
           Text(
             label,
-            style: theme.textTheme.bodySmall,
+            style: theme.textTheme.bodyMedium?.copyWith( // استخدمت bodyMedium ليكون أوضح
+              fontSize: 12.sp,
+              color: theme.hintColor,
+            ),
             textAlign: TextAlign.center,
-            maxLines: 2,
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
+    );
+  }
+}
+
+class _StyledContainer extends StatelessWidget {
+  const _StyledContainer({
+    required this.child,
+    this.width,
+    this.height
+  });
+
+  final Widget child;
+  final double? width;
+  final double? height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      decoration: ShapeDecoration(
+        color: Theme.of(context).cardColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16), // زيادة التدوير قليلاً ليناسب الشكل الحديث
+        ),
+        shadows: const [
+          BoxShadow(
+            color: Color(0x0C000000),
+            blurRadius: 5,
+            offset: Offset(0, 2),
+          ),
+          // يمكنك تخفيف الظلال إذا كانت الشبكة مزدحمة
+        ],
+      ),
+      child: child,
     );
   }
 }

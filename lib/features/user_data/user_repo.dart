@@ -1,10 +1,5 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:clinic_app/features/user_data/user_model.dart';
-
-
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../core/db/shared_pref_helper.dart';
 import '../../core/utils/app_constans.dart';
 
@@ -16,6 +11,7 @@ class UserRepository {
   factory UserRepository() => _instance;
 
   UserRepository._internal();
+
   final _controller = StreamController<UserModel?>.broadcast();
 
   Stream<UserModel?> get userStream => _controller.stream;
@@ -58,3 +54,4 @@ class UserRepository {
     _controller.close();
   }
 }
+
