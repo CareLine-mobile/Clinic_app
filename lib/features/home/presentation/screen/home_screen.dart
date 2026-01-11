@@ -26,11 +26,35 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late final ScrollController _scrollController;
+
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController()..addListener(_onScroll);
     // Load clinics when screen initializes
     context.read<HomeCubit>().loadClinics();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  // Handle scroll for pagination
+  void _onScroll() {
+    if (_isBottom) {
+      context.read<HomeCubit>().loadMoreClinics();
+    }
+  }
+
+  // Check if scrolled to bottom (trigger at 90%)
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= (maxScroll * 0.9);
   }
 
   @override
@@ -108,6 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return RefreshIndicator(
       onRefresh: () => context.read<HomeCubit>().refresh(),
       child: CustomScrollView(
+        controller: _scrollController, // ✅ Add scroll controller
         physics: const BouncingScrollPhysics(),
         slivers: [
           // Header with Search
@@ -159,6 +184,34 @@ class _HomeScreenState extends State<HomeScreen> {
           // All Clinics List
           _buildClinicsList(state.allClinics),
 
+          // Loading More Indicator
+          if (state.isLoadingMore)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(SizeApp.s16),
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            ),
+
+          // No More Data Message
+          if (!state.hasMorePages && state.allClinics.isNotEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(SizeApp.s16),
+                child: Center(
+                  child: Text(
+                    'لا توجد المزيد من العيادات',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+          // Bottom padding
           SliverToBoxAdapter(child: SizedBox(height: SizeApp.s40)),
         ],
       ),
@@ -171,13 +224,13 @@ class _HomeScreenState extends State<HomeScreen> {
         return HomeHeaderWidget(
           userName: 'أحمد محمد',
           userPhotoUrl: null,
-          lastBooking: state.lastBooking,
+          lastBooking: state.allClinics.isNotEmpty ? state.allClinics.first : null,
           queuePosition: 5,
           peopleAhead: 4,
           onNotificationTap: _handleNotificationTap,
           onBookingCardTap: () {
-            if (state.lastBooking != null) {
-              _navigateToClinicDetails(state.lastBooking!);
+            if (state.allClinics.isNotEmpty) {
+              _navigateToClinicDetails(state.allClinics.first);
             }
           },
           onSearchTap: () => widget.onNavigateToSearch?.call(1),
@@ -238,56 +291,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _bookAppointment(ClinicSummary clinic) {
-    final uiCubit = context.read<HomeUiCubit>();
-    final homeCubit = context.read<HomeCubit>();
-
-    // Start booking loading
-    uiCubit.startBooking(clinic.id);
-
-    // Perform booking
-    homeCubit.bookAppointment(clinic.id).then((_) {
-      // Finish booking loading
-      uiCubit.finishBooking();
-
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(
-                Icons.check_circle,
-                color: Colors.white,
-              ),
-              SizedBox(width: SizeApp.s12),
-              Expanded(
-                child: Text(
-                  'جاري حجز موعد في ${clinic.name}...',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: ColorsManager.primaryColor,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(SizeApp.s12),
-          ),
-          margin: EdgeInsets.all(SizeApp.s16),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }).catchError((error) {
-      uiCubit.cancelBooking();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('فشل الحجز: ${error.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    });
+    // Navigate to clinic details instead of booking directly
+    _navigateToClinicDetails(clinic);
   }
 
   void _handleNotificationTap() {
@@ -300,4 +305,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-

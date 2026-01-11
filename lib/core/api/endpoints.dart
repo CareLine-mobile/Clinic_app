@@ -9,10 +9,10 @@ class Endpoints {
   static const String logout = '/auth/logout';
 
   // Clinics
-  static const String allClinics = 'http://clinicalapp22-001-site1.ltempurl.com/api/clinicals';
-  static const String featuredClinics = 'http://clinicalapp22-001-site1.ltempurl.com/api/clinicals';
-  static const String nearbyClinics = 'http://clinicalapp22-001-site1.ltempurl.com/api/clinicals';
-  static const String clinicDetails = 'http://clinicalapp22-001-site1.ltempurl.com/api/clinicals'; // + /{id}
+  static const String allClinics = '/clinicals';
+  static const String featuredClinics = '/clinicals';
+  static const String nearbyClinics = '/clinicals';
+  static const String clinicDetails = '/clinicals'; // + /{id}
 
   // Favorites
   static const String toggleFavorite = '/favorites/toggle';

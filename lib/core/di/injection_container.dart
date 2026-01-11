@@ -10,6 +10,7 @@ import '../../features/clinic_details/data/repositories/clinic_repository_impl.d
 import '../../features/clinic_details/domain/repositories/clinic_repository.dart';
 import '../../features/clinic_details/domain/usecases/book_appointment_usecase.dart';
 import '../../features/clinic_details/domain/usecases/get_clinic_details_usecase.dart';
+import '../../features/clinic_details/domain/usecases/toggle_favorite_usecase.dart' as clinic_details;
 import '../../features/clinic_details/domain/usecases/toggle_favorite_usecase.dart';
 import '../../features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
 import '../../features/clinic_details/presentation/cubit/clinic_ui_cubit.dart';
@@ -26,27 +27,19 @@ final sl = GetIt.instance;
 
 Future<void> init() async {
   // ==========================
-  // Core - MUST BE FIRST
+  // External Dependencies
+  // ==========================
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton(() => sharedPreferences);
+
+  // ==========================
+  // Core - Network & API
   // ==========================
 
   // Dio instance
-  sl.registerLazySingleton<Dio>(() {
-    final dio = Dio(
-      BaseOptions(
-        baseUrl: 'http://clinicalapp22-001-site1.ltempurl.com/api',
-        connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 30),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      ),
-    );
+  sl.registerLazySingleton<Dio>(() => Dio());
 
-    return dio;
-  });
-
-  // ApiService
+  // ApiService (will configure Dio internally)
   sl.registerLazySingleton<ApiService>(
         () => ApiService(sl()),
   );
@@ -55,45 +48,53 @@ Future<void> init() async {
   // Feature: Home
   // ==========================
 
-  // Bloc/Cubit
-  sl.registerFactory(() => HomeCubit(homeRepository: sl()));
-  sl.registerFactory(() => HomeUiCubit());
-
-  // Use Cases
-  sl.registerLazySingleton(() => GetClinicsUseCase(sl()));
-
-  // Repository
-  sl.registerLazySingleton<HomeRepository>(
-        () => HomeRepositoryImpl(remoteDataSource: sl()),
-  );
-
   // Data Sources
   sl.registerLazySingleton<HomeRemoteDataSource>(
         () => HomeRemoteDataSourceImpl(
       apiService: sl(),
-      useFakeData: true, // ✅ Use fake data while backend fixes CORS
     ),
+  );
+
+  // Repository
+  sl.registerLazySingleton<HomeRepository>(
+        () => HomeRepositoryImpl(
+      remoteDataSource: sl(),
+    ),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton<GetClinicsUseCase>(
+        () => GetClinicsUseCase(sl()),
+  );
+
+  // Cubits (Factory - new instance each time)
+  sl.registerFactory<HomeCubit>(
+        () => HomeCubit(
+      getClinicsUseCase: sl(),
+      toggleFavoriteUseCase: sl(),
+    ),
+  );
+
+  sl.registerFactory<HomeUiCubit>(
+        () => HomeUiCubit(),
   );
 
   // ==========================
   // Feature: Clinic Details
   // ==========================
 
-  // Bloc/Cubit
-  sl.registerFactory(
-        () => ClinicDetailsCubit(
-      getClinicDetailsUseCase: sl(),
-      toggleFavoriteUseCase: sl(),
-      bookAppointmentUseCase: sl(),
+  // Data Sources
+  sl.registerLazySingleton<ClinicRemoteDataSource>(
+        () => ClinicRemoteDataSourceImpl(
+      apiService: sl(),
     ),
   );
 
-  sl.registerFactory(() => ClinicUiCubit());
-
-  // Use Cases
-  sl.registerLazySingleton(() => GetClinicDetailsUseCase(sl()));
-  sl.registerLazySingleton(() => ToggleFavoriteUseCase(sl()));
-  sl.registerLazySingleton(() => BookAppointmentUseCase(sl()));
+  sl.registerLazySingleton<ClinicLocalDataSource>(
+        () => ClinicLocalDataSourceImpl(
+      sharedPreferences: sl(),
+    ),
+  );
 
   // Repository
   sl.registerLazySingleton<ClinicRepository>(
@@ -103,18 +104,29 @@ Future<void> init() async {
     ),
   );
 
-  // Data Sources
-  sl.registerLazySingleton<ClinicRemoteDataSource>(
-        () => ClinicRemoteDataSourceImpl(apiService: sl(),useFakeData: true),
+  // Use Cases
+  sl.registerLazySingleton<GetClinicDetailsUseCase>(
+        () => GetClinicDetailsUseCase(sl()),
   );
 
-  sl.registerLazySingleton<ClinicLocalDataSource>(
-        () => ClinicLocalDataSourceImpl(sharedPreferences: sl()),
+  sl.registerLazySingleton<clinic_details.ToggleFavoriteUseCase>(
+        () => clinic_details.ToggleFavoriteUseCase(sl()),
   );
 
-  // ==========================
-  // External
-  // ==========================
-  final sharedPreferences = await SharedPreferences.getInstance();
-  sl.registerLazySingleton(() => sharedPreferences);
+  sl.registerLazySingleton<BookAppointmentUseCase>(
+        () => BookAppointmentUseCase(sl()),
+  );
+
+  // Cubits (Factory - new instance each time)
+  sl.registerFactory<ClinicDetailsCubit>(
+        () => ClinicDetailsCubit(
+      getClinicDetailsUseCase: sl(),
+      toggleFavoriteUseCase: sl(),
+      bookAppointmentUseCase: sl(),
+    ),
+  );
+
+  sl.registerFactory<ClinicUiCubit>(
+        () => ClinicUiCubit(),
+  );
 }

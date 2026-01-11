@@ -12,26 +12,34 @@ class HomeLoaded extends HomeState {
   final List<ClinicSummary> featuredClinics;
   final List<ClinicSummary> nearbyClinics;
   final List<ClinicSummary> allClinics;
-  final ClinicSummary? lastBooking; // Added missing field
+  final int currentPage;
+  final bool hasMorePages;
+  final bool isLoadingMore;
 
   HomeLoaded({
     required this.featuredClinics,
     required this.nearbyClinics,
     required this.allClinics,
-    this.lastBooking,
+    this.currentPage = 1,
+    this.hasMorePages = true,
+    this.isLoadingMore = false,
   });
 
   HomeLoaded copyWith({
     List<ClinicSummary>? featuredClinics,
     List<ClinicSummary>? nearbyClinics,
     List<ClinicSummary>? allClinics,
-    ClinicSummary? lastBooking,
+    int? currentPage,
+    bool? hasMorePages,
+    bool? isLoadingMore,
   }) {
     return HomeLoaded(
       featuredClinics: featuredClinics ?? this.featuredClinics,
       nearbyClinics: nearbyClinics ?? this.nearbyClinics,
       allClinics: allClinics ?? this.allClinics,
-      lastBooking: lastBooking ?? this.lastBooking,
+      currentPage: currentPage ?? this.currentPage,
+      hasMorePages: hasMorePages ?? this.hasMorePages,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
     );
   }
 }
@@ -44,17 +52,4 @@ class HomeError extends HomeState {
     required this.message,
     required this.actionMessage,
   });
-}
-
-// Remove these states - they break the loaded state pattern
-// Use HomeLoaded with error flags or show errors via listener instead
-
-class HomeBookingInProgress extends HomeState {}
-
-class HomeBookingSuccess extends HomeState {}
-
-class HomeBookingError extends HomeState {
-  final String message;
-
-  HomeBookingError({required this.message});
 }

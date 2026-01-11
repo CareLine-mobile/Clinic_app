@@ -1,10 +1,10 @@
 // lib/features/home/data/datasources/remotedatasource/remote_data_source.dart
 
+import 'package:clinic_app/core/api/endpoints.dart';
 import 'package:clinic_app/core/errors/exceptions.dart';
 import '../../../../../core/api/api_service.dart';
 import '../../model/clinic_model.dart';
 import '../../model/clinics_response.dart';
-
 import '../fake/home_fake_data.dart';
 
 abstract class HomeRemoteDataSource {
@@ -12,7 +12,6 @@ abstract class HomeRemoteDataSource {
   Future<List<ClinicModel>> getNearbyClinics();
   Future<ClinicsResponse> getAllClinics({int page = 1});
   Future<void> toggleFavorite(int clinicId);
-  Future<void> bookAppointment(int clinicId);
 }
 
 class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
@@ -21,158 +20,102 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
 
   HomeRemoteDataSourceImpl({
     required this.apiService,
-    this.useFakeData = true, // ✅ Default to fake data while backend fixes CORS
+    this.useFakeData = false,
   });
 
+  /// Get featured clinics (not exist in backend yet)
   @override
   Future<List<ClinicModel>> getFeaturedClinics() async {
     if (useFakeData) {
-      // Use fake data
       await Future.delayed(const Duration(seconds: 1));
       return HomeFakeData.generateFeaturedClinics();
     }
 
     try {
-      // Real API call
-      final response = await apiService.get('/clinicals/featured');
+      final response = await apiService.get(Endpoints.allClinics);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final clinicsResponse = ClinicsResponse.fromJson(response.data);
         return clinicsResponse.clinics;
       } else {
-        throw ServerException(
-         'Failed to load featured clinics',
-
-        );
+        throw ServerException('Failed to load featured clinics');
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw ServerException(
-       'Failed to fetch featured clinics: ${e.toString()}',
-      );
+      throw ServerException('Failed to fetch featured clinics: ${e.toString()}');
     }
   }
 
+  /// Get nearby clinics (not exist in backend yet)
   @override
   Future<List<ClinicModel>> getNearbyClinics() async {
     if (useFakeData) {
-      // Use fake data
       await Future.delayed(const Duration(milliseconds: 800));
       return HomeFakeData.generateNearbyClinics();
     }
 
     try {
-      // Real API call
-      final response = await apiService.get('/clinicals/nearby');
+      final response = await apiService.get('/clinics/nearby');
 
       if (response.statusCode == 200) {
         final clinicsResponse = ClinicsResponse.fromJson(response.data);
         return clinicsResponse.clinics;
       } else {
-        throw ServerException(
-    'Failed to load nearby clinics',
-
-        );
+        throw ServerException('Failed to load nearby clinics');
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw ServerException(
-    'Failed to fetch nearby clinics: ${e.toString()}',
-      );
+      throw ServerException('Failed to fetch nearby clinics: ${e.toString()}');
     }
   }
 
+  /// Get all clinics with pagination
   @override
   Future<ClinicsResponse> getAllClinics({int page = 1}) async {
     if (useFakeData) {
-      // Use fake data
       await Future.delayed(const Duration(milliseconds: 600));
-      final clinics = HomeFakeData.generateClinicsList(count: 20);
+      final clinics = HomeFakeData.generateClinicsList(count: 10);
       return ClinicsResponse(
         clinics: clinics,
-        hasMorePage: false,
-        currentPage: 1,
+        hasMorePage: page < 3, // Simulate 3 pages
+        currentPage: page,
       );
     }
 
     try {
-      // Real API call
       final response = await apiService.get(
-        '/clinicals',
+        Endpoints.allClinics,
         queryParameters: {'page': page},
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         return ClinicsResponse.fromJson(response.data);
       } else {
-        throw ServerException(
-         'Failed to load clinics',
-
-        );
+        throw ServerException('Failed to load clinics');
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw ServerException(
-         'Failed to fetch clinics: ${e.toString()}',
-      );
+      throw ServerException('Failed to fetch clinics: ${e.toString()}');
     }
   }
 
+  /// Toggle favorite (not exist in backend yet)
   @override
   Future<void> toggleFavorite(int clinicId) async {
     if (useFakeData) {
-      // Simulate API call
       await Future.delayed(const Duration(milliseconds: 300));
       return; // Success
     }
 
     try {
-      // Real API call
-      final response = await apiService.post('/clinicals/$clinicId/favorite');
+      final response = await apiService.post('/clinics/$clinicId/favorite');
 
       if (response.statusCode != 200 && response.statusCode != 201) {
-        throw ServerException(
-         'Failed to toggle favorite',
-
-        );
+        throw ServerException('Failed to toggle favorite');
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw ServerException(
-       'Failed to toggle favorite: ${e.toString()}',
-      );
-    }
-  }
-
-  @override
-  Future<void> bookAppointment(int clinicId) async {
-    if (useFakeData) {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
-      return; // Success
-    }
-
-    try {
-      // Real API call
-      final response = await apiService.post(
-        '/clinicals/$clinicId/appointments',
-        data: {
-          'clinic_id': clinicId,
-          'date': DateTime.now().toIso8601String(),
-        },
-      );
-
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw ServerException(
-         'Failed to book appointment',
-
-        );
-      }
-    } catch (e) {
-      if (e is ServerException) rethrow;
-      throw ServerException(
-        'Failed to book appointment: ${e.toString()}',
-      );
+      throw ServerException('Failed to toggle favorite: ${e.toString()}');
     }
   }
 }

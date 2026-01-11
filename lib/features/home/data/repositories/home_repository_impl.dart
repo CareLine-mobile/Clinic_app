@@ -7,26 +7,18 @@ import '../../domain/repositories/home_repository.dart';
 import '../datasources/remotedatasource/remote_data_source.dart';
 
 
+// lib/features/home/data/repositories/home_repository_impl.dart
+import 'package:dartz/dartz.dart';
+import '../../../../core/errors/failures.dart';
+import '../../../../core/errors/result_handler.dart';
+import '../../domain/entities/clinic_summary.dart';
+import '../../domain/repositories/home_repository.dart';
+import '../datasources/remotedatasource/remote_data_source.dart';
+
 class HomeRepositoryImpl implements HomeRepository {
   final HomeRemoteDataSource remoteDataSource;
 
   HomeRepositoryImpl({required this.remoteDataSource});
-
-  @override
-  Future<Either<Failure, List<ClinicSummary>>> getFeaturedClinics() async {
-    return ResultHandler.handle(() async {
-      final clinics = await remoteDataSource.getFeaturedClinics();
-      return clinics.map((model) => model.toEntity()).toList();
-    });
-  }
-
-  @override
-  Future<Either<Failure, List<ClinicSummary>>> getNearbyClinics() async {
-    return ResultHandler.handle(() async {
-      final clinics = await remoteDataSource.getNearbyClinics();
-      return clinics.map((model) => model.toEntity()).toList();
-    });
-  }
 
   @override
   Future<Either<Failure, List<ClinicSummary>>> getAllClinics({
@@ -39,16 +31,29 @@ class HomeRepositoryImpl implements HomeRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> toggleFavorite(int clinicId) async {
-    return ResultHandler.handleVoid(() async {
-      await remoteDataSource.toggleFavorite(clinicId);
+  Future<Either<Failure, List<ClinicSummary>>> getFeaturedClinics({
+    int page = 1,
+  }) async {
+    return ResultHandler.handle(() async {
+      final clinics = await remoteDataSource.getFeaturedClinics();
+      return clinics.map((model) => model.toEntity()).toList();
     });
   }
 
   @override
-  Future<Either<Failure, Unit>> bookAppointment(int clinicId) async {
+  Future<Either<Failure, List<ClinicSummary>>> getNearbyClinics({
+    int page = 1,
+  }) async {
+    return ResultHandler.handle(() async {
+      final clinics = await remoteDataSource.getNearbyClinics();
+      return clinics.map((model) => model.toEntity()).toList();
+    });
+  }
+
+  @override
+  Future<Either<Failure, Unit>> toggleFavorite(int clinicId) async {
     return ResultHandler.handleVoid(() async {
-      await remoteDataSource.bookAppointment(clinicId);
+      await remoteDataSource.toggleFavorite(clinicId);
     });
   }
 }

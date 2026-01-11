@@ -1,59 +1,62 @@
 import 'package:bloc/bloc.dart';
+import 'package:clinic_app/features/clinic_details/domain/usecases/toggle_favorite_usecase.dart';
 import 'package:meta/meta.dart';
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/clinic_summary.dart';
-import '../../domain/repositories/home_repository.dart';
+import '../../domain/usecases/get_clinics_usecase.dart';
 
 part 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
-  final HomeRepository homeRepository;
+  final GetClinicsUseCase getClinicsUseCase;
+  final ToggleFavoriteUseCase toggleFavoriteUseCase;
 
-  HomeCubit({required this.homeRepository}) : super(HomeInitial());
+  HomeCubit({
+    required this.getClinicsUseCase,
+    required this.toggleFavoriteUseCase,
+  }) : super(HomeInitial());
 
+  // Pagination state
+  List<ClinicSummary> _allClinics = [];
+  int _currentPage = 1;
+  bool _hasMorePages = true;
+  bool _isLoadingMore = false;
+
+  // Separate lists for different sections (for future use)
   List<ClinicSummary> _featuredClinics = [];
   List<ClinicSummary> _nearbyClinics = [];
-  List<ClinicSummary> _allClinics = [];
 
+  /// Load initial clinics (page 1)
   Future<void> loadClinics() async {
     emit(HomeLoading());
 
     try {
-      final results = await Future.wait([
-        homeRepository.getFeaturedClinics(),
-        homeRepository.getNearbyClinics(),
-      ]);
+      final result = await getClinicsUseCase(page: 1);
 
-      final featuredResult = results[0];
-      final nearbyResult = results[1];
-
-      featuredResult.fold(
+      result.fold(
             (failure) {
           final message = FailureMessageMapper.mapFailureToMessage(failure);
           final action = FailureMessageMapper.getActionMessage(failure);
           emit(HomeError(message: message, actionMessage: action));
         },
-            (featured) {
-          _featuredClinics = featured;
+            (clinics) {
+          _allClinics = clinics;
+          _currentPage = 1;
+          _hasMorePages = true; // Will be updated when backend sends pagination info
 
-          nearbyResult.fold(
-                (failure) {
-              final message = FailureMessageMapper.mapFailureToMessage(failure);
-              final action = FailureMessageMapper.getActionMessage(failure);
-              emit(HomeError(message: message, actionMessage: action));
-            },
-                (nearby) {
-              _nearbyClinics = nearby;
-              _allClinics = [..._featuredClinics, ..._nearbyClinics];
+          // For now, treat all clinics as featured
+          // When backend adds nearby, we can split them
+          _featuredClinics = clinics;
+          _nearbyClinics = [];
 
-              emit(HomeLoaded(
-                featuredClinics: _featuredClinics,
-                nearbyClinics: _nearbyClinics,
-                allClinics: _allClinics,
-                lastBooking: null, // Added missing parameter
-              ));
-            },
-          );
+          emit(HomeLoaded(
+            featuredClinics: _featuredClinics,
+            nearbyClinics: _nearbyClinics,
+            allClinics: _allClinics,
+            currentPage: _currentPage,
+            hasMorePages: _hasMorePages,
+            isLoadingMore: false,
+          ));
         },
       );
     } catch (e) {
@@ -64,6 +67,55 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
+  /// Load more clinics (pagination)
+  Future<void> loadMoreClinics() async {
+    final currentState = state;
+    if (currentState is! HomeLoaded) return;
+    if (_isLoadingMore || !_hasMorePages) return;
+
+    _isLoadingMore = true;
+    emit(currentState.copyWith(isLoadingMore: true));
+
+    try {
+      _currentPage++;
+      final result = await getClinicsUseCase(page: _currentPage);
+
+      result.fold(
+            (failure) {
+          // Revert page number on failure
+          _currentPage--;
+          _isLoadingMore = false;
+
+          // Keep showing current data, just stop loading
+          emit(currentState.copyWith(isLoadingMore: false));
+        },
+            (newClinics) {
+          if (newClinics.isEmpty) {
+            _hasMorePages = false;
+          } else {
+            _allClinics.addAll(newClinics);
+            _featuredClinics.addAll(newClinics);
+          }
+
+          _isLoadingMore = false;
+
+          emit(currentState.copyWith(
+            featuredClinics: List.from(_featuredClinics),
+            allClinics: List.from(_allClinics),
+            currentPage: _currentPage,
+            hasMorePages: _hasMorePages,
+            isLoadingMore: false,
+          ));
+        },
+      );
+    } catch (e) {
+      _currentPage--;
+      _isLoadingMore = false;
+      emit(currentState.copyWith(isLoadingMore: false));
+    }
+  }
+
+  /// Toggle favorite for a clinic
   Future<void> toggleFavorite(int clinicId) async {
     final currentState = state;
     if (currentState is! HomeLoaded) return;
@@ -83,8 +135,8 @@ class HomeCubit extends Cubit<HomeState> {
       allClinics: updatedAll,
     ));
 
-    // Call API
-    final result = await homeRepository.toggleFavorite(clinicId);
+    // Call UseCase
+    final result = await toggleFavoriteUseCase(clinicId);
 
     result.fold(
           (failure) {
@@ -97,7 +149,6 @@ class HomeCubit extends Cubit<HomeState> {
         _nearbyClinics = revertedNearby;
         _allClinics = revertedAll;
 
-        // Return to loaded state with reverted data
         emit(currentState.copyWith(
           featuredClinics: revertedFeatured,
           nearbyClinics: revertedNearby,
@@ -108,6 +159,7 @@ class HomeCubit extends Cubit<HomeState> {
     );
   }
 
+  /// Helper method to update clinic favorite status
   List<ClinicSummary> _updateClinicFavorite(
       List<ClinicSummary> clinics,
       int clinicId,
@@ -120,23 +172,33 @@ class HomeCubit extends Cubit<HomeState> {
     }).toList();
   }
 
-  Future<void> bookAppointment(int clinicId) async {
-    // Don't change state here - let UI handle loading via HomeUiCubit
-    final result = await homeRepository.bookAppointment(clinicId);
-
-    result.fold(
-          (failure) {
-        // Error will be handled in UI via .catchError
-        throw Exception(FailureMessageMapper.mapFailureToMessage(failure));
-      },
-          (_) {
-        // Success - reload clinics
-        loadClinics();
-      },
-    );
+  /// Refresh data (pull to refresh)
+  Future<void> refresh() async {
+    _currentPage = 1;
+    _hasMorePages = true;
+    _allClinics.clear();
+    _featuredClinics.clear();
+    _nearbyClinics.clear();
+    await loadClinics();
   }
 
-  Future<void> refresh() async {
-    await loadClinics();
+  /// Split clinics into featured and nearby when backend adds this
+  /// Call this method when you get the split data from backend
+  void updateWithSeparateLists({
+    List<ClinicSummary>? featured,
+    List<ClinicSummary>? nearby,
+  }) {
+    final currentState = state;
+    if (currentState is! HomeLoaded) return;
+
+    if (featured != null) _featuredClinics = featured;
+    if (nearby != null) _nearbyClinics = nearby;
+    _allClinics = [..._featuredClinics, ..._nearbyClinics];
+
+    emit(currentState.copyWith(
+      featuredClinics: _featuredClinics,
+      nearbyClinics: _nearbyClinics,
+      allClinics: _allClinics,
+    ));
   }
 }
