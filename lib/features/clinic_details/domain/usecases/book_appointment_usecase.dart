@@ -16,8 +16,8 @@ class BookAppointmentUseCase {
 }
 
 class BookingParams {
-  final String clinicId;
-  final String doctorId;
+  final int clinicId;
+  final int doctorId;
   final DateTime date;
   final String timeSlot;
 

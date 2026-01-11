@@ -74,7 +74,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final Color activeColor = ColorsManager.primaryColor;
+    const Color activeColor = ColorsManager.primaryColor;
     final Color inactiveColor = theme.colorScheme.onSurfaceVariant;
 
     final Color glassColor = isDark

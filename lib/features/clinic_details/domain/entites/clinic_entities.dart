@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 
 /// Doctor Entity (Domain Layer)
 class Doctor extends Equatable {
-  final String id;
+  final int id;
   final String name;
   final String specialty;
   final String imageUrl;
@@ -79,7 +79,7 @@ class DoctorAvailabilitySlot extends Equatable {
 
 /// Clinic Details Entity (Domain Layer)
 class ClinicDetails extends Equatable {
-  final String id;
+  final int id;
   final String name;
   final String specialty;
   final String description;

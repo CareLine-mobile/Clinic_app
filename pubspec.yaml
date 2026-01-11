@@ -68,6 +68,7 @@ dependencies:
   flutter_screenutil:
   uuid: ^4.2.2
   permission_handler: ^12.0.0+1
+  url_launcher:
 
   # QR/Barcode Scanner
   # mobile_scanner: ^3.5.5
@@ -79,10 +80,15 @@ dependencies:
   # Charts (للـ adherence tracking)
   fl_chart: ^0.66.0
 
+  # Google
+  google_maps_flutter:
+
   # Image Picker
   image_picker: ^1.0.7
 
 dev_dependencies:
+  pretty_dio_logger:
+
   flutter_test:
     sdk: flutter
 

@@ -4,13 +4,13 @@ import 'package:clinic_app/core/widgets/app_text_feild.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
-import '../../data/model/clinic_model.dart';
 import '../../../../core/theme/colors.dart';
+import '../../domain/entities/clinic_summary.dart';
 
 class HomeHeaderWidget extends StatelessWidget {
   final String? userName;
   final String? userPhotoUrl;
-  final ClinicModel? lastBooking;
+  final ClinicSummary? lastBooking;
   final int? queuePosition;
   final int? peopleAhead;
   final VoidCallback onNotificationTap;
@@ -35,7 +35,7 @@ class HomeHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverAppBar(
       backgroundColor: ColorsManager.primaryColor,
-      expandedHeight: SizeApp.expandedHeight, // زودنا المساحة للسيرش
+      expandedHeight: SizeApp.expandedHeight,
       collapsedHeight: SizeApp.collapsedHeight,
       floating: false,
       pinned: true,
@@ -50,7 +50,7 @@ class HomeHeaderWidget extends StatelessWidget {
               _buildBackground(context),
               _buildTopBar(context, isExpanded, constraints),
               if (isExpanded) ...[
-                // Description مع fade animation
+                // Description with fade animation
                 Positioned(
                   top: 70.h,
                   left: SizeApp.s16,
@@ -121,17 +121,17 @@ class HomeHeaderWidget extends StatelessWidget {
             children: [
               _buildUserAvatar(),
               SizedBox(width: isExpanded ? SizeApp.s12 : SizeApp.s8),
-                Expanded(
-                  child: Text(
-                    userName ?? "مستخدم",
-                    style: textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
-                      fontSize: isExpanded ? SizeApp.s16 + SizeApp.s2 : SizeApp.s16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+              Expanded(
+                child: Text(
+                  userName ?? "مستخدم",
+                  style: textTheme.titleLarge?.copyWith(
+                    color: Colors.white,
+                    fontSize: isExpanded ? SizeApp.s16 + SizeApp.s2 : SizeApp.s16,
+                    fontWeight: FontWeight.bold,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
+              ),
               const Spacer(),
               _buildNotificationBell(),
             ],
@@ -201,7 +201,7 @@ class HomeHeaderWidget extends StatelessWidget {
           ),
           SizedBox(height: SizeApp.s4),
           Text(
-              'Follow your turn without waiting',
+            'Follow your turn without waiting',
             style: textTheme.bodyMedium?.copyWith(
               color: Colors.white.withOpacity(0.9),
               fontSize: SizeApp.s16,
@@ -219,7 +219,6 @@ class HomeHeaderWidget extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildClinicCard(BuildContext context) {
     return Align(
@@ -263,21 +262,21 @@ class HomeHeaderWidget extends StatelessWidget {
               width: SizeApp.s50 + SizeApp.s10,
               height: SizeApp.s50 + SizeApp.s10,
               decoration: BoxDecoration(
-                color: clinic.accentColor.withOpacity(0.1),
+                color: Theme.of(context).primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(SizeApp.s12 + SizeApp.s2),
                 border: Border.all(
-                  color: clinic.accentColor.withOpacity(0.3),
+                  color: Theme.of(context).primaryColor.withOpacity(0.3),
                   width: 2,
                 ),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(SizeApp.s12),
                 child: Image.network(
-                  clinic.imageUrl,
+                  clinic.firstImageUrl, // ✅ Changed from imageUrl
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Icon(
                     Icons.local_hospital,
-                    color: clinic.accentColor,
+                    color: Theme.of(context).primaryColor,
                     size: SizeApp.s30,
                   ),
                 ),
@@ -297,14 +296,14 @@ class HomeHeaderWidget extends StatelessWidget {
                           vertical: SizeApp.s4,
                         ),
                         decoration: BoxDecoration(
-                          color: clinic.accentColor.withOpacity(0.15),
+                          color: Theme.of(context).primaryColor.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(SizeApp.s6),
                         ),
                         child: Text(
                           'آخر حجز',
                           style: textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: clinic.accentColor,
+                            color: Theme.of(context).primaryColor,
                           ),
                         ),
                       ),
@@ -328,19 +327,24 @@ class HomeHeaderWidget extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: SizeApp.s4),
+                  // ✅ Changed: Show location instead of nextAppointment
                   Row(
                     children: [
                       Icon(
-                        Icons.schedule,
+                        Icons.location_on_outlined,
                         size: SizeApp.s12 + SizeApp.s2,
                         color: ColorsManager.defaultTextSecondary,
                       ),
                       SizedBox(width: SizeApp.s4),
-                      Text(
-                        clinic.nextAppointment,
-                        style: textTheme.bodySmall?.copyWith(
-                          fontSize: SizeApp.s12,
-                          color: ColorsManager.defaultTextSecondary,
+                      Expanded(
+                        child: Text(
+                          clinic.location,
+                          style: textTheme.bodySmall?.copyWith(
+                            fontSize: SizeApp.s12,
+                            color: ColorsManager.defaultTextSecondary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -352,7 +356,7 @@ class HomeHeaderWidget extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(SizeApp.s10),
                 decoration: BoxDecoration(
-                  color: clinic.accentColor.withOpacity(0.1),
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(SizeApp.s12),
                 ),
                 child: Column(
@@ -363,7 +367,7 @@ class HomeHeaderWidget extends StatelessWidget {
                       style: textTheme.headlineLarge?.copyWith(
                         fontSize: SizeApp.s20,
                         fontWeight: FontWeight.bold,
-                        color: clinic.accentColor,
+                        color: Theme.of(context).primaryColor,
                       ),
                     ),
                     Text(
@@ -388,7 +392,7 @@ class HomeHeaderWidget extends StatelessWidget {
                         style: textTheme.labelSmall?.copyWith(
                           fontSize: SizeApp.s10 - SizeApp.s2,
                           fontWeight: FontWeight.bold,
-                          color: clinic.accentColor,
+                          color: Theme.of(context).primaryColor,
                         ),
                       ),
                     ),

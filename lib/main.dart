@@ -1,3 +1,4 @@
+import 'package:clinic_app/features/home/presentation/cubit/home_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,11 +8,12 @@ import 'core/routes/routes.dart';
 import 'core/service/app_initializer.dart';
 import 'core/theme/app_theme.dart';
 import 'features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
-import 'features/home/presentation/cubit/clinics_cubit.dart';
+import 'features/clinic_details/presentation/cubit/clinic_ui_cubit.dart';
+import 'features/home/presentation/cubit/home_ui_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  AppInitializer.init();
+ await AppInitializer.init();
 
 
   runApp(const MyApp());
@@ -29,6 +31,12 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<ClinicUiCubit>(
           create: (context) => di.sl<ClinicUiCubit>(),
+        ),
+        BlocProvider<HomeCubit>(
+          create: (context) => di.sl<HomeCubit>(),
+        ),
+        BlocProvider<HomeUiCubit>(
+          create: (context) => di.sl<HomeUiCubit>(),
         ),
       ],
       child: ScreenUtilInit(

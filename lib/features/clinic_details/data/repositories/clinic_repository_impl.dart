@@ -88,7 +88,7 @@ class ClinicRepositoryImpl implements ClinicRepository {
   });
 
   @override
-  Future<Either<Failure, ClinicDetails>> getClinicDetails(String clinicId) async {
+  Future<Either<Failure, ClinicDetails>> getClinicDetails(int clinicId) async {
     try {
       // Try to get from remote
       final remoteClinic = await remoteDataSource.getClinicDetails(clinicId);
@@ -105,7 +105,7 @@ class ClinicRepositoryImpl implements ClinicRepository {
         if (cachedClinic != null) {
           return Right(cachedClinic);
         }
-        return Left(CacheFailure( 'لا توجد بيانات محفوظة'));
+        return const Left(CacheFailure( 'لا توجد بيانات محفوظة'));
       } catch (e) {
         return Left(ServerFailure('فشل في تحميل البيانات: ${e.toString()}'));
       }
@@ -113,7 +113,7 @@ class ClinicRepositoryImpl implements ClinicRepository {
   }
 
   @override
-  Future<Either<Failure, List<Doctor>>> getDoctors(String clinicId) async {
+  Future<Either<Failure, List<Doctor>>> getDoctors(int clinicId) async {
     try {
       final doctors = await remoteDataSource.getDoctors(clinicId);
       return Right(doctors.map((model) => model).toList());
@@ -123,7 +123,7 @@ class ClinicRepositoryImpl implements ClinicRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> toggleFavorite(String clinicId) async {
+  Future<Either<Failure, bool>> toggleFavorite(int clinicId) async {
     try {
       final result = await remoteDataSource.toggleFavorite(clinicId);
       return Right(result);

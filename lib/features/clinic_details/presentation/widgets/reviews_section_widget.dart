@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/utils/app_size.dart';
-import '../../data/clinic_details_model.dart';
+import '../../data/model/clinic_details_model.dart';
 import '../../domain/entites/clinic_entities.dart';
 
 class ReviewsSectionWidget extends StatelessWidget {

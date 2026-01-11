@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/utils/app_size.dart';
 import 'package:intl/intl.dart';
-import '../../data/clinic_details_model.dart';
+import '../../data/model/clinic_details_model.dart';
 import '../../domain/entites/clinic_entities.dart';
 
 
@@ -192,8 +192,6 @@ class DoctorListWidget extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: vSize.s16),
-
         if (availableDoctors.isEmpty)
           Center(
             child: Padding(
@@ -255,108 +253,108 @@ class DoctorCard extends StatelessWidget {
     required this.accentColor,
   }) : super(key: key);
 
-  List<DoctorAvailabilitySlot> _getAvailableSlots() {
-    return doctor.availableSlots.where((slot) =>
+  @override
+  Widget build(BuildContext context) {
+    // Filter logic
+    final availableSlots = doctor.availableSlots
+        .where((slot) =>
     slot.dateTime.day == selectedDate.day &&
         slot.dateTime.month == selectedDate.month &&
         slot.dateTime.year == selectedDate.year &&
-        slot.isAvailable).toList();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final vSize = AppSizeVertical.instance;
-    final hSize = AppSizeHorizontal.instance;
-    final availableSlots = _getAvailableSlots();
+        slot.isAvailable)
+        .toList();
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(bottom: vSize.s12),
-        padding: EdgeInsets.all(hSize.s16),
+        margin: EdgeInsets.only(bottom: 16.h),
+        padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
-          color: isSelected
-              ? accentColor.withOpacity(0.1)
-              : theme.cardColor,
-          borderRadius: BorderRadius.circular(hSize.s16),
+          color: isSelected ? accentColor.withOpacity(0.04) : Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
-            color: isSelected ? accentColor : theme.dividerColor,
-            width: isSelected ? 2 : 1,
+            color: isSelected ? accentColor : Colors.grey.shade200,
+            width: isSelected ? 1.5 : 1,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // --- TOP ROW: Image + Info + Price ---
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Doctor Image
-                CircleAvatar(
-                  radius: 32.r,
-                  backgroundImage: NetworkImage(doctor.imageUrl),
-                  onBackgroundImageError: (exception, stackTrace) {},
-                  child: ClipOval(
-                    child: Image.network(
-                      doctor.imageUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: accentColor.withOpacity(0.2),
-                          child: Icon(
-                            Icons.person,
-                            size: 32.r,
-                            color: accentColor,
-                          ),
-                        );
-                      },
+                // 1. Avatar
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12.r),
+                  child: Image.network(
+                    doctor.imageUrl,
+                    width: 65.w,
+                    height: 65.w,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      width: 65.w,
+                      height: 65.w,
+                      color: Colors.grey.shade100,
+                      child: Icon(Icons.person, color: Colors.grey.shade400),
                     ),
                   ),
                 ),
-                SizedBox(width: hSize.s12),
+                SizedBox(width: 12.w),
 
-                // Doctor Info
+                // 2. Main Info (Name, Spec, Rating)
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         doctor.name,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
                         maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        overflow: TextOverflow.ellipsis, // Prevents overflow
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
                       ),
-                      SizedBox(height: vSize.s4),
+                      SizedBox(height: 4.h),
                       Text(
                         doctor.specialty,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: accentColor,
-                          fontWeight: FontWeight.w600,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: Colors.grey.shade600,
                         ),
                       ),
-                      SizedBox(height: vSize.s4),
+                      SizedBox(height: 8.h),
+
+                      // Rating & Experience Row
                       Row(
                         children: [
-                          Icon(
-                            Icons.star,
-                            size: 16.r,
-                            color: Colors.amber,
-                          ),
-                          SizedBox(width: hSize.s4),
+                          Icon(Icons.star_rounded, size: 16.sp, color: Colors.amber),
+                          SizedBox(width: 4.w),
                           Text(
-                            '${doctor.rating} (${doctor.reviewsCount})',
-                            style: theme.textTheme.bodySmall,
+                            doctor.rating.toStringAsFixed(1),
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
-                          SizedBox(width: hSize.s12),
-                          Icon(
-                            Icons.work_outline,
-                            size: 16.r,
-                            color: theme.hintColor,
-                          ),
-                          SizedBox(width: hSize.s4),
+                          SizedBox(width: 12.w),
+                          Icon(Icons.work_outline, size: 14.sp, color: Colors.grey.shade400),
+                          SizedBox(width: 4.w),
                           Text(
-                            '${doctor.experienceYears} سنوات',
-                            style: theme.textTheme.bodySmall,
+                            '${doctor.experienceYears} سنة',
+                            style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade600),
                           ),
                         ],
                       ),
@@ -364,108 +362,73 @@ class DoctorCard extends StatelessWidget {
                   ),
                 ),
 
-                // Price
+                // 3. Price (Right side)
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '${doctor.consultationFee.toInt()} ج.م',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                      '${doctor.consultationFee.toInt()}',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w800,
                         color: accentColor,
                       ),
                     ),
                     Text(
-                      'سعر الكشف',
-                      style: theme.textTheme.bodySmall,
+                      'ج.م',
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        color: Colors.grey.shade500,
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
 
-            // Available Time Slots
-            if (availableSlots.isNotEmpty) ...[
-              SizedBox(height: vSize.s12),
-              const Divider(),
-              SizedBox(height: vSize.s8),
+            // --- BOTTOM SECTION: Slots ---
+            SizedBox(height: 16.h),
+            Divider(height: 1, color: Colors.grey.shade100),
+            SizedBox(height: 12.h),
+
+            if (availableSlots.isNotEmpty)
+            // Horizontal Scroll View - Solves vertical overflow completely
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: availableSlots.map((slot) {
+                    return Container(
+                      margin: EdgeInsets.only(left: 8.w), // Arabic RTL spacing
+                      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+                      decoration: BoxDecoration(
+                        color: isSelected ? accentColor : Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(
+                            color: isSelected ? accentColor : Colors.grey.shade200
+                        ),
+                      ),
+                      child: Text(
+                        slot.timeSlot,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          color: isSelected ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              )
+            else
               Row(
                 children: [
-                  Icon(
-                    Icons.access_time,
-                    size: 16.r,
-                    color: theme.hintColor,
-                  ),
-                  SizedBox(width: hSize.s8),
+                  Icon(Icons.info_outline, size: 16.sp, color: Colors.grey.shade400),
+                  SizedBox(width: 6.w),
                   Text(
-                    'المواعيد المتاحة:',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    'لا توجد مواعيد متاحة اليوم',
+                    style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade500),
                   ),
                 ],
               ),
-              SizedBox(height: vSize.s8),
-              Wrap(
-                spacing: hSize.s8,
-                runSpacing: vSize.s8,
-                children: availableSlots.take(4).map((slot) {
-                  return Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: hSize.s12,
-                      vertical: vSize.s6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? accentColor
-                          : accentColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(hSize.s8),
-                    ),
-                    child: Text(
-                      slot.timeSlot,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: isSelected ? Colors.white : accentColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-              if (availableSlots.length > 4)
-                Padding(
-                  padding: EdgeInsets.only(top: vSize.s8),
-                  child: Text(
-                    '+${availableSlots.length - 4} مواعيد أخرى',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: accentColor,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-            ],
-
-            // View Details Button
-            SizedBox(height: vSize.s12),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: onTap,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: accentColor,
-                  side: BorderSide(color: accentColor),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(hSize.s10),
-                  ),
-                ),
-                child: Text(
-                  'عرض التفاصيل',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -572,3 +535,5 @@ class ReviewCard extends StatelessWidget {
     );
   }
 }
+
+

@@ -1,6 +1,6 @@
 // lib/features/clinics/data/models/clinic_models.dart
 import 'package:flutter/material.dart';
-import '../domain/entites/clinic_entities.dart';
+import '../../domain/entites/clinic_entities.dart';
 
 
 /// Doctor Model (Data Layer)
@@ -23,7 +23,7 @@ class DoctorModel extends Doctor {
   // From JSON
   factory DoctorModel.fromJson(Map<String, dynamic> json) {
     return DoctorModel(
-      id: json['id'] as String,
+      id: json['id'] as int,
       name: json['name'] as String,
       specialty: json['specialty'] as String,
       imageUrl: json['image_url'] as String,
@@ -142,7 +142,7 @@ class ClinicDetailsModel extends ClinicDetails {
 
   factory ClinicDetailsModel.fromJson(Map<String, dynamic> json) {
     return ClinicDetailsModel(
-      id: json['id'] as String,
+      id: json['id'] as int,
       name: json['name'] as String,
       specialty: json['specialty'] as String,
       description: json['description'] as String,
@@ -205,7 +205,7 @@ class ClinicDetailsModel extends ClinicDetails {
   }
 
   ClinicDetailsModel copyWith({
-    String? id,
+    int? id,
     String? name,
     String? specialty,
     String? description,

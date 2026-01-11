@@ -9,6 +9,7 @@ class ClinicImageGalleryWidget extends StatefulWidget {
   final bool isOpen;
   final bool isFavorite;
   final VoidCallback onFavoriteToggle;
+  final VoidCallback? onSharePressed;
 
   const ClinicImageGalleryWidget({
     Key? key,
@@ -16,6 +17,7 @@ class ClinicImageGalleryWidget extends StatefulWidget {
     required this.isOpen,
     required this.isFavorite,
     required this.onFavoriteToggle,
+    this.onSharePressed,
   }) : super(key: key);
 
   @override
@@ -60,121 +62,95 @@ class _ClinicImageGalleryWidgetState extends State<ClinicImageGalleryWidget> {
       fit: StackFit.expand,
       children: [
         // Main Image Gallery
-        PageView.builder(
-          controller: _pageController,
-          onPageChanged: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          itemCount: widget.imageUrls.length,
-          itemBuilder: (context, index) {
-            return Image.network(
-              widget.imageUrls[index],
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  color: Colors.grey[300],
-                  child: const Icon(
-                    Icons.local_hospital,
-                    size: 60,
-                    color: Colors.grey,
-                  ),
-                );
-              },
-            );
-          },
-        ),
+        _buildMainGallery(),
 
         // Gradient Overlay
-        Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  Colors.black.withOpacity(0.3),
-                ],
-              ),
-            ),
-          ),
-        ),
+        _buildGradientOverlay(),
 
-        // Status Badge
+        // Status Badge (bottom Left)
         Positioned(
-          top: vSize.s50,
-          left: hSize.s16,
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: hSize.s12,
-              vertical: vSize.s6,
-            ),
-            decoration: BoxDecoration(
-              color: widget.isOpen ? Colors.green : Colors.red,
-              borderRadius: BorderRadius.circular(hSize.s20),
-            ),
-            child: Text(
-              widget.isOpen ? 'مفتوح' : 'مغلق',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+          bottom: vSize.s85,
+          right: hSize.s32,
+          child: _StatusBadge(isOpen: widget.isOpen),
         ),
 
-        // Favorite Button
-        Positioned(
-          top: vSize.s50,
-          right: hSize.s16,
-          child: GestureDetector(
-            onTap: widget.onFavoriteToggle,
-            child: Container(
-              padding: EdgeInsets.all(hSize.s10),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                widget.isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: widget.isFavorite ? Colors.red : Colors.grey[700],
-                size: 24.r,
-              ),
-            ),
-          ),
-        ),
-
-        // Thumbnail Strip at Bottom
+        // Thumbnail Strip (Bottom)
         Positioned(
           bottom: vSize.s16,
           left: hSize.s32,
           right: hSize.s32,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: Theme.of(context).scaffoldBackgroundColor,
-            ),
-            padding: EdgeInsets.all(4),
-            height: 60.h,
-            child: Row(
-              children: [
-                // Thumbnails
-                ...List.generate(
-                  _maxVisibleThumbnails.clamp(0, widget.imageUrls.length),
-                      (index) => _buildThumbnail(index),
-                ),
-
-                // "+N" indicator if there are more images
-                if (widget.imageUrls.length > _maxVisibleThumbnails)
-                  _buildMoreIndicator(),
-              ],
-            ),
-          ),
+          child: _buildThumbnailStrip(),
         ),
       ],
+    );
+  }
+
+  Widget _buildMainGallery() {
+    return PageView.builder(
+      controller: _pageController,
+      onPageChanged: (index) {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+      itemCount: widget.imageUrls.length,
+      itemBuilder: (context, index) {
+        return Image.network(
+          widget.imageUrls[index],
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              color: Colors.grey[300],
+              child: const Icon(
+                Icons.local_hospital,
+                size: 60,
+                color: Colors.grey,
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildGradientOverlay() {
+    return Positioned.fill(
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.transparent,
+              Colors.black.withOpacity(0.3),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThumbnailStrip() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: Theme.of(context).scaffoldBackgroundColor,
+      ),
+      padding: const EdgeInsets.all(4),
+      height: 60.h,
+      child: Row(
+        children: [
+          // Thumbnails
+          ...List.generate(
+            _maxVisibleThumbnails.clamp(0, widget.imageUrls.length),
+                (index) => _buildThumbnail(index),
+          ),
+
+          // "+N" indicator if there are more images
+          if (widget.imageUrls.length > _maxVisibleThumbnails)
+            _buildMoreIndicator(),
+        ],
+      ),
     );
   }
 
@@ -259,7 +235,6 @@ class _ClinicImageGalleryWidgetState extends State<ClinicImageGalleryWidget> {
 
   void _showAllImages() {
     final hSize = AppSizeHorizontal.instance;
-    final vSize = AppSizeVertical.instance;
 
     showModalBottomSheet(
       context: context,
@@ -339,3 +314,45 @@ class _ClinicImageGalleryWidgetState extends State<ClinicImageGalleryWidget> {
     );
   }
 }
+
+// ==================== Status Badge ====================
+class _StatusBadge extends StatelessWidget {
+  final bool isOpen;
+
+  const _StatusBadge({required this.isOpen});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: Colors.white24, width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8.r,
+            height: 8.r,
+            decoration: BoxDecoration(
+              color: isOpen ? Colors.greenAccent : Colors.redAccent,
+              shape: BoxShape.circle,
+            ),
+          ),
+          SizedBox(width: 6.w),
+          Text(
+            isOpen ? 'مفتوح الآن' : 'مغلق حالياً',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 11.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

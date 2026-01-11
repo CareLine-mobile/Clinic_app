@@ -3,6 +3,7 @@ class Assets {
 
   // details icons
   static const String doctorIcon = 'assets/icons/doctor_icon.svg';
+  static const locationIcon = 'assets/icons/location.svg';
 
   // NavBar Icon
   static const String settingIcon = 'assets/icons/settings_icon.svg';

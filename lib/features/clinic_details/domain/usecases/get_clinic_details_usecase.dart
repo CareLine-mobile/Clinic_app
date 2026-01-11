@@ -9,7 +9,7 @@ class GetClinicDetailsUseCase {
 
   GetClinicDetailsUseCase(this.repository);
 
-  Future<Either<Failure, ClinicDetails>> call(String clinicId) async {
+  Future<Either<Failure, ClinicDetails>> call(int clinicId) async {
     return await repository.getClinicDetails(clinicId);
   }
 }

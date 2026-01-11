@@ -14,7 +14,7 @@ class AppRouter {
         );
 
       case Routes.clinicDetails:
-        final clinicId = settings.arguments as String?;
+        final clinicId = settings.arguments as int?;
         if (clinicId == null) {
           return _errorRoute();
         }

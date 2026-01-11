@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'dart:math';
-import '../../clinic_details_model.dart';
+import '../../model/clinic_details_model.dart';
 
 
 /// Fake Data Factory for Testing
@@ -105,10 +105,10 @@ class ClinicFakeData {
 
   // Generate single clinic details
   static ClinicDetailsModel generateClinicDetails({
-    String? id,
+    int? id,
     Color? accentColor,
   }) {
-    final clinicId = id ?? 'clinic_${_random.nextInt(1000)}';
+    final clinicId = id ?? _random.nextInt(1000);
     final specialty = _specialties[_random.nextInt(_specialties.length)];
 
     return ClinicDetailsModel(
@@ -144,13 +144,13 @@ class ClinicFakeData {
   }) {
     return List.generate(
       count,
-          (index) => generateClinicDetails(id: 'clinic_$index'),
+          (index) => generateClinicDetails(id: index),
     );
   }
 
   // Generate Doctor
-  static DoctorModel generateDoctor({String? id}) {
-    final doctorId = id ?? 'doctor_${_random.nextInt(1000)}';
+  static DoctorModel generateDoctor({int? id}) {
+    final doctorId = id ?? _random.nextInt(1000);
     final specialty = _specialties[_random.nextInt(_specialties.length)];
 
     return DoctorModel(
@@ -158,7 +158,7 @@ class ClinicFakeData {
       name: _doctorNames[_random.nextInt(_doctorNames.length)],
       specialty: 'استشاري $specialty',
       imageUrl: 'https://i.pravatar.cc/150?img=${_random.nextInt(70)}',
-      rating: 4.0 + _random.nextDouble(),
+      rating: 4.0 + _random.nextDouble().floor(),
       reviewsCount: 20 + _random.nextInt(150),
       experienceYears: 5 + _random.nextInt(20),
       qualifications: _generateQualifications(),
@@ -173,7 +173,7 @@ class ClinicFakeData {
   static List<DoctorModel> generateDoctorsList({int count = 5}) {
     return List.generate(
       count,
-          (index) => generateDoctor(id: 'doctor_$index'),
+          (index) => generateDoctor(id: index),
     );
   }
 
@@ -348,21 +348,21 @@ class ClinicFakeData {
 
   static ClinicDetailsModel dental() {
     return generateClinicDetails(
-      id: 'dental_clinic',
+      id: _random.nextInt(400),
       accentColor: const Color(0xFF6C63FF),
     );
   }
 
   static ClinicDetailsModel cardiology() {
     return generateClinicDetails(
-      id: 'cardiology_clinic',
+      id: _random.nextInt(400),
       accentColor: const Color(0xFFFF6B6B),
     );
   }
 
   static ClinicDetailsModel pediatrics() {
     return generateClinicDetails(
-      id: 'pediatrics_clinic',
+      id: _random.nextInt(400),
       accentColor: const Color(0xFF4ECDC4),
     );
   }

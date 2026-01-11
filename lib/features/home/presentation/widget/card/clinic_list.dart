@@ -1,16 +1,18 @@
 // lib/features/clinics/presentation/widgets/clinics_carousel.dart
 
+import 'package:clinic_app/core/utils/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../data/model/clinic_model.dart';
+import '../../../domain/entities/clinic_summary.dart';
 import 'clinic_card.dart';
 
 // ==================== Featured Section (Parallax Carousel) ====================
 class FeaturedClinicsSection extends StatefulWidget {
-  final List<ClinicModel> clinics;
-  final Function(ClinicModel) onTap;
-  final Function(ClinicModel)? onFavorite;
-  final Function(ClinicModel)? onBook;
+  final List<ClinicSummary> clinics;
+  final Function(ClinicSummary) onTap;
+  final Function(ClinicSummary)? onFavorite;
+  final Function(ClinicSummary)? onBook;
 
   const FeaturedClinicsSection({
     Key? key,
@@ -100,10 +102,10 @@ class _FeaturedClinicsSectionState extends State<FeaturedClinicsSection> {
 
 // ==================== Horizontal Carousel Section (Optimized) ====================
 class HorizontalClinicsCarousel extends StatefulWidget {
-  final List<ClinicModel> clinics;
-  final Function(ClinicModel) onTap;
-  final Function(ClinicModel)? onFavorite;
-  final Function(ClinicModel)? onBook;
+  final List<ClinicSummary> clinics;
+  final Function(ClinicSummary) onTap;
+  final Function(ClinicSummary)? onFavorite;
+  final Function(ClinicSummary)? onBook;
   final String? title;
 
   const HorizontalClinicsCarousel({
@@ -196,10 +198,10 @@ class _HorizontalClinicsCarouselState extends State<HorizontalClinicsCarousel> {
 
 // ==================== Vertical List Section ====================
 class ClinicsList extends StatelessWidget {
-  final List<ClinicModel> clinics;
-  final Function(ClinicModel) onTap;
-  final Function(ClinicModel)? onFavorite;
-  final Function(ClinicModel)? onBook;
+  final List<ClinicSummary> clinics;
+  final Function(ClinicSummary) onTap;
+  final Function(ClinicSummary)? onFavorite;
+  final Function(ClinicSummary)? onBook;
 
   const ClinicsList({
     Key? key,

@@ -55,6 +55,7 @@ abstract class AppSizeBase {
   double get s60;
   double get s70;
   double get s80;
+  double get s85;
   double get s90;
   double get s100;
   double get s230 ;
@@ -86,6 +87,7 @@ class AppSizeVertical extends AppSizeBase {
   @override double get s60 => 60.h;
   @override double get s70 => 70.h;
   @override double get s80 => 80.h;
+  @override double get s85 => 85.h;
   @override double get s90 => 90.h;
   @override double get s100 => 100.h;
   @override double get s230 => 230.h;
@@ -121,6 +123,7 @@ class AppSizeHorizontal extends AppSizeBase {
   @override double get s60 => 60.w;
   @override double get s70 => 70.w;
   @override double get s80 => 80.w;
+  @override double get s85 => 85.w;
   @override double get s90 => 90.w;
   @override double get s100 => 100.w;
   @override double get s230 => 230.w;
@@ -197,6 +200,9 @@ class TextSizeApp extends AppSizeBase {
 
   @override
   double get s80 => 80.sp;
+
+  @override
+  double get s85 => 85.sp;
 
   @override
   double get s90 => 90.sp;

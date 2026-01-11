@@ -17,10 +17,10 @@ class BookingSummary extends StatelessWidget {
             color: ColorsManager.primaryColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
+          child: const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 "Consultation Fee:",
                 style: TextStyle(
                   fontWeight: FontWeight.w500,

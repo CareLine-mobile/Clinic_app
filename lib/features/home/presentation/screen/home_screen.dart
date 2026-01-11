@@ -1,12 +1,17 @@
-// lib/features/clinics/presentation/screens/home_screen.dart
+// lib/features/home/presentation/screens/home_screen.dart
+
+import 'package:clinic_app/core/utils/enums.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/app_size.dart';
+import '../../../../core/theme/colors.dart';
 import '../../../clinic_details/presentation/view/clinic_details_screen.dart';
-import '../../data/model/clinic_model.dart';
+import '../../domain/entities/clinic_summary.dart';
+import '../cubit/home_cubit.dart';
+import '../cubit/home_ui_cubit.dart';
 import '../widget/card/clinic_card.dart';
 import '../widget/card/clinic_list.dart';
 import '../widget/home_app_bar_widget.dart';
-import '../../../../core/theme/colors.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(int)? onNavigateToSearch;
@@ -21,134 +26,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
-  bool _isLoadingBooking = false;
-
-  final List<ClinicModel> _featuredClinics = [
-    ClinicModel(
-      id: '1',
-      name: 'عيادة الدكتور أحمد محمود',
-      specialty: 'طب الأسنان',
-      location: 'المعادي، القاهرة',
-      imageUrl: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800',
-      rating: 4.8,
-      reviewsCount: 156,
-      nextAppointment: 'غداً 10:00 ص',
-      price: 300,
-      accentColor: ColorsManager.primaryColor,
-      isFavorite: true,
-      isOpen: true,
-      doctorsCount: 4,
-      availableTimes: ['10:00 ص', '12:00 م', '02:00 م', '04:00 م'],
-    ),
-    ClinicModel(
-      id: '2',
-      name: 'مركز العناية بالبشرة',
-      specialty: 'الأمراض الجلدية',
-      location: 'مدينة نصر، القاهرة',
-      imageUrl: 'https://images.unsplash.com/photo-1631815588090-d4bfec5b1ccb?w=800',
-      rating: 4.9,
-      reviewsCount: 243,
-      nextAppointment: 'اليوم 03:00 م',
-      price: 500,
-      accentColor: ColorsManager.primaryColor,
-      isFavorite: false,
-      isOpen: true,
-      doctorsCount: 4,
-      availableTimes: ['09:00 ص', '11:00 ص', '03:00 م', '05:00 م'],
-    ),
-    ClinicModel(
-      id: '3',
-      name: 'عيادة القلب المتخصصة',
-      specialty: 'أمراض القلب',
-      location: 'الزمالك، القاهرة',
-      imageUrl: 'https://images.unsplash.com/photo-1551076805-e1869033e561?w=800',
-      rating: 4.7,
-      reviewsCount: 189,
-      nextAppointment: 'بعد غد 11:00 ص',
-      price: 450,
-      accentColor: ColorsManager.primaryColor,
-      isFavorite: true,
-      isOpen: true,
-      doctorsCount: 4,
-      availableTimes: ['08:00 ص', '10:00 ص', '12:00 م', '02:00 م'],
-    ),
-  ];
-
-  List<ClinicModel> _nearbyClinics = [];
-  List<ClinicModel> _allClinics = [];
-
   @override
   void initState() {
     super.initState();
-    _initializeClinics();
-  }
-
-  @override
-  void dispose() {
-
-    super.dispose();
-  }
-
-  void _initializeClinics() {
-    _nearbyClinics = [
-      ClinicModel(
-        id: '4',
-        name: 'عيادة العيون المتخصصة',
-        specialty: 'طب العيون',
-        location: 'الدقي، الجيزة',
-        imageUrl: 'https://images.unsplash.com/photo-1551076805-e1869033e561?w=800',
-        rating: 4.6,
-        reviewsCount: 132,
-        nextAppointment: 'السبت 09:00 ص',
-        price: 400,
-        accentColor: ColorsManager.primaryColor,
-        isFavorite: true,
-        isOpen: true,
-        doctorsCount: 4,
-        availableTimes: ['09:00 ص', '11:00 ص', '01:00 م', '03:00 م'],
-      ),
-      ClinicModel(
-        id: '5',
-        name: 'مركز الطب النفسي',
-        specialty: 'الطب النفسي',
-        location: 'المهندسين، الجيزة',
-        imageUrl: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800',
-        rating: 4.5,
-        reviewsCount: 98,
-        nextAppointment: 'اليوم 05:00 م',
-        price: 350,
-        accentColor:ColorsManager.primaryColor,
-        isFavorite: false,
-        isOpen: true,
-        doctorsCount: 4,
-        availableTimes: ['10:00 ص', '02:00 م', '05:00 م'],
-      ),
-      ClinicModel(
-        id: '6',
-        name: 'عيادة الأطفال الحديثة',
-        specialty: 'طب الأطفال',
-        location: 'مصر الجديدة، القاهرة',
-        imageUrl: 'https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=800',
-        rating: 4.9,
-        reviewsCount: 276,
-        nextAppointment: 'غداً 08:00 ص',
-        price: 280,
-        accentColor: ColorsManager.primaryColor,
-        isFavorite: false,
-        isOpen: true,
-        doctorsCount: 4,
-        availableTimes: ['08:00 ص', '10:00 ص', '12:00 م', '03:00 م'],
-      ),
-    ];
-    _simulateLoadingBooking();
-    _allClinics = [..._featuredClinics, ..._nearbyClinics];
-  }
-
-  void _simulateLoadingBooking() async {
-    setState(() => _isLoadingBooking = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isLoadingBooking = false);
+    // Load clinics when screen initializes
+    context.read<HomeCubit>().loadClinics();
   }
 
   @override
@@ -157,50 +39,104 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: ColorsManager.backgroundSurface,
-      body: CustomScrollView(
+      body: BlocConsumer<HomeCubit, HomeState>(
+        listener: _handleStateChanges,
+        builder: (context, state) {
+          if (state is HomeLoading) {
+            return _buildLoadingState();
+          }
 
+          if (state is HomeError) {
+            return _buildErrorState(state.message);
+          }
+
+          if (state is HomeLoaded) {
+            return _buildLoadedState(state, textTheme);
+          }
+
+          return const SizedBox.shrink();
+        },
+      ),
+    );
+  }
+
+  void _handleStateChanges(BuildContext context, HomeState state) {
+    // Handle any state changes that need UI feedback
+    if (state is HomeError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(state.message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Widget _buildLoadingState() {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget _buildErrorState(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 64,
+            color: Colors.red,
+          ),
+          SizedBox(height: SizeApp.s16),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          SizedBox(height: SizeApp.s24),
+          ElevatedButton(
+            onPressed: () => context.read<HomeCubit>().loadClinics(),
+            child: const Text('إعادة المحاولة'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadedState(HomeLoaded state, TextTheme textTheme) {
+    return RefreshIndicator(
+      onRefresh: () => context.read<HomeCubit>().refresh(),
+      child: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          // Header Widget with Search inside
-          HomeHeaderWidget(
-            userName: 'أحمد محمد',
-            userPhotoUrl: null,
-            lastBooking: _featuredClinics.first,
-            queuePosition: 5,
-            peopleAhead: 4,
-            onNotificationTap: () {},
-            onBookingCardTap: () => _showClinicDetails(_featuredClinics.first),
-            onSearchTap: () {
-              // Navigate to search screen (index 1)
-              widget.onNavigateToSearch?.call(1);
-            },
-            isLoading: _isLoadingBooking,
-          ),
+          // Header with Search
+          _buildHeader(state),
 
           SliverToBoxAdapter(child: SizedBox(height: SizeApp.s50)),
 
           // Featured Clinics
-          SliverToBoxAdapter(
-            child: FeaturedClinicsSection(
-              clinics: _featuredClinics,
-              onTap: _showClinicDetails,
-              onFavorite: _toggleFavorite,
-              onBook: _bookAppointment,
-
+          if (state.featuredClinics.isNotEmpty)
+            SliverToBoxAdapter(
+              child: FeaturedClinicsSection(
+                clinics: state.featuredClinics,
+                onTap: _navigateToClinicDetails,
+                onFavorite: _toggleFavorite,
+                onBook: _bookAppointment,
+              ),
             ),
-          ),
 
           // Nearby Clinics
-          SliverToBoxAdapter(
-            child: HorizontalClinicsCarousel(
-              clinics: _nearbyClinics,
-              title: "العيادات القريبة",
-              onTap: _showClinicDetails,
-              onFavorite: _toggleFavorite,
-              onBook: _bookAppointment,
-
+          if (state.nearbyClinics.isNotEmpty)
+            SliverToBoxAdapter(
+              child: HorizontalClinicsCarousel(
+                clinics: state.nearbyClinics,
+                title: "العيادات القريبة",
+                onTap: _navigateToClinicDetails,
+                onFavorite: _toggleFavorite,
+                onBook: _bookAppointment,
+              ),
             ),
-          ),
 
           // All Clinics Header
           SliverToBoxAdapter(
@@ -221,28 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           // All Clinics List
-          SliverPadding(
-            padding: EdgeInsets.symmetric(horizontal: SizeApp.s20),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                  final clinic = _allClinics[index];
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: SizeApp.s12),
-                    child: ClinicCard(
-                      clinic: clinic,
-                      layout: ClinicCardLayout.list,
-                      onTap: () => _showClinicDetails(clinic),
-                      onFavoriteToggle: () => _toggleFavorite(clinic),
-                      onBookNow: () => _bookAppointment(clinic),
-
-                    ),
-                  );
-                },
-                childCount: _allClinics.length,
-              ),
-            ),
-          ),
+          _buildClinicsList(state.allClinics),
 
           SliverToBoxAdapter(child: SizedBox(height: SizeApp.s40)),
         ],
@@ -250,7 +165,55 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showClinicDetails(ClinicModel clinic) {
+  Widget _buildHeader(HomeLoaded state) {
+    return BlocBuilder<HomeUiCubit, HomeUiState>(
+      builder: (context, uiState) {
+        return HomeHeaderWidget(
+          userName: 'أحمد محمد',
+          userPhotoUrl: null,
+          lastBooking: state.lastBooking,
+          queuePosition: 5,
+          peopleAhead: 4,
+          onNotificationTap: _handleNotificationTap,
+          onBookingCardTap: () {
+            if (state.lastBooking != null) {
+              _navigateToClinicDetails(state.lastBooking!);
+            }
+          },
+          onSearchTap: () => widget.onNavigateToSearch?.call(1),
+          isLoading: uiState.isBookingLoading,
+        );
+      },
+    );
+  }
+
+  Widget _buildClinicsList(List<ClinicSummary> clinics) {
+    return SliverPadding(
+      padding: EdgeInsets.symmetric(horizontal: SizeApp.s20),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+              (context, index) {
+            final clinic = clinics[index];
+            return Padding(
+              padding: EdgeInsets.only(bottom: SizeApp.s12),
+              child: ClinicCard(
+                clinic: clinic,
+                layout: ClinicCardLayout.list,
+                onTap: () => _navigateToClinicDetails(clinic),
+                onFavoriteToggle: () => _toggleFavorite(clinic),
+                onBookNow: () => _bookAppointment(clinic),
+              ),
+            );
+          },
+          childCount: clinics.length,
+        ),
+      ),
+    );
+  }
+
+  // Event Handlers
+
+  void _navigateToClinicDetails(ClinicSummary clinic) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -261,65 +224,80 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _toggleFavorite(ClinicModel clinic) {
-    setState(() {
-      final featuredIndex =
-      _featuredClinics.indexWhere((c) => c.id == clinic.id);
-      if (featuredIndex != -1) {
-        _featuredClinics[featuredIndex] = clinic.copyWith(
-          isFavorite: !clinic.isFavorite,
-        );
-      }
-
-      final nearbyIndex = _nearbyClinics.indexWhere((c) => c.id == clinic.id);
-      if (nearbyIndex != -1) {
-        _nearbyClinics[nearbyIndex] = clinic.copyWith(
-          isFavorite: !clinic.isFavorite,
-        );
-      }
-
-      final allIndex = _allClinics.indexWhere((c) => c.id == clinic.id);
-      if (allIndex != -1) {
-        _allClinics[allIndex] = clinic.copyWith(
-          isFavorite: !clinic.isFavorite,
-        );
-      }
-    });
-  }
-
-  void _bookAppointment(ClinicModel clinic) {
-    final textTheme = Theme.of(context).textTheme;
+  void _toggleFavorite(ClinicSummary clinic) {
+    context.read<HomeCubit>().toggleFavorite(clinic.id);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              Icons.check_circle,
-              color: Colors.white,
-              size: SizeApp.iconSize,
-            ),
-            SizedBox(width: SizeApp.s12),
-            Expanded(
-              child: Text(
-                'جاري حجز موعد في ${clinic.name}...',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: Colors.white,
-                  fontSize: SizeApp.s16,
-                  fontWeight: FontWeight.w500,
+        content: Text(
+          clinic.isFavorite ? 'تم الإزالة من المفضلة' : 'تم الإضافة للمفضلة',
+        ),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
+  void _bookAppointment(ClinicSummary clinic) {
+    final uiCubit = context.read<HomeUiCubit>();
+    final homeCubit = context.read<HomeCubit>();
+
+    // Start booking loading
+    uiCubit.startBooking(clinic.id);
+
+    // Perform booking
+    homeCubit.bookAppointment(clinic.id).then((_) {
+      // Finish booking loading
+      uiCubit.finishBooking();
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(
+                Icons.check_circle,
+                color: Colors.white,
+              ),
+              SizedBox(width: SizeApp.s12),
+              Expanded(
+                child: Text(
+                  'جاري حجز موعد في ${clinic.name}...',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
+          backgroundColor: ColorsManager.primaryColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(SizeApp.s12),
+          ),
+          margin: EdgeInsets.all(SizeApp.s16),
+          duration: const Duration(seconds: 2),
         ),
-        backgroundColor: clinic.accentColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(SizeApp.s12),
+      );
+    }).catchError((error) {
+      uiCubit.cancelBooking();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('فشل الحجز: ${error.toString()}'),
+          backgroundColor: Colors.red,
         ),
-        margin: EdgeInsets.all(SizeApp.s16),
-        duration: const Duration(seconds: 2),
+      );
+    });
+  }
+
+  void _handleNotificationTap() {
+    // TODO: Navigate to notifications screen
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('لا توجد إشعارات جديدة'),
+        duration: Duration(seconds: 1),
       ),
     );
   }
 }
+

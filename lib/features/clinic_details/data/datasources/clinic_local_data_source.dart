@@ -3,11 +3,11 @@
 // lib/features/clinics/data/datasources/clinic_local_data_source.dart
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import '../clinic_details_model.dart';
+import '../model/clinic_details_model.dart';
 
 
 abstract class ClinicLocalDataSource {
-  Future<ClinicDetailsModel?> getCachedClinic(String clinicId);
+  Future<ClinicDetailsModel?> getCachedClinic(int clinicId);
   Future<void> cacheClinic(ClinicDetailsModel clinic);
 }
 
@@ -17,7 +17,7 @@ class ClinicLocalDataSourceImpl implements ClinicLocalDataSource {
   ClinicLocalDataSourceImpl({required this.sharedPreferences});
 
   @override
-  Future<ClinicDetailsModel?> getCachedClinic(String clinicId) async {
+  Future<ClinicDetailsModel?> getCachedClinic(int clinicId) async {
     final jsonString = sharedPreferences.getString('CACHED_CLINIC_$clinicId');
     if (jsonString != null) {
       return ClinicDetailsModel.fromJson(json.decode(jsonString));

@@ -1,98 +1,202 @@
-// // lib/features/clinics/data/datasources/clinic_remote_data_source.dart
-// import '../clinic_details_model.dart';
-// import '../../domain/usecases/book_appointment_usecase.dart';
-//
-// abstract class ClinicRemoteDataSource {
-//   Future<ClinicDetailsModel> getClinicDetails(String clinicId);
-//   Future<List<DoctorModel>> getDoctors(String clinicId);
-//   Future<bool> toggleFavorite(String clinicId);
-//   Future<bool> bookAppointment(BookingParams params);
-// }
-//
-// // Implementation
-// class ClinicRemoteDataSourceImpl implements ClinicRemoteDataSource {
-//   // final Dio dio; // استخدم Dio أو http
-//
-//   ClinicRemoteDataSourceImpl();
-//
-//   @override
-//   Future<ClinicDetailsModel> getClinicDetails(String clinicId) async {
-//     // TODO: Replace with real API call
-//     // final response = await dio.get('/api/v1/clinics/$clinicId');
-//     // return ClinicDetailsModel.fromJson(response.data);
-//
-//     // For now, return fake data
-//     await Future.delayed(const Duration(seconds: 1));
-//     throw UnimplementedError('Implement API call');
-//   }
-//
-//   @override
-//   Future<List<DoctorModel>> getDoctors(String clinicId) async {
-//     await Future.delayed(const Duration(milliseconds: 500));
-//     throw UnimplementedError('Implement API call');
-//   }
-//
-//   @override
-//   Future<bool> toggleFavorite(String clinicId) async {
-//     await Future.delayed(const Duration(milliseconds: 300));
-//     return true;
-//   }
-//
-//   @override
-//   Future<bool> bookAppointment(BookingParams params) async {
-//     await Future.delayed(const Duration(seconds: 1));
-//     return true;
-//   }
-// }
-//
-// lib/features/clinics/data/datasources/clinic_remote_data_source.dart
-import '../clinic_details_model.dart';
+// lib/features/clinic_details/data/datasources/clinic_remote_data_source.dart
+
+import '../../../../core/api/api_service.dart';
+import '../../../../core/errors/exceptions.dart';
+import '../model/clinic_details_model.dart';
 import '../../domain/usecases/book_appointment_usecase.dart';
 import 'fake/clinic_fake_data.dart';
 
 abstract class ClinicRemoteDataSource {
-  Future<ClinicDetailsModel> getClinicDetails(String clinicId);
-  Future<List<DoctorModel>> getDoctors(String clinicId);
-  Future<bool> toggleFavorite(String clinicId);
+  Future<ClinicDetailsModel> getClinicDetails(int clinicId);
+  Future<List<DoctorModel>> getDoctors(int clinicId);
+  Future<bool> toggleFavorite(int clinicId);
   Future<bool> bookAppointment(BookingParams params);
 }
 
-// Implementation with Fake Data
 class ClinicRemoteDataSourceImpl implements ClinicRemoteDataSource {
-  ClinicRemoteDataSourceImpl();
+  final ApiService apiService;
+  final bool useFakeData;
+
+  ClinicRemoteDataSourceImpl({
+    required this.apiService,
+    this.useFakeData = true, // Set to true to use fake data
+  });
 
   @override
-  Future<ClinicDetailsModel> getClinicDetails(String clinicId) async {
+  Future<ClinicDetailsModel> getClinicDetails(int clinicId) async {
+    if (useFakeData) {
+      // Simulate network delay
+      await Future.delayed(const Duration(seconds: 1));
+
+      // Generate fake clinic details with the provided clinicId
+      return ClinicFakeData.generateClinicDetails(id: clinicId);
+    }
+
+    try {
+      final response = await apiService.get('/clinics/$clinicId');
+
+      if (response.statusCode == 200) {
+        return ClinicDetailsModel.fromJson(response.data);
+      } else {
+        throw ServerException(
+          'Failed to load clinic details',
+        );
+      }
+    } catch (e) {
+      if (e is ServerException) rethrow;
+      throw ServerException(
+        'Failed to fetch clinic details: ${e.toString()}',
+      );
+    }
+  }
+
+  @override
+  Future<List<DoctorModel>> getDoctors(int clinicId) async {
+    if (useFakeData) {
+      // Simulate network delay
+      await Future.delayed(const Duration(milliseconds: 800));
+
+      // Generate fake doctors list
+      return ClinicFakeData.generateDoctorsList(count: 3 + (clinicId % 5));
+    }
+
+    try {
+      final response = await apiService.get('/clinics/$clinicId/doctors');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> doctorsJson = response.data['data'] ?? response.data;
+        return doctorsJson
+            .map((json) => DoctorModel.fromJson(json))
+            .toList();
+      } else {
+        throw ServerException(
+          'Failed to load doctors',
+        );
+      }
+    } catch (e) {
+      if (e is ServerException) rethrow;
+      throw ServerException(
+        'Failed to fetch doctors: ${e.toString()}',
+      );
+    }
+  }
+
+  @override
+  Future<bool> toggleFavorite(int clinicId) async {
+    if (useFakeData) {
+      // Simulate network delay
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Simulate success
+      return true;
+    }
+
+    try {
+      final response = await apiService.post(
+        '/clinics/$clinicId/favorite',
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        throw ServerException(
+          'Failed to toggle favorite',
+        );
+      }
+    } catch (e) {
+      if (e is ServerException) rethrow;
+      throw ServerException(
+        'Failed to toggle favorite: ${e.toString()}',
+      );
+    }
+  }
+
+  @override
+  Future<bool> bookAppointment(BookingParams params) async {
+    if (useFakeData) {
+      // Simulate network delay
+      await Future.delayed(const Duration(seconds: 2));
+
+      // Simulate random success/failure (90% success rate)
+      final random = DateTime.now().millisecondsSinceEpoch % 10;
+      if (random < 9) {
+        return true;
+      } else {
+        throw ServerException(
+          'فشل في حجز الموعد. يرجى المحاولة مرة أخرى.',
+        );
+      }
+    }
+
+    try {
+      final response = await apiService.post(
+        '/clinics/${params.clinicId}/appointments',
+        data: {
+          'doctor_id': params.doctorId,
+          'date': params.date.toIso8601String(),
+          'time_slot': params.timeSlot,
+          'notes': '', // Add notes if needed
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        throw ServerException(
+          'Failed to book appointment',
+        );
+      }
+    } catch (e) {
+      if (e is ServerException) rethrow;
+      throw ServerException(
+        'Failed to book appointment: ${e.toString()}',
+      );
+    }
+  }
+}
+
+// Fake Data Source Implementation (Alternative approach)
+class ClinicFakeDataSource implements ClinicRemoteDataSource {
+  @override
+  Future<ClinicDetailsModel> getClinicDetails(int clinicId) async {
     // Simulate network delay
     await Future.delayed(const Duration(seconds: 1));
 
-    // Return fake data based on clinicId
-    final clinic = ClinicFakeData.generateClinicDetails(id: clinicId);
-
-    return clinic;
+    // Generate fake clinic details
+    return ClinicFakeData.generateClinicDetails(id: clinicId);
   }
 
   @override
-  Future<List<DoctorModel>> getDoctors(String clinicId) async {
-    await Future.delayed(const Duration(milliseconds: 500));
+  Future<List<DoctorModel>> getDoctors(int clinicId) async {
+    // Simulate network delay
+    await Future.delayed(const Duration(milliseconds: 800));
 
     // Generate fake doctors list
-    return ClinicFakeData.generateDoctorsList(count: 5);
+    return ClinicFakeData.generateDoctorsList(count: 3 + (clinicId % 5));
   }
 
   @override
-  Future<bool> toggleFavorite(String clinicId) async {
-    await Future.delayed(const Duration(milliseconds: 300));
+  Future<bool> toggleFavorite(int clinicId) async {
+    // Simulate network delay
+    await Future.delayed(const Duration(milliseconds: 500));
 
-    // Simulate successful toggle
+    // Always return success
     return true;
   }
 
   @override
   Future<bool> bookAppointment(BookingParams params) async {
-    await Future.delayed(const Duration(seconds: 1));
+    // Simulate network delay
+    await Future.delayed(const Duration(seconds: 2));
 
-    // Simulate successful booking
-    return true;
+    // Simulate random success/failure (90% success rate)
+    final random = DateTime.now().millisecondsSinceEpoch % 10;
+    if (random < 9) {
+      return true;
+    } else {
+      throw ServerException(
+        'فشل في حجز الموعد. يرجى المحاولة مرة أخرى.',
+      );
+    }
   }
 }

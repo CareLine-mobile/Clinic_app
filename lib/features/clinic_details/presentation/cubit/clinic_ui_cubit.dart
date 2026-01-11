@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 
 import '../../../clinic_details/domain/entites/clinic_entities.dart';
 
-part 'clinics_state.dart';
+part 'clinic_ui_state.dart';
 
 // lib/features/clinics/presentation/cubit/clinic_ui_cubit.da
 

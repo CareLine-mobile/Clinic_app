@@ -179,7 +179,43 @@ class AppOutlinedButton extends StatelessWidget {
   }
 }
 
+class AppBarButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+  final bool isTransparent;
 
+  const AppBarButton({
+    Key? key,
+    required this.icon,
+    required this.onPressed,
+    this.isTransparent = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.all(8.r),
+      decoration: BoxDecoration(
+        // If transparent, show a blurred or semi-black background to keep icon visible
+        color: isTransparent
+            ? Colors.black.withOpacity(0.3)
+            : Theme.of(context).cardColor,
+        shape: BoxShape.circle,
+        boxShadow: isTransparent
+            ? null
+            : [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+      ),
+      child: IconButton(
+        icon: Icon(
+          icon,
+          color: isTransparent ? Colors.white : Theme.of(context).primaryColor,
+          size: 20.r,
+        ),
+        onPressed: onPressed,
+      ),
+    );
+  }
+}
 
 class SecondryAppButton extends StatelessWidget {
   final String text;
@@ -205,3 +241,4 @@ class SecondryAppButton extends StatelessWidget {
         child: Text(text, style: Theme.of(context).textTheme.bodyMedium));
   }
 }
+

@@ -21,7 +21,7 @@ class ClinicDetailsCubit extends Cubit<ClinicDetailsState> {
   // Current clinic data
   ClinicDetails? _currentClinic;
 
-  Future<void> loadClinicDetails(String clinicId) async {
+  Future<void> loadClinicDetails(int clinicId) async {
     emit(ClinicDetailsLoading());
 
     final result = await getClinicDetailsUseCase(clinicId);
@@ -62,7 +62,7 @@ class ClinicDetailsCubit extends Cubit<ClinicDetailsState> {
   }
 
   Future<void> bookAppointment({
-    required String doctorId,
+    required int doctorId,
     required DateTime date,
     required String timeSlot,
   }) async {
