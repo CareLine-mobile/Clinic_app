@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:clinic_app/core/utils/assets.dart';
 import 'package:clinic_app/core/widgets/CustomIcon.dart';
-import 'package:clinic_app/features/home/presentation/screen/home_screen.dart';
-import 'package:clinic_app/features/home/presentation/screen/medication_tap_screen.dart';
+import 'package:clinic_app/features/home/presentation/view/home_screen.dart';
+import 'package:clinic_app/features/home/presentation/view/medication_tap_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theme/colors.dart';
