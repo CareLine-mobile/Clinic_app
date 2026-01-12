@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theme/colors.dart';
 import '../../../../core/utils/app_size.dart';
+import '../settings/presentation/view/settings_screen.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   const PatientHomeScreen({Key? key}) : super(key: key);
@@ -41,7 +42,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       ),
       const MedicationsTabScreen(),
       const RemindersTabScreen(),
-      const ChatTabScreen(),
+      const SettingsTabScreen(),
       const ProfileTabScreen(),
     ];
   }
@@ -194,35 +195,6 @@ class RemindersTabScreen extends StatelessWidget {
       body: Center(
         child: Text(
           'Reminders Screen',
-          style: textTheme.bodyLarge,
-        ),
-      ),
-    );
-  }
-}
-
-class ChatTabScreen extends StatelessWidget {
-  const ChatTabScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'المساعد',
-          style: textTheme.titleLarge?.copyWith(
-            color: theme.colorScheme.onPrimary,
-          ),
-        ),
-        backgroundColor: ColorsManager.primaryColor,
-        iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
-      ),
-      body: Center(
-        child: Text(
-          'Chat Screen',
           style: textTheme.bodyLarge,
         ),
       ),
