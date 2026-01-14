@@ -12,6 +12,7 @@ abstract class HomeRemoteDataSource {
   Future<List<ClinicModel>> getFeaturedClinics();
   Future<List<ClinicModel>> getNearbyClinics();
   Future<ClinicsResponse> getAllClinics({int page = 1});
+  Future<ClinicsResponse> latestClinics();
   Future<void> toggleFavorite(int clinicId);
 }
 
@@ -69,6 +70,20 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
       throw ApiErrorHandler.handleDioException(e);
     } catch (e) {
       throw ServerException('errors.clinics.toggleFavorite'.tr());
+    }
+  }
+
+  @override
+  Future<ClinicsResponse> latestClinics() async {
+    try {
+      final response = await apiService.get(
+        Endpoints.latestBooking,
+      );
+      return ClinicsResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      throw ApiErrorHandler.handleDioException(e);
+    } catch (e) {
+      throw ServerException('errors.clinics.all'.tr());
     }
   }
 }

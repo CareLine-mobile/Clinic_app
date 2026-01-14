@@ -48,4 +48,12 @@ class HomeRepositoryImpl implements HomeRepository {
       await remoteDataSource.toggleFavorite(clinicId);
     });
   }
+
+  @override
+  Future<Either<Failure, List<ClinicSummary>>> latestClinics() {
+    return ResultHandler.handle(() async {
+      final response = await remoteDataSource.latestClinics();
+      return response.clinics.map((model) => model.toEntity()).toList();
+    });
+  }
 }

@@ -7,6 +7,7 @@ import 'package:clinic_app/core/widgets/CustomIcon.dart';
 import 'package:clinic_app/core/widgets/custom_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../../core/widgets/animated_lottie_icon.dart';
 import '../../../data/model/clinic_model.dart' show ClinicModel;
 import '../../../domain/entities/clinic_summary.dart';
 
@@ -113,21 +114,27 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
           borderRadius: BorderRadius.circular(_hSize.s16),
         ),
         child: IntrinsicHeight(
-          child: Row(
+          child: Stack(
             children: [
-              _buildImage(
-                width: 120.w,
-                height: null,
-                borderRadius: BorderRadius.horizontal(
-                  left: Radius.circular(_hSize.s16),
-                ),
-                showOverlay: true,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.all(_hSize.s14),
-                  child: _buildBasicInfo(showBookButton: true),
-                ),
+              _buildBadges(),
+              Row(
+                children: [
+                  _buildImage(
+                    width: 120.w,
+                    height: null,
+                    borderRadius: BorderRadius.horizontal(
+                      left: Radius.circular(_hSize.s16),
+                    ),
+                    showOverlay: true,
+                    showFavIcon: false
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.all(_hSize.s14),
+                      child: _buildBasicInfo(showBookButton: true),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -535,6 +542,7 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
     required double? height,
     required BorderRadius borderRadius,
     required bool showOverlay,
+    bool showFavIcon = true,
   }) {
     return ClipRRect(
       borderRadius: borderRadius,
@@ -582,14 +590,16 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
                 ),
               ),
 
-            if (showOverlay) _buildBadges(),
+            if (showOverlay) _buildBadges(showFavIcon: showFavIcon),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBadges() {
+  Widget _buildBadges({
+    bool showFavIcon = true,
+  }) {
     final theme = Theme.of(context);
 
     return Stack(
@@ -620,30 +630,18 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
           ),
         ),
 
+        if (showFavIcon)
         // Favorite Badge
-        Positioned(
-          top: _vSize.s10,
-          right: _hSize.s10,
-          child: GestureDetector(
-            onTap: widget.onFavoriteToggle,
-            child: Container(
-              padding: EdgeInsets.all(_hSize.s8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                widget.clinic.isFavorite
-                    ? Icons.favorite
-                    : Icons.favorite_border,
-                color: widget.clinic.isFavorite
-                    ? Colors.red
-                    : Colors.grey[600],
-                size: _tSize.s18,
-              ),
+          Positioned(
+            top: _vSize.s10,
+            right: _hSize.s10,
+            child: AnimatedLottieIcon(
+              assetPath: Assets.favIcon, // Your Lottie animation file
+              size: _tSize.s32,
+              isActive: widget.clinic.isFavorite,
+              onTap: widget.onFavoriteToggle,
             ),
           ),
-        ),
 
         // Rating Badge (for list layout only)
         if (widget.layout == ClinicCardLayout.list)
@@ -725,8 +723,8 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
             SizedBox(height: _vSize.s6),
             Row(
               children: [
-                Icon(
-                  Icons.location_on_outlined,
+                  CustomIcon(
+                 assetPath: Assets.locationIcon,
                   size: _tSize.s14,
                   color: theme.hintColor,
                 ),

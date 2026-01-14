@@ -27,7 +27,7 @@ class HomeCubit extends Cubit<HomeState> {
   Future<void> loadClinics() async {
     emit(HomeLoading());
 
-    final result = await getClinicsUseCase(page: 1);
+    final result = await getClinicsUseCase.call(page: 1);
 
     result.fold(
           (failure) {
@@ -35,6 +35,33 @@ class HomeCubit extends Cubit<HomeState> {
       },
           (clinics) {
         _allClinics = clinics;
+        _nearbyClinics = [];
+        _currentPage = 1;
+        _hasMorePages = true;
+
+        emit(HomeLoaded(
+          featuredClinics: _featuredClinics,
+          nearbyClinics: _nearbyClinics,
+          allClinics: _allClinics,
+          currentPage: _currentPage,
+          hasMorePages: _hasMorePages,
+          isLoadingMore: false,
+        ));
+      },
+    );
+  }
+
+  /// Load initial clinics (page 1)
+  Future<void> latestClinics() async {
+    emit(HomeLoading());
+
+    final result = await getClinicsUseCase.callLatestClinics();
+
+    result.fold(
+          (failure) {
+        emit(HomeError(failure: failure));
+      },
+          (clinics) {
         _featuredClinics = clinics;
         _nearbyClinics = [];
         _currentPage = 1;

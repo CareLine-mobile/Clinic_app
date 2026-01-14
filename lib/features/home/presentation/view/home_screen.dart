@@ -1,6 +1,7 @@
 // lib/features/home/presentation/screens/home_screen.dart
 
 import 'package:clinic_app/core/utils/enums.dart';
+import 'package:clinic_app/core/widgets/Loading_widget.dart';
 import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _scrollController = ScrollController()..addListener(_onScroll);
     // Load clinics when screen initializes
     context.read<HomeCubit>().loadClinics();
+    context.read<HomeCubit>().latestClinics();
   }
 
   @override
@@ -98,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildLoadingState() {
     return const Center(
-      child: CircularProgressIndicator(),
+      child: LoadingSpinner(),
     );
   }
 
@@ -238,8 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Event Handlers
-
+  // todo:: Event Handlers
   void _navigateToClinicDetails(ClinicSummary clinic) {
     Navigator.push(
       context,

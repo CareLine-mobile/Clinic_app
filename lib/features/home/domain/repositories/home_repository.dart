@@ -8,6 +8,8 @@ abstract class HomeRepository {
   /// Get all clinics with pagination
   Future<Either<Failure, List<ClinicSummary>>> getAllClinics({int page = 1});
 
+  Future<Either<Failure, List<ClinicSummary>>> latestClinics();
+
   /// Get featured clinics todo:: (for future use when backend splits data)
   Future<Either<Failure, List<ClinicSummary>>> getFeaturedClinics({int page = 1});
 

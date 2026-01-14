@@ -10,6 +10,7 @@ class Endpoints {
 
   // Clinics
   static const String allClinics = '/clinicals';
+  static const String latestBooking = '/clinicals/latest';
   static const String featuredClinics = '/clinicals';
   static const String nearbyClinics = '/clinicals';
   static const String clinicDetails = '/clinicals'; // + /{id}
