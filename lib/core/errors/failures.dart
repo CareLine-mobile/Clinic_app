@@ -1,49 +1,71 @@
-// lib/core/errors/failures.dart
+import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
 
+/// Base Failure class
 abstract class Failure extends Equatable {
   final String message;
-  const Failure(this.message);
+  final String? code;
+
+  const Failure(this.message, [this.code]);
 
   @override
-  List<Object> get props => [message];
+  List<Object?> get props => [message, code];
+
+  /// Get localized error message key
+  String get errorKey;
+
+  /// Get error type for tracking/analytics
+  String get errorType;
 }
 
 class ServerFailure extends Failure {
-  const ServerFailure(super.message);
-}
+  const ServerFailure(super.message, [super.code]);
 
-class CacheFailure extends Failure {
-  const CacheFailure(super.message);
+  @override
+  String get errorKey => 'errors.server.title'.tr();
+
+  @override
+  String get errorType => 'server_error'.tr();
 }
 
 class NetworkFailure extends Failure {
-  const NetworkFailure(super.message);
+  const NetworkFailure(super.message, [super.code]);
+
+  @override
+  String get errorKey => 'errors.network.title'.tr();
+
+  @override
+  String get errorType => 'network_error'.tr();
 }
 
-class FailureMessageMapper {
-  static String mapFailureToMessage(Failure failure) {
-    if (failure is ServerFailure) {
-      return failure.message;
-    } else if (failure is NetworkFailure) {
-      return failure.message;
-    } else if (failure is CacheFailure) {
-      return failure.message;
-    } else {
-      return 'حدث خطأ غير متوقع';
-    }
-  }
+class CacheFailure extends Failure {
+  const CacheFailure(super.message, [super.code]);
 
-  static String getActionMessage(Failure failure) {
-    if (failure is NetworkFailure) {
-      return 'تحقق من الاتصال بالإنترنت';
-    } else if (failure is ServerFailure) {
-      if (failure.message.contains('401') ||
-          failure.message.contains('مصرح')) {
-        return 'قم بتسجيل الدخول مرة أخرى';
-      }
-      return 'حاول مرة أخرى';
-    }
-    return 'حاول لاحقاً';
-  }
+  @override
+  String get errorKey => 'errors.cache.title'.tr();
+
+  @override
+  String get errorType => 'cache_error'.tr();
 }
+
+class ValidationFailure extends Failure {
+  const ValidationFailure(super.message, [super.code]);
+
+  @override
+  String get errorKey => 'errors.server.invalidData'.tr();
+
+  @override
+  String get errorType => 'validation_error'.tr();
+}
+
+class UnauthorizedFailure extends Failure {
+  const UnauthorizedFailure(super.message, [super.code]);
+
+  @override
+  String get errorKey => 'errors.auth.title'.tr();
+
+  @override
+  String get errorType => 'unauthorized_error'.tr();
+}
+
+

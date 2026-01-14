@@ -1,18 +1,29 @@
-// ============================================
-// lib/core/errors/exceptions.dart
-class ServerException implements Exception {
+abstract class AppException implements Exception {
   final String message;
-  ServerException(this.message);
+  final String? code;
+
+  AppException(this.message, [this.code]);
+
+  @override
+  String toString() => message;
 }
 
-class CacheException implements Exception {
-  final String message;
-  CacheException(this.message);
+class ServerException extends AppException {
+  ServerException(super.message, [super.code]);
 }
 
-class NetworkException implements Exception {
-  final String message;
-  NetworkException(this.message);
+class NetworkException extends AppException {
+  NetworkException(super.message, [super.code]);
 }
 
+class CacheException extends AppException {
+  CacheException(super.message, [super.code]);
+}
 
+class ValidationException extends AppException {
+  ValidationException(super.message, [super.code]);
+}
+
+class UnauthorizedException extends AppException {
+  UnauthorizedException(super.message, [super.code]);
+}

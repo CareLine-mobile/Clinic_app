@@ -1,10 +1,12 @@
 // lib/features/home/presentation/screens/home_screen.dart
 
 import 'package:clinic_app/core/utils/enums.dart';
+import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/app_size.dart';
 import '../../../../core/theme/colors.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../../clinic_details/presentation/view/clinic_details_screen.dart';
 import '../../domain/entities/clinic_summary.dart';
 import '../cubit/home_cubit.dart';
@@ -71,7 +73,10 @@ class _HomeScreenState extends State<HomeScreen> {
           }
 
           if (state is HomeError) {
-            return _buildErrorState(state.message);
+            return ErrorStateWidget(
+              failure: state.failure,
+              onRetry: () => context.read<HomeCubit>().loadClinics(),
+            );
           }
 
           if (state is HomeLoaded) {
@@ -87,44 +92,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void _handleStateChanges(BuildContext context, HomeState state) {
     // Handle any state changes that need UI feedback
     if (state is HomeError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(state.message),
-          backgroundColor: Colors.red,
-        ),
-      );
+      CustomSnackBar.show(context, message: state.failure.message,type: SnackBarType.error);
     }
   }
 
   Widget _buildLoadingState() {
     return const Center(
       child: CircularProgressIndicator(),
-    );
-  }
-
-  Widget _buildErrorState(String message) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 64,
-            color: Colors.red,
-          ),
-          SizedBox(height: SizeApp.s16),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          SizedBox(height: SizeApp.s24),
-          ElevatedButton(
-            onPressed: () => context.read<HomeCubit>().loadClinics(),
-            child: const Text('إعادة المحاولة'),
-          ),
-        ],
-      ),
     );
   }
 

@@ -5,9 +5,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../features/user_data/user_model.dart';
 import '../utils/app_constans.dart';
 
-
-
-
 class SharedPrefHelper {
   static const FlutterSecureStorage storage = FlutterSecureStorage(
     aOptions: AndroidOptions(
@@ -60,7 +57,7 @@ class SharedPrefHelper {
   }
   static Future<UserModel?> getUserData() async {
     try {
-      final jsonString = await storage.read(key: AppConst.userKey);
+      final jsonString = await storage.read(key: AppConstants.userKey);
       if (jsonString != null && jsonString.isNotEmpty) {
         return UserModel.fromJson(jsonDecode(jsonString));
       }

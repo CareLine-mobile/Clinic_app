@@ -1,0 +1,60 @@
+{
+  "errors": {
+    "network": {
+      "title": "No Internet Connection",
+      "subtitle": "Check your internet connection and try again",
+      "action": "Retry",
+      "timeout": "Connection timeout",
+      "cancelled": "Request cancelled",
+      "connection": "Network connection error",
+      "certificate": "Security certificate error",
+      "serverConnection": "Failed to connect to server",
+      "noResponse": "No response from server"
+    },
+    "server": {
+      "title": "Server Error",
+      "subtitle": "We apologize for this error. Please try again later",
+      "action": "Try Again",
+      "badRequest": "Invalid request",
+      "unauthorized": "Session expired",
+      "forbidden": "You are not authorized for this action",
+      "notFound": "Requested data not found",
+      "invalidData": "Invalid data",
+      "internal": "Server error",
+      "unexpected": "Unexpected error occurred"
+    },
+    "auth": {
+      "title": "Session Expired",
+      "subtitle": "Please login again to continue",
+      "action": "Login"
+    },
+    "cache": {
+      "title": "Local Data Error",
+      "subtitle": "An error occurred while accessing saved data",
+      "action": "Retry"
+    },
+    "validation": {
+      "title": "Validation Error",
+      "subtitle": "Please check your input and try again",
+      "action": "OK"
+    },
+    "unknown": {
+      "title": "Unexpected Error",
+      "subtitle": "We apologize for this error. Try again",
+      "action": "Try Again"
+    },
+    "clinics": {
+      "featured": "Failed to load featured clinics",
+      "nearby": "Failed to load nearby clinics",
+      "all": "Failed to load clinics list",
+      "toggleFavorite": "Failed to update favorites"
+    }
+  },
+  "common": {
+    "retry": "Retry",
+    "tryAgain": "Try Again",
+    "cancel": "Cancel",
+    "ok": "OK",
+    "login": "Login"
+  }
+}

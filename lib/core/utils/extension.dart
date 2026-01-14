@@ -1,5 +1,9 @@
 // lib/core/utils/date_extensions.dart
+import 'package:clinic_app/core/widgets/error_state_widget.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+
+import '../errors/failures.dart';
 
 /// Arabic plural rules (simplified for UI)
 String _arPlural(int n, String one, String two, String few, String many) {
@@ -136,24 +140,50 @@ extension MedicationFrequencyExtension on String {
   }
 }
 
-/// Medication Filter Types
-enum MedicationFilter {
-  all('all', 'الكل', Icons.grid_view_rounded),
-  daily('daily', 'يومي', Icons.calendar_today),
-  alternateDays('alternate_days', 'أيام متبادلة', Icons.event_repeat),
-  weekly('weekly', 'أسبوعي', Icons.calendar_month),
-  asNeeded('as_needed', 'عند الحاجة', Icons.notifications_active);
-
-  final String value;
-  final String label;
-  final IconData icon;
-
-  const MedicationFilter(this.value, this.label, this.icon);
-
-  static MedicationFilter fromValue(String value) {
-    return MedicationFilter.values.firstWhere(
-          (e) => e.value == value,
-      orElse: () => MedicationFilter.all,
+extension FailureExtensions on Failure {
+  /// Convert failure to error widget
+  Widget toErrorWidget({
+    required VoidCallback onRetry,
+    bool showAppBar = false,
+  }) {
+    return ErrorStateWidget(
+      failure: this,
+      onRetry: onRetry,
+      showAppBar: showAppBar,
     );
+  }
+
+  /// Get localized title
+  String getTitle() {
+    return errorKey.tr();
+  }
+
+  /// Get localized message
+  String getMessage() {
+    return message;
+  }
+
+  /// Get error icon
+  IconData getIcon() {
+    if (this is NetworkFailure) {
+      return Icons.wifi_off;
+    } else if (this is UnauthorizedFailure) {
+      return Icons.lock_outline;
+    } else if (this is CacheFailure) {
+      return Icons.storage;
+    } else {
+      return Icons.error_outline;
+    }
+  }
+
+  /// Get error color
+  Color getColor() {
+    if (this is NetworkFailure) {
+      return Colors.orange;
+    } else if (this is UnauthorizedFailure) {
+      return Colors.red;
+    } else {
+      return Colors.grey;
+    }
   }
 }

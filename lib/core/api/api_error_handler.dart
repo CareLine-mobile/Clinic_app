@@ -1,42 +1,18 @@
+
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
+
+import '../errors/exceptions.dart';
 import '../utils/app_constans.dart';
-import 'exceptions.dart';
-import 'failures.dart';
 
-
-class ErrorHandler {
-  /// Convert exceptions to failures
-  static Failure handleException(Object error, [StackTrace? stackTrace]) {
-    // Log error for debugging/analytics
-    _logError(error, stackTrace);
-
-    if (error is ServerException) {
-      return ServerFailure(error.message, error.code);
-    } else if (error is NetworkException) {
-      return NetworkFailure(error.message, error.code);
-    } else if (error is CacheException) {
-      return CacheFailure(error.message, error.code);
-    } else if (error is ValidationException) {
-      return ValidationFailure(error.message, error.code);
-    } else if (error is UnauthorizedException) {
-      return UnauthorizedFailure(error.message, error.code);
-    } else if (error is DioException) {
-      return _handleDioError(error);
-    } else {
-      return ServerFailure(
-        'errors.server.unexpected'.tr(),
-        'UNKNOWN_ERROR',
-      );
-    }
-  }
-
-  static Failure _handleDioError(DioException error) {
+/// Handles API-specific errors and converts them to exceptions
+class ApiErrorHandler {
+  static Exception handleDioException(DioException error) {
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return NetworkFailure(
+        return NetworkException(
           'errors.network.timeout'.tr(),
           ErrorMessages.connectionTimeout,
         );
@@ -45,34 +21,34 @@ class ErrorHandler {
         return _handleResponseError(error.response);
 
       case DioExceptionType.cancel:
-        return NetworkFailure(
+        return NetworkException(
           'errors.network.cancelled'.tr(),
-          ErrorMessages.nearbyClinicsError,
+          ErrorMessages.requestCancelled,
         );
 
       case DioExceptionType.connectionError:
-        return NetworkFailure(
+        return NetworkException(
           'errors.network.connection'.tr(),
           ErrorMessages.networkError,
         );
 
       case DioExceptionType.badCertificate:
-        return NetworkFailure(
+        return NetworkException(
           'errors.network.certificate'.tr(),
           'CERTIFICATE_ERROR',
         );
 
       case DioExceptionType.unknown:
-      return NetworkFailure(
+      return NetworkException(
           'errors.network.serverConnection'.tr(),
           'CONNECTION_ERROR',
         );
     }
   }
 
-  static Failure _handleResponseError(Response? response) {
+  static Exception _handleResponseError(Response? response) {
     if (response == null) {
-      return ServerFailure(
+      return ServerException(
         'errors.network.noResponse'.tr(),
         'NO_RESPONSE',
       );
@@ -83,31 +59,31 @@ class ErrorHandler {
 
     switch (statusCode) {
       case 400:
-        return ServerFailure(
+        return ServerException(
           message.isNotEmpty ? message : 'errors.server.badRequest'.tr(),
           ErrorMessages.badRequest,
         );
 
       case 401:
-        return UnauthorizedFailure(
+        return UnauthorizedException(
           message.isNotEmpty ? message : 'errors.server.unauthorized'.tr(),
           ErrorMessages.unauthorized,
         );
 
       case 403:
-        return ServerFailure(
+        return ServerException(
           message.isNotEmpty ? message : 'errors.server.forbidden'.tr(),
           ErrorMessages.forbidden,
         );
 
       case 404:
-        return ServerFailure(
+        return ServerException(
           message.isNotEmpty ? message : 'errors.server.notFound'.tr(),
           ErrorMessages.notFound,
         );
 
       case 422:
-        return ValidationFailure(
+        return ValidationException(
           message.isNotEmpty ? message : 'errors.server.invalidData'.tr(),
           ErrorMessages.unexpectedError,
         );
@@ -115,13 +91,13 @@ class ErrorHandler {
       case 500:
       case 502:
       case 503:
-        return ServerFailure(
+        return ServerException(
           'errors.server.internal'.tr(),
           ErrorMessages.serverError,
         );
 
       default:
-        return ServerFailure(
+        return ServerException(
           message.isNotEmpty ? message : 'errors.server.unexpected'.tr(),
           'HTTP_$statusCode',
         );
@@ -132,7 +108,6 @@ class ErrorHandler {
     if (data == null) return '';
 
     if (data is Map<String, dynamic>) {
-      // Try different API error response formats
       if (data.containsKey('message')) {
         return data['message'].toString();
       }
@@ -164,12 +139,4 @@ class ErrorHandler {
 
     return '';
   }
-
-  static void _logError(Object error, StackTrace? stackTrace) {
-    // TODO: Implement logging (Firebase Crashlytics, Sentry, etc.)
-    // print('Error: $error');
-    // if (stackTrace != null) print('StackTrace: $stackTrace');
-  }
 }
-
-

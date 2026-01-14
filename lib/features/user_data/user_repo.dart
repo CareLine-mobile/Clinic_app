@@ -38,7 +38,7 @@ class UserRepository {
 
 
     
-    SharedPrefHelper.saveJson(key: AppConst.userKey, value: user.toJson());
+    SharedPrefHelper.saveJson(key: AppConstants.userKey, value: user.toJson());
   }
 
   /// Clear user (logout)
@@ -47,7 +47,7 @@ class UserRepository {
     _controller.add(null);
 
 
-    SharedPrefHelper.delete(key: AppConst.userKey);
+    SharedPrefHelper.delete(key: AppConstants.userKey);
   }
 
   void dispose() {

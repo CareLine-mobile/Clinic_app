@@ -1,4 +1,5 @@
 import 'package:clinic_app/features/home/presentation/cubit/home_cubit.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -16,7 +17,18 @@ void main() async {
  await AppInitializer.init();
 
 
-  runApp(const MyApp());
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [
+        Locale('ar'),
+        Locale('en'),
+      ],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      startLocale: const Locale('en'),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -47,6 +59,9 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             navigatorKey: AppRouter.navigatorKey,
             theme: AppTheme.light,
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
             initialRoute: Routes.dashBoard,
             onGenerateRoute: AppRouter.onGenerateRoute,
           );

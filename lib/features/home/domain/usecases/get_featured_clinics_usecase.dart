@@ -11,7 +11,7 @@ class GetFeaturedClinicsUseCase {
   GetFeaturedClinicsUseCase(this.repository);
 
   Future<Either<Failure, List<ClinicSummary>>> call({int page = 1}) async {
-    return await repository.getFeaturedClinics(page: page);
+    return await repository.getFeaturedClinics();
   }
 }
 

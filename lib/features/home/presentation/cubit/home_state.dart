@@ -1,4 +1,3 @@
-// ==================== home_state.dart ====================
 part of 'home_cubit.dart';
 
 @immutable
@@ -20,9 +19,9 @@ class HomeLoaded extends HomeState {
     required this.featuredClinics,
     required this.nearbyClinics,
     required this.allClinics,
-    this.currentPage = 1,
-    this.hasMorePages = true,
-    this.isLoadingMore = false,
+    required this.currentPage,
+    required this.hasMorePages,
+    required this.isLoadingMore,
   });
 
   HomeLoaded copyWith({
@@ -45,11 +44,7 @@ class HomeLoaded extends HomeState {
 }
 
 class HomeError extends HomeState {
-  final String message;
-  final String actionMessage;
+  final Failure failure;
 
-  HomeError({
-    required this.message,
-    required this.actionMessage,
-  });
+  HomeError({required this.failure});
 }

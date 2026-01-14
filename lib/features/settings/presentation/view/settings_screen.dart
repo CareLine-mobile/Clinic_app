@@ -1,7 +1,6 @@
 // lib/features/settings/presentation/screens/settings_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theme/colors.dart';
 import '../../../../core/utils/app_size.dart';
 import '../widgets/settings_header.dart';
@@ -25,7 +24,7 @@ class SettingsTabScreen extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           // Header with Profile Card
-          SettingsHeader(
+           SettingsHeader(
             userName: 'أحمد محمد',
             userEmail: 'ahmed@example.com',
             userPhotoUrl: null,

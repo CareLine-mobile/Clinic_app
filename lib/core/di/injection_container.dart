@@ -11,7 +11,6 @@ import '../../features/clinic_details/domain/repositories/clinic_repository.dart
 import '../../features/clinic_details/domain/usecases/book_appointment_usecase.dart';
 import '../../features/clinic_details/domain/usecases/get_clinic_details_usecase.dart';
 import '../../features/clinic_details/domain/usecases/toggle_favorite_usecase.dart' as clinic_details;
-import '../../features/clinic_details/domain/usecases/toggle_favorite_usecase.dart';
 import '../../features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
 import '../../features/clinic_details/presentation/cubit/clinic_ui_cubit.dart';
 
