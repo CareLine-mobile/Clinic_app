@@ -19,6 +19,7 @@ import '../../features/home/data/datasources/remotedatasource/remote_data_source
 import '../../features/home/data/repositories/home_repository_impl.dart';
 import '../../features/home/domain/repositories/home_repository.dart';
 import '../../features/home/domain/usecases/get_clinics_usecase.dart';
+import '../../features/home/domain/usecases/get_latest_clinics_usecase.dart';
 import '../../features/home/presentation/cubit/home_cubit.dart';
 import '../../features/home/presentation/cubit/home_ui_cubit.dart';
 
@@ -65,10 +66,14 @@ Future<void> init() async {
   sl.registerLazySingleton<GetClinicsUseCase>(
         () => GetClinicsUseCase(sl()),
   );
+  sl.registerLazySingleton<GetLatestClinicsUseCase>(
+        () => GetLatestClinicsUseCase(sl()),
+  );
 
   // Cubits (Factory - new instance each time)
   sl.registerFactory<HomeCubit>(
         () => HomeCubit(
+      getLatestClinicsUseCase: sl(),
       getClinicsUseCase: sl(),
       toggleFavoriteUseCase: sl(),
     ),

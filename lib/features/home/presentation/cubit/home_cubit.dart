@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:clinic_app/features/home/domain/usecases/get_latest_clinics_usecase.dart';
 import 'package:meta/meta.dart';
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/clinic_summary.dart';
@@ -9,11 +10,14 @@ part 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
   final GetClinicsUseCase getClinicsUseCase;
+  final GetLatestClinicsUseCase getLatestClinicsUseCase;
   final ToggleFavoriteUseCase toggleFavoriteUseCase;
 
-  HomeCubit({
-    required this.getClinicsUseCase,
-    required this.toggleFavoriteUseCase,
+  HomeCubit(
+    {
+      required this.getClinicsUseCase,
+      required this.getLatestClinicsUseCase,
+      required this.toggleFavoriteUseCase,
   }) : super(HomeInitial());
 
   List<ClinicSummary> _allClinics = [];
@@ -55,7 +59,7 @@ class HomeCubit extends Cubit<HomeState> {
   Future<void> latestClinics() async {
     emit(HomeLoading());
 
-    final result = await getClinicsUseCase.callLatestClinics();
+    final result = await getLatestClinicsUseCase.call();
 
     result.fold(
           (failure) {
@@ -103,13 +107,9 @@ class HomeCubit extends Cubit<HomeState> {
             _hasMorePages = false;
           } else {
             _allClinics.addAll(newClinics);
-            _featuredClinics.addAll(newClinics);
           }
-
           _isLoadingMore = false;
-
           emit(currentState.copyWith(
-            featuredClinics: List.from(_featuredClinics),
             allClinics: List.from(_allClinics),
             currentPage: _currentPage,
             hasMorePages: _hasMorePages,
@@ -189,5 +189,6 @@ class HomeCubit extends Cubit<HomeState> {
     _featuredClinics.clear();
     _nearbyClinics.clear();
     await loadClinics();
+    await latestClinics();
   }
 }

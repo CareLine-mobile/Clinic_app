@@ -12,8 +12,4 @@ class GetClinicsUseCase {
   Future<Either<Failure, List<ClinicSummary>>> call({int page = 1}) async {
     return await repository.getAllClinics(page: page);
   }
-
-  Future<Either<Failure, List<ClinicSummary>>> callLatestClinics() async {
-    return await repository.latestClinics();
-  }
 }
