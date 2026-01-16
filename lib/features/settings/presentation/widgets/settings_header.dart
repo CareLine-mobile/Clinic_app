@@ -28,7 +28,7 @@ class SettingsHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverAppBar(
       backgroundColor: ColorsManager.primaryColor,
-      expandedHeight: 220.h,
+      expandedHeight: SizeApp.expandedHeight,
       pinned: true,
       automaticallyImplyLeading: false,
       flexibleSpace: LayoutBuilder(

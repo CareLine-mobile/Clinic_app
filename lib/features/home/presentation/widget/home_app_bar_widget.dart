@@ -39,7 +39,7 @@ class HomeHeaderWidget extends StatelessWidget {
       collapsedHeight: SizeApp.collapsedHeight,
       floating: false,
       pinned: true,
-      stretch: true,
+      stretch: false,
       automaticallyImplyLeading: false,
       flexibleSpace: LayoutBuilder(
         builder: (context, constraints) {

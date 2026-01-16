@@ -56,7 +56,7 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   /// Load initial clinics (page 1)
-  Future<void> latestClinics() async {
+  Future<void> loadLatestClinics() async {
     emit(HomeLoading());
 
     final result = await getLatestClinicsUseCase.call();
@@ -189,6 +189,6 @@ class HomeCubit extends Cubit<HomeState> {
     _featuredClinics.clear();
     _nearbyClinics.clear();
     await loadClinics();
-    await latestClinics();
+    await loadLatestClinics();
   }
 }

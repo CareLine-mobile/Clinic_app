@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _scrollController = ScrollController()..addListener(_onScroll);
     context.read<HomeCubit>().loadClinics();
-    context.read<HomeCubit>().latestClinics();
+    context.read<HomeCubit>().loadLatestClinics();
   }
 
   @override
