@@ -1,11 +1,12 @@
 // ==================== clinic_info_tab_widget.dart ====================
+import 'package:clinic_app/features/clinic_details/domain/entites/contact_info_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../../../core/utils/app_size.dart';
 import '../../../../../core/utils/assets.dart';
 import '../../../../../core/widgets/CustomIcon.dart';
-import '../../../domain/entites/clinic_entities.dart' show ContactInfo;
+
 
 
 import 'package:clinic_app/features/clinic_details/domain/entites/clinic_entities.dart';
@@ -15,7 +16,7 @@ class ClinicInfoTabWidget extends StatelessWidget {
   final String location;
   final String fullAddress;
   final String openingHours;
-  final ContactInfo contactInfo;
+  final ContactInfoEntity contactInfo;
   final Color accentColor;
 
   const ClinicInfoTabWidget({

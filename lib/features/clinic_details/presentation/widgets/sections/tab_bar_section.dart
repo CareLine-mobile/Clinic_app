@@ -7,7 +7,7 @@ import '../tab_bar_delegate.dart';
 
 
 class TabBarSection extends StatelessWidget {
-  final ClinicDetails clinic;
+  final ClinicEntity clinic;
   final TabController tabController;
 
   const TabBarSection({

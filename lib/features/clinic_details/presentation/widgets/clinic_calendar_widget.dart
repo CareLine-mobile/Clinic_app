@@ -1,12 +1,12 @@
 // lib/features/clinics/presentation/widgets/details/
 
 // ==================== clinic_calendar_widget.dart ====================
+import 'package:clinic_app/features/clinic_details/domain/entites/doctor_entity.dart';
+import 'package:clinic_app/features/clinic_details/domain/entites/review_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/utils/app_size.dart';
 import 'package:intl/intl.dart';
-import '../../data/model/clinic_details_model.dart';
-import '../../domain/entites/clinic_entities.dart';
 
 
 
@@ -150,11 +150,12 @@ class _ClinicCalendarWidgetState extends State<ClinicCalendarWidget> {
 
 // ==================== doctor_list_widget.dart ====================
 
+// lib/features/clinics/presentation/widgets/details/doctor_list_widget.dart
 class DoctorListWidget extends StatelessWidget {
-  final List<Doctor> doctors;
+  final List<DoctorEntity> doctors;
   final DateTime selectedDate;
-  final Doctor? selectedDoctor;
-  final Function(Doctor) onDoctorSelected;
+  final DoctorEntity? selectedDoctor;
+  final Function(DoctorEntity) onDoctorSelected;
   final Color accentColor;
 
   const DoctorListWidget({
@@ -166,13 +167,26 @@ class DoctorListWidget extends StatelessWidget {
     required this.accentColor,
   }) : super(key: key);
 
-  List<Doctor> _getAvailableDoctors() {
-    // Filter doctors who have available slots for selected date
+  String _getDayName(DateTime date) {
+    const days = [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ];
+    return days[date.weekday - 1];
+  }
+
+  List<DoctorEntity> _getAvailableDoctors() {
+    final dayName = _getDayName(selectedDate);
+
     return doctors.where((doctor) {
+      // Check if doctor has any available slots for the selected day
       return doctor.availableSlots.any((slot) =>
-      slot.dateTime.day == selectedDate.day &&
-          slot.dateTime.month == selectedDate.month &&
-          slot.dateTime.year == selectedDate.year &&
+      slot.day.toLowerCase() == dayName.toLowerCase() &&
           slot.isAvailable);
     }).toList();
   }
@@ -235,10 +249,10 @@ class DoctorListWidget extends StatelessWidget {
     );
   }
 }
-
 // ==================== doctor_card.dart ====================
+// lib/features/clinics/presentation/widgets/details/doctor_card.dart
 class DoctorCard extends StatelessWidget {
-  final Doctor doctor;
+  final DoctorEntity doctor;
   final DateTime selectedDate;
   final bool isSelected;
   final VoidCallback onTap;
@@ -253,14 +267,26 @@ class DoctorCard extends StatelessWidget {
     required this.accentColor,
   }) : super(key: key);
 
+  String _getDayName(DateTime date) {
+    const days = [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ];
+    return days[date.weekday - 1];
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Filter logic
+    // Get slots for selected date
+    final dayName = _getDayName(selectedDate);
     final availableSlots = doctor.availableSlots
         .where((slot) =>
-    slot.dateTime.day == selectedDate.day &&
-        slot.dateTime.month == selectedDate.month &&
-        slot.dateTime.year == selectedDate.year &&
+    slot.day.toLowerCase() == dayName.toLowerCase() &&
         slot.isAvailable)
         .toList();
 
@@ -317,7 +343,7 @@ class DoctorCard extends StatelessWidget {
                       Text(
                         doctor.name,
                         maxLines: 1,
-                        overflow: TextOverflow.ellipsis, // Prevents overflow
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.bold,
@@ -339,7 +365,8 @@ class DoctorCard extends StatelessWidget {
                       // Rating & Experience Row
                       Row(
                         children: [
-                          Icon(Icons.star_rounded, size: 16.sp, color: Colors.amber),
+                          Icon(Icons.star_rounded,
+                              size: 16.sp, color: Colors.amber),
                           SizedBox(width: 4.w),
                           Text(
                             doctor.rating.toStringAsFixed(1),
@@ -350,11 +377,13 @@ class DoctorCard extends StatelessWidget {
                             ),
                           ),
                           SizedBox(width: 12.w),
-                          Icon(Icons.work_outline, size: 14.sp, color: Colors.grey.shade400),
+                          Icon(Icons.work_outline,
+                              size: 14.sp, color: Colors.grey.shade400),
                           SizedBox(width: 4.w),
                           Text(
                             '${doctor.experienceYears} سنة',
-                            style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade600),
+                            style: TextStyle(
+                                fontSize: 12.sp, color: Colors.grey.shade600),
                           ),
                         ],
                       ),
@@ -391,20 +420,21 @@ class DoctorCard extends StatelessWidget {
             SizedBox(height: 12.h),
 
             if (availableSlots.isNotEmpty)
-            // Horizontal Scroll View - Solves vertical overflow completely
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: availableSlots.map((slot) {
                     return Container(
-                      margin: EdgeInsets.only(left: 8.w), // Arabic RTL spacing
-                      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+                      margin: EdgeInsets.only(left: 8.w),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 14.w, vertical: 8.h),
                       decoration: BoxDecoration(
                         color: isSelected ? accentColor : Colors.grey.shade50,
                         borderRadius: BorderRadius.circular(8.r),
                         border: Border.all(
-                            color: isSelected ? accentColor : Colors.grey.shade200
-                        ),
+                            color: isSelected
+                                ? accentColor
+                                : Colors.grey.shade200),
                       ),
                       child: Text(
                         slot.timeSlot,
@@ -421,11 +451,13 @@ class DoctorCard extends StatelessWidget {
             else
               Row(
                 children: [
-                  Icon(Icons.info_outline, size: 16.sp, color: Colors.grey.shade400),
+                  Icon(Icons.info_outline,
+                      size: 16.sp, color: Colors.grey.shade400),
                   SizedBox(width: 6.w),
                   Text(
                     'لا توجد مواعيد متاحة اليوم',
-                    style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade500),
+                    style: TextStyle(
+                        fontSize: 12.sp, color: Colors.grey.shade500),
                   ),
                 ],
               ),
@@ -438,7 +470,7 @@ class DoctorCard extends StatelessWidget {
 
 // ==================== review_card.dart ====================
 class ReviewCard extends StatelessWidget {
-  final ReviewModel review;
+  final ReviewEntity review;
 
   const ReviewCard({
     Key? key,

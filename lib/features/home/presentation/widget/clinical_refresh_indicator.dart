@@ -203,7 +203,7 @@ class _DrawingECGPainter extends CustomPainter {
 
     final baseline = size.height / 2;
 
-    // الرسم من اليسار لليمين كأنه بيترسم
+    // draw from left to right
     final drawWidth = size.width * progress;
 
     // الخط الخارجي (glow)
@@ -214,7 +214,7 @@ class _DrawingECGPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 15);
 
-    // الخط الأساسي
+    // mainPaint
     final mainPaint = Paint()
       ..color = isArmed ? Colors.white : ColorsManager.primaryColor
       ..style = PaintingStyle.stroke

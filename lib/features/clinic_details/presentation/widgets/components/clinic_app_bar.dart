@@ -1,13 +1,12 @@
 // ==================== components/clinic_app_bar.dart ====================
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../../core/utils/app_size.dart';
 import '../../../../../core/widgets/app_buton.dart';
 import '../../../domain/entites/clinic_entities.dart';
 
 
 class ClinicAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final ClinicDetails clinic;
+  final ClinicEntity clinic;
   final bool isTransparent;
   final bool isFavorite; // أضف هذا
   final VoidCallback onFavoriteToggle; // أضف هذا

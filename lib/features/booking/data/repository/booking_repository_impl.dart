@@ -14,7 +14,7 @@ class BookingRepositoryImpl implements BookingRepository {
   }
 
   @override
-  Future<List<TimeSlotEntity>> getTimeSlots(DateTime date) {
+  Future<List<TimeSlotBookingEntity>> getTimeSlots(DateTime date) {
     // In a real app, we'd fetch based on date. Here just return dummy list.
     return dataSource.getTimeSlots();
   }

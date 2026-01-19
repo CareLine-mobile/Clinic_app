@@ -1,11 +1,12 @@
 // ==================== components/price_section.dart ====================
+import 'package:clinic_app/features/clinic_details/domain/entites/doctor_entity.dart';
 import 'package:flutter/material.dart';
 
 import '../../../domain/entites/clinic_entities.dart';
 
 
 class PriceSection extends StatelessWidget {
-  final Doctor doctor;
+  final DoctorEntity doctor;
   final Color accentColor;
 
   const PriceSection({

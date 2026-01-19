@@ -8,7 +8,7 @@ import '../taps/services_tab.dart';
 
 
 class TabBarViewSection extends StatelessWidget {
-  final ClinicDetails clinic;
+  final ClinicEntity clinic;
   final TabController tabController;
 
   const TabBarViewSection({

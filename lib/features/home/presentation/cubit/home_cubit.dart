@@ -145,7 +145,7 @@ class HomeCubit extends Cubit<HomeState> {
     ));
 
     // Call API
-    final result = await toggleFavoriteUseCase(clinicId);
+    final result = await toggleFavoriteUseCase(clinicId.toString());
 
     result.fold(
           (failure) {

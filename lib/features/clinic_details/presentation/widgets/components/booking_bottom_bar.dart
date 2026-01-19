@@ -1,4 +1,5 @@
 // ==================== components/booking_bottom_bar.dart ====================
+import 'package:clinic_app/features/clinic_details/domain/entites/doctor_entity.dart';
 import 'package:clinic_app/features/clinic_details/presentation/widgets/components/price_section.dart';
 import 'package:flutter/material.dart';
 import '../../../../../core/utils/app_size.dart';
@@ -6,8 +7,8 @@ import '../../../domain/entites/clinic_entities.dart';
 import 'book_button.dart';
 
 class BookingBottomBar extends StatelessWidget {
-  final ClinicDetails clinic;
-  final Doctor doctor;
+  final ClinicEntity clinic;
+  final DoctorEntity doctor;
 
   const BookingBottomBar({
     Key? key,

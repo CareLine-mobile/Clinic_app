@@ -7,7 +7,7 @@ import '../../widgets/clinic_calendar_widget.dart';
 import '../../../../../core/utils/app_size.dart';
 
 class BookingTab extends StatelessWidget {
-  final ClinicDetails clinic;
+  final ClinicEntity clinic;
 
   const BookingTab({
     Key? key,

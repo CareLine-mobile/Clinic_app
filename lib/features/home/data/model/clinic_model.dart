@@ -2,8 +2,8 @@
 
 import '../../domain/entities/clinic_summary.dart';
 
-class ClinicModel extends ClinicSummary {
-  const ClinicModel({
+class ClinicsHomeModel extends ClinicSummary {
+  const ClinicsHomeModel({
     required super.id,
     required super.name,
     required super.imageUrls,
@@ -17,8 +17,8 @@ class ClinicModel extends ClinicSummary {
   });
 
   // From JSON - matches API response exactly
-  factory ClinicModel.fromJson(Map<String, dynamic> json) {
-    return ClinicModel(
+  factory ClinicsHomeModel.fromJson(Map<String, dynamic> json) {
+    return ClinicsHomeModel(
       id: json['id'] as int,
       name: json['name'] as String? ?? '',
       imageUrls: (json['image_urls'] as List<dynamic>?)
@@ -53,7 +53,7 @@ class ClinicModel extends ClinicSummary {
 
   // Copy With
   @override
-  ClinicModel copyWith({
+  ClinicsHomeModel copyWith({
     int? id,
     String? name,
     List<String>? imageUrls,
@@ -65,7 +65,7 @@ class ClinicModel extends ClinicSummary {
     int? doctorsCount,
     bool? isFavorite,
   }) {
-    return ClinicModel(
+    return ClinicsHomeModel(
       id: id ?? this.id,
       name: name ?? this.name,
       imageUrls: imageUrls ?? this.imageUrls,
@@ -96,8 +96,8 @@ class ClinicModel extends ClinicSummary {
   }
 
   // From Entity
-  factory ClinicModel.fromEntity(ClinicSummary entity) {
-    return ClinicModel(
+  factory ClinicsHomeModel.fromEntity(ClinicSummary entity) {
+    return ClinicsHomeModel(
       id: entity.id,
       name: entity.name,
       imageUrls: entity.imageUrls,

@@ -7,7 +7,7 @@ import '../../cubit/clinic_details_cubit.dart';
 import '../../widgets/clinic_image_gallery_widget.dart';
 
 class ImageGallerySection extends StatelessWidget {
-  final ClinicDetails clinic;
+  final ClinicEntity clinic;
 
   const ImageGallerySection({
     Key? key,
@@ -22,7 +22,7 @@ class ImageGallerySection extends StatelessWidget {
         child: ClinicImageGalleryWidget(
           imageUrls: clinic.imageUrls,
           isOpen: clinic.isOpen,
-          isFavorite: clinic.isFavorite,
+          isFavorite: clinic.isOpen,
           onFavoriteToggle: () {
             context.read<ClinicDetailsCubit>().toggleFavorite();
           },

@@ -12,7 +12,7 @@ import '../widgets/sections/tab_bar_view_section.dart';
 
 
 class ContentView extends StatelessWidget {
-  final ClinicDetails clinic;
+  final ClinicEntity clinic;
   final ScrollController scrollController;
   final TabController tabController;
 
@@ -32,7 +32,7 @@ class ContentView extends StatelessWidget {
           appBar: ClinicAppBar(
             clinic: clinic,
             isTransparent: uiState.isAppBarTransparent,
-            isFavorite: clinic.isFavorite,
+            isFavorite: clinic.isOpen,
             onFavoriteToggle: () {
 
             },

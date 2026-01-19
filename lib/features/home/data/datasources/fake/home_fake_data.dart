@@ -56,10 +56,10 @@ class HomeFakeData {
   ];
 
   /// Generate a single clinic
-  static ClinicModel generateClinic({int? id}) {
+  static ClinicsHomeModel generateClinic({int? id}) {
     final clinicId = id ?? _random.nextInt(10000);
 
-    return ClinicModel(
+    return ClinicsHomeModel(
       id: clinicId,
       name: _clinicNames[_random.nextInt(_clinicNames.length)],
       imageUrls: _generateImageUrls(),
@@ -74,7 +74,7 @@ class HomeFakeData {
   }
 
   /// Generate list of clinics
-  static List<ClinicModel> generateClinicsList({int count = 10}) {
+  static List<ClinicsHomeModel> generateClinicsList({int count = 10}) {
     return List.generate(
       count,
           (index) => generateClinic(id: index + 1),
@@ -82,9 +82,9 @@ class HomeFakeData {
   }
 
   /// Generate featured clinics - matches your API data
-  static List<ClinicModel> generateFeaturedClinics() {
+  static List<ClinicsHomeModel> generateFeaturedClinics() {
     return [
-      const ClinicModel(
+      const ClinicsHomeModel(
         id: 2,
         name: 'مركز القلب الطبي',
         imageUrls: [
@@ -99,7 +99,7 @@ class HomeFakeData {
         doctorsCount: 3,
         isFavorite: false,
       ),
-      const ClinicModel(
+      const ClinicsHomeModel(
         id: 3,
         name: 'عيادة الجلدية المتخصصة',
         imageUrls: [
@@ -114,7 +114,7 @@ class HomeFakeData {
         doctorsCount: 3,
         isFavorite: false,
       ),
-      const ClinicModel(
+      const ClinicsHomeModel(
         id: 4,
         name: 'مستشفى الأطفال التخصصي',
         imageUrls: [
@@ -133,9 +133,9 @@ class HomeFakeData {
   }
 
   /// Generate nearby clinics
-  static List<ClinicModel> generateNearbyClinics() {
+  static List<ClinicsHomeModel> generateNearbyClinics() {
     return [
-      const ClinicModel(
+      const ClinicsHomeModel(
         id: 5,
         name: 'عيادة العيون المتخصصة',
         imageUrls: [
@@ -149,7 +149,7 @@ class HomeFakeData {
         doctorsCount: 4,
         isFavorite: false,
       ),
-      const ClinicModel(
+      const ClinicsHomeModel(
         id: 6,
         name: 'مركز الطب النفسي',
         imageUrls: [
@@ -163,7 +163,7 @@ class HomeFakeData {
         doctorsCount: 3,
         isFavorite: true,
       ),
-      const ClinicModel(
+      const ClinicsHomeModel(
         id: 7,
         name: 'عيادة الأطفال الحديثة',
         imageUrls: [
@@ -177,7 +177,7 @@ class HomeFakeData {
         doctorsCount: 7,
         isFavorite: false,
       ),
-      const ClinicModel(
+      const ClinicsHomeModel(
         id: 8,
         name: 'عيادة الدكتور أحمد محمود',
         imageUrls: [

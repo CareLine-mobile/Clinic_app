@@ -8,7 +8,6 @@ import '../../features/clinic_details/data/datasources/clinic_local_data_source.
 import '../../features/clinic_details/data/datasources/clinic_remote_data_source.dart';
 import '../../features/clinic_details/data/repositories/clinic_repository_impl.dart';
 import '../../features/clinic_details/domain/repositories/clinic_repository.dart';
-import '../../features/clinic_details/domain/usecases/book_appointment_usecase.dart';
 import '../../features/clinic_details/domain/usecases/get_clinic_details_usecase.dart';
 import '../../features/clinic_details/domain/usecases/toggle_favorite_usecase.dart' as clinic_details;
 import '../../features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
@@ -117,16 +116,12 @@ Future<void> init() async {
         () => clinic_details.ToggleFavoriteUseCase(sl()),
   );
 
-  sl.registerLazySingleton<BookAppointmentUseCase>(
-        () => BookAppointmentUseCase(sl()),
-  );
 
   // Cubits (Factory - new instance each time)
   sl.registerFactory<ClinicDetailsCubit>(
         () => ClinicDetailsCubit(
       getClinicDetailsUseCase: sl(),
       toggleFavoriteUseCase: sl(),
-      bookAppointmentUseCase: sl(),
     ),
   );
 

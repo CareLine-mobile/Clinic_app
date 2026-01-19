@@ -9,7 +9,7 @@ class BookingLoading extends BookingState {}
 
 class BookingLoaded extends BookingState {
   final List<BookingDateEntity> dates;
-  final List<TimeSlotEntity> timeSlots;
+  final List<TimeSlotBookingEntity> timeSlots;
   final DateTime selectedDate;
   final String? selectedTime;
   final int currentStep;
@@ -28,7 +28,7 @@ class BookingLoaded extends BookingState {
 
   BookingLoaded copyWith({
     List<BookingDateEntity>? dates,
-    List<TimeSlotEntity>? timeSlots,
+    List<TimeSlotBookingEntity>? timeSlots,
     DateTime? selectedDate,
     String? selectedTime,
     int? currentStep,

@@ -8,7 +8,7 @@ import 'package:clinic_app/core/widgets/custom_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/widgets/animated_lottie_icon.dart';
-import '../../../data/model/clinic_model.dart' show ClinicModel;
+import '../../../data/model/clinic_model.dart' show ClinicsHomeModel;
 import '../../../domain/entities/clinic_summary.dart';
 
 

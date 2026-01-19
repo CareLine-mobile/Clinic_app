@@ -269,12 +269,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _toggleFavorite(ClinicSummary clinic) {
     context.read<HomeCubit>().toggleFavorite(clinic.id);
-
-    CustomSnackBar.show(
-      context,
-      message: clinic.isFavorite ? 'تم الإزالة من المفضلة' : 'تم الإضافة للمفضلة',
-      type: SnackBarType.success,
-    );
   }
 
   void _bookAppointment(ClinicSummary clinic) {

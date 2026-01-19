@@ -7,7 +7,7 @@ final class ClinicsInitial extends ClinicsState {}
 
 class ClinicUiState {
   final DateTime selectedDate;
-  final Doctor? selectedDoctor;
+  final DoctorEntity? selectedDoctor;
   final int selectedTabIndex;
   final bool isAppBarTransparent;
 
@@ -20,7 +20,7 @@ class ClinicUiState {
 
   ClinicUiState copyWith({
     DateTime? selectedDate,
-    Doctor? selectedDoctor,
+    DoctorEntity? selectedDoctor,
     bool clearDoctor = false,
     int? selectedTabIndex,
     bool? isAppBarTransparent,

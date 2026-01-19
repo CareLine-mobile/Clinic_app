@@ -13,21 +13,21 @@ class BookingMockDataSource {
     });
   }
 
-  Future<List<TimeSlotEntity>> getTimeSlots() async {
+  Future<List<TimeSlotBookingEntity>> getTimeSlots() async {
     // Dummy time slots matching the image
     return [
-      TimeSlotEntity(time: "9:00 AM", isAvailable: true),
-      TimeSlotEntity(time: "9:30 AM", isAvailable: true),
-      TimeSlotEntity(time: "10:00 AM", isAvailable: false), // Greyed out in image? Maybe.
-      TimeSlotEntity(time: "10:30 AM", isAvailable: true),
-      TimeSlotEntity(time: "11:00 AM", isAvailable: true, isSelected: true), // Example selected
-      TimeSlotEntity(time: "11:30 AM", isAvailable: false),
-      TimeSlotEntity(time: "2:00 PM", isAvailable: true),
-      TimeSlotEntity(time: "2:30 PM", isAvailable: true),
-      TimeSlotEntity(time: "3:00 PM", isAvailable: true),
-      TimeSlotEntity(time: "3:30 PM", isAvailable: false),
-      TimeSlotEntity(time: "4:00 PM", isAvailable: true),
-      TimeSlotEntity(time: "4:30 PM", isAvailable: true),
+      TimeSlotBookingEntity(time: "9:00 AM", isAvailable: true),
+      TimeSlotBookingEntity(time: "9:30 AM", isAvailable: true),
+      TimeSlotBookingEntity(time: "10:00 AM", isAvailable: false), // Greyed out in image? Maybe.
+      TimeSlotBookingEntity(time: "10:30 AM", isAvailable: true),
+      TimeSlotBookingEntity(time: "11:00 AM", isAvailable: true, isSelected: true), // Example selected
+      TimeSlotBookingEntity(time: "11:30 AM", isAvailable: false),
+      TimeSlotBookingEntity(time: "2:00 PM", isAvailable: true),
+      TimeSlotBookingEntity(time: "2:30 PM", isAvailable: true),
+      TimeSlotBookingEntity(time: "3:00 PM", isAvailable: true),
+      TimeSlotBookingEntity(time: "3:30 PM", isAvailable: false),
+      TimeSlotBookingEntity(time: "4:00 PM", isAvailable: true),
+      TimeSlotBookingEntity(time: "4:30 PM", isAvailable: true),
     ];
   }
 }

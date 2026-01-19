@@ -9,7 +9,7 @@ class ToggleFavoriteUseCase {
 
   ToggleFavoriteUseCase(this.repository);
 
-  Future<Either<Failure, bool>> call(int clinicId) async {
+  Future<Either<Failure, bool>> call(String clinicId) async {
     return await repository.toggleFavorite(clinicId);
   }
 }

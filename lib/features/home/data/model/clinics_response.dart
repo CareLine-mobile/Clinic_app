@@ -3,7 +3,7 @@
 import 'clinic_model.dart';
 
 class ClinicsResponse {
-  final List<ClinicModel> clinics;
+  final List<ClinicsHomeModel> clinics;
   final bool hasMorePage;
   final int currentPage;
 
@@ -16,7 +16,7 @@ class ClinicsResponse {
   factory ClinicsResponse.fromJson(Map<String, dynamic> json) {
     return ClinicsResponse(
       clinics: (json['data'] as List<dynamic>?)
-          ?.map((e) => ClinicModel.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => ClinicsHomeModel.fromJson(e as Map<String, dynamic>))
           .toList() ??
           [],
       hasMorePage: json['hasMorePage'] as bool? ?? false,
@@ -33,7 +33,7 @@ class ClinicsResponse {
   }
 
   ClinicsResponse copyWith({
-    List<ClinicModel>? clinics,
+    List<ClinicsHomeModel>? clinics,
     bool? hasMorePage,
     int? currentPage,
   }) {

@@ -187,3 +187,36 @@ extension FailureExtensions on Failure {
     }
   }
 }
+
+extension DateTimeDayExtension on DateTime {
+  /// Convert DateTime to day name (lowercase)
+  /// Example: Sunday -> 'sunday'
+  String get dayName {
+    const days = [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ];
+    return days[weekday - 1];
+  }
+
+  /// Convert DateTime to Arabic day name (lowercase)
+  /// Example: Sunday -> 'الأحد'
+  String get arabicDayName {
+    const arabicDays = [
+      'الاثنين',
+      'الثلاثاء',
+      'الأربعاء',
+      'الخميس',
+      'الجمعة',
+      'السبت',
+      'الأحد',
+    ];
+    return arabicDays[weekday - 1];
+  }
+}
+

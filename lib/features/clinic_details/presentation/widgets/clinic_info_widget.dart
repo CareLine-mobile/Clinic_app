@@ -1,9 +1,9 @@
 // lib/features/clinics/presentation/widgets/clinic_info_widget.dart
 
+import 'package:clinic_app/features/clinic_details/domain/entites/contact_info_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/utils/app_size.dart';
-import '../../data/model/clinic_details_model.dart';
 import '../../domain/entites/clinic_entities.dart';
 
 class ClinicInfoWidget extends StatelessWidget {
@@ -13,7 +13,7 @@ class ClinicInfoWidget extends StatelessWidget {
   final String fullAddress;
   final String openingHours;
   final Color accentColor;
-  final ContactInfo contactInfo;
+  final ContactInfoEntity contactInfo;
 
   const ClinicInfoWidget({
     Key? key,

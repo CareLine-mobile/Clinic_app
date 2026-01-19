@@ -4,7 +4,7 @@ import '../../../domain/entites/clinic_entities.dart';
 import '../../widgets/clinic_statistics_widget.dart';
 
 class StatisticsSection extends StatelessWidget {
-  final ClinicDetails clinic;
+  final ClinicEntity clinic;
 
   const StatisticsSection({
     Key? key,

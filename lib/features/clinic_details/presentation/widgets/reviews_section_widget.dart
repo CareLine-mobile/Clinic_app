@@ -1,14 +1,14 @@
 // lib/features/clinics/presentation/widgets/reviews_section_widget.dart
 
+import 'package:clinic_app/features/clinic_details/domain/entites/review_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/utils/app_size.dart';
-import '../../data/model/clinic_details_model.dart';
 import '../../domain/entites/clinic_entities.dart';
 
 class ReviewsSectionWidget extends StatelessWidget {
-  final List<Review> reviews;
+  final List<ReviewEntity> reviews;
   final double averageRating;
   final int totalReviews;
 
@@ -173,7 +173,7 @@ class ReviewsSectionWidget extends StatelessWidget {
 }
 
 class _ReviewCard extends StatelessWidget {
-  final Review review;
+  final ReviewEntity review;
 
   const _ReviewCard({required this.review});
 

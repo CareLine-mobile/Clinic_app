@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:clinic_app/features/clinic_details/domain/entites/doctor_entity.dart';
 import 'package:meta/meta.dart';
 
 import '../../../clinic_details/domain/entites/clinic_entities.dart';
@@ -20,7 +21,7 @@ class ClinicUiCubit extends Cubit<ClinicUiState> {
     ));
   }
 
-  void selectDoctor(Doctor? doctor) {
+  void selectDoctor(DoctorEntity? doctor) {
     emit(state.copyWith(selectedDoctor: doctor));
   }
 

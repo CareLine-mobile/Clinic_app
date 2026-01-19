@@ -1,8 +1,15 @@
 // lib/features/clinics/data/datasources/fake/clinic_fake_data.dart
 
+import 'package:clinic_app/features/clinic_details/data/model/time_slot_model.dart';
+import 'package:clinic_app/features/clinic_details/domain/entites/social_media_entity.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
-import '../../model/clinic_details_model.dart';
+
+import '../../model/clinic_model.dart';
+import '../../model/clinic_statistics_model.dart';
+import '../../model/contact_info_model.dart';
+import '../../model/doctor_model.dart';
+import '../../model/review_model.dart';
 
 
 /// Fake Data Factory for Testing
@@ -104,15 +111,15 @@ class ClinicFakeData {
   ];
 
   // Generate single clinic details
-  static ClinicDetailsModel generateClinicDetails({
+  static ClinicModel generateClinicDetails({
     int? id,
     Color? accentColor,
   }) {
     final clinicId = id ?? _random.nextInt(1000);
     final specialty = _specialties[_random.nextInt(_specialties.length)];
 
-    return ClinicDetailsModel(
-      id: clinicId,
+    return ClinicModel(
+      id: clinicId.toString(),
       name: _clinicNames[_random.nextInt(_clinicNames.length)],
       specialty: specialty,
       description: _generateDescription(specialty),
@@ -124,8 +131,6 @@ class ClinicFakeData {
       rating: 3.5 + _random.nextDouble() * 1.5,
       reviewsCount: 50 + _random.nextInt(200),
       price: 200.0 + _random.nextInt(300).toDouble(),
-      accentColor: accentColor ?? _generateRandomColor(),
-      isFavorite: _random.nextBool(),
       isOpen: _random.nextBool(),
       openingHours: _generateOpeningHours(),
       services: _generateServices(),
@@ -139,7 +144,7 @@ class ClinicFakeData {
   }
 
   // Generate list of clinic details
-  static List<ClinicDetailsModel> generateClinicDetailsList({
+  static List<ClinicModel> generateClinicDetailsList({
     int count = 10,
   }) {
     return List.generate(
@@ -154,7 +159,7 @@ class ClinicFakeData {
     final specialty = _specialties[_random.nextInt(_specialties.length)];
 
     return DoctorModel(
-      id: doctorId,
+      id: doctorId.toString(),
       name: _doctorNames[_random.nextInt(_doctorNames.length)],
       specialty: 'استشاري $specialty',
       imageUrl: 'https://i.pravatar.cc/150?img=${_random.nextInt(70)}',
@@ -178,11 +183,11 @@ class ClinicFakeData {
   }
 
   // Generate Availability Slots
-  static List<DoctorAvailabilitySlotModel> generateAvailabilitySlots({
+  static List<TimeSlotModel> generateAvailabilitySlots({
     int daysAhead = 7,
     int slotsPerDay = 8,
   }) {
-    final List<DoctorAvailabilitySlotModel> slots = [];
+    final List<TimeSlotModel> slots = [];
     final now = DateTime.now();
 
     for (int day = 0; day < daysAhead; day++) {
@@ -195,12 +200,15 @@ class ClinicFakeData {
         final bookedCount = _random.nextInt(maxBookings + 2);
 
         slots.add(
-          DoctorAvailabilitySlotModel(
-            dateTime: slotTime,
+          TimeSlotModel(
+            day: slotTime.toString(),
             timeSlot: _formatTimeSlot(hour),
-            isAvailable: bookedCount < maxBookings,
             bookedCount: bookedCount,
             maxBookings: maxBookings,
+            id: 2,
+            timeFrom: '',
+            timeTo: '',
+            isBooked: false,
           ),
         );
       }
@@ -246,7 +254,6 @@ class ClinicFakeData {
       totalBookings: 500 + _random.nextInt(2000),
       totalDoctors: 3 + _random.nextInt(10),
       satisfactionRate: 85 + _random.nextInt(15),
-      monthlyVisits: monthlyVisits,
     );
   }
 
@@ -256,11 +263,8 @@ class ClinicFakeData {
       phone: '+20 ${_random.nextInt(10)}${_random.nextInt(10)} ${_random.nextInt(1000)} ${_random.nextInt(10000)}',
       email: 'info@clinic${_random.nextInt(100)}.com',
       website: 'www.clinic${_random.nextInt(100)}.com',
-      socialMedia: {
-        'facebook': 'https://facebook.com/clinic${_random.nextInt(100)}',
-        'twitter': 'https://twitter.com/clinic${_random.nextInt(100)}',
-        'instagram': 'https://instagram.com/clinic${_random.nextInt(100)}',
-      },
+      socialMedia:
+      const SocialMediaEntity(facebook: 'https://facebook.com/clinic', instagram: 'https://facebook.com/clinic'),
     );
   }
 
@@ -346,21 +350,21 @@ class ClinicFakeData {
 
   // Quick Presets
 
-  static ClinicDetailsModel dental() {
+  static ClinicModel dental() {
     return generateClinicDetails(
       id: _random.nextInt(400),
       accentColor: const Color(0xFF6C63FF),
     );
   }
 
-  static ClinicDetailsModel cardiology() {
+  static ClinicModel cardiology() {
     return generateClinicDetails(
       id: _random.nextInt(400),
       accentColor: const Color(0xFFFF6B6B),
     );
   }
 
-  static ClinicDetailsModel pediatrics() {
+  static ClinicModel pediatrics() {
     return generateClinicDetails(
       id: _random.nextInt(400),
       accentColor: const Color(0xFF4ECDC4),

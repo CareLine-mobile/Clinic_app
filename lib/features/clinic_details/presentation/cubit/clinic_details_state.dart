@@ -8,24 +8,21 @@ final class ClinicDetailsInitial extends ClinicDetailsState {}
 class ClinicDetailsLoading extends ClinicDetailsState {}
 
 class ClinicDetailsLoaded extends ClinicDetailsState {
-  final ClinicDetails clinic;
-  final bool isFavorite;
+  final ClinicEntity clinic;
 
    ClinicDetailsLoaded({
     required this.clinic,
-    required this.isFavorite,
+
   });
 
-  @override
-  List<Object?> get props => [clinic, isFavorite];
+  List<Object?> get props => [clinic];
 
   ClinicDetailsLoaded copyWith({
-    ClinicDetails? clinic,
+    ClinicEntity? clinic,
     bool? isFavorite,
   }) {
     return ClinicDetailsLoaded(
       clinic: clinic ?? this.clinic,
-      isFavorite: isFavorite ?? this.isFavorite,
     );
   }
 }

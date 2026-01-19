@@ -9,8 +9,8 @@ import 'package:easy_localization/easy_localization.dart';
 
 
 abstract class HomeRemoteDataSource {
-  Future<List<ClinicModel>> getFeaturedClinics();
-  Future<List<ClinicModel>> getNearbyClinics();
+  Future<List<ClinicsHomeModel>> getFeaturedClinics();
+  Future<List<ClinicsHomeModel>> getNearbyClinics();
   Future<ClinicsResponse> getAllClinics({int page = 1});
   Future<ClinicsResponse> latestClinics();
   Future<void> toggleFavorite(int clinicId);
@@ -22,7 +22,7 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
   HomeRemoteDataSourceImpl({required this.apiService});
 
   @override
-  Future<List<ClinicModel>> getFeaturedClinics() async {
+  Future<List<ClinicsHomeModel>> getFeaturedClinics() async {
     try {
       final response = await apiService.get(Endpoints.allClinics);
       final clinicsResponse = ClinicsResponse.fromJson(response.data);
@@ -35,7 +35,7 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
   }
 
   @override
-  Future<List<ClinicModel>> getNearbyClinics() async {
+  Future<List<ClinicsHomeModel>> getNearbyClinics() async {
     try {
       final response = await apiService.get(Endpoints.nearbyClinics);
       final clinicsResponse = ClinicsResponse.fromJson(response.data);

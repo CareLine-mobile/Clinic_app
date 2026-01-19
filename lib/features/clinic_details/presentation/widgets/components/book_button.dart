@@ -1,5 +1,6 @@
 // ==================== components/book_button.dart ====================
 import 'package:clinic_app/core/widgets/confirmation_dialog.dart';
+import 'package:clinic_app/features/clinic_details/domain/entites/doctor_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,7 +11,7 @@ import '../../../../../core/utils/app_size.dart';
 
 
 class BookButton extends StatelessWidget {
-  final Doctor doctor;
+  final DoctorEntity doctor;
   final Color accentColor;
 
   const BookButton({
@@ -66,12 +67,8 @@ class BookButton extends StatelessWidget {
     AppDialog.warning(
       context: context,
       onConfirm: () {
-        context.read<ClinicDetailsCubit>().bookAppointment(
-          doctorId: doctor.id,
-          date: uiState.selectedDate,
-          timeSlot: '10:00 ص',
-        );
-      }, message: '',
+
+    }, message: '',
     );
   }
 }

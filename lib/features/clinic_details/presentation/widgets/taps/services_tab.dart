@@ -4,7 +4,7 @@ import '../../../domain/entites/clinic_entities.dart';
 import '../../widgets/clinic_services_widget.dart';
 
 class ServicesTab extends StatelessWidget {
-  final ClinicDetails clinic;
+  final ClinicEntity clinic;
 
   const ServicesTab({
     Key? key,

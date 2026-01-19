@@ -1,10 +1,10 @@
 import 'package:clinic_app/core/utils/app_size.dart';
+import 'package:clinic_app/features/clinic_details/domain/entites/clinic_statistics_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../domain/entites/clinic_entities.dart';
 
 class ClinicStatisticsWidget extends StatelessWidget {
-  final ClinicStatistics statistics;
+  final ClinicStatisticsEntity statistics;
   final Color accentColor;
 
   const ClinicStatisticsWidget({

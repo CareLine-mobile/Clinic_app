@@ -33,7 +33,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
   static const double _appBarTransitionOffset = 180.0;
 
   // Keep track of the last loaded clinic
-  ClinicDetails? _lastLoadedClinic;
+  ClinicEntity? _lastLoadedClinic;
 
   @override
   void initState() {
@@ -108,7 +108,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
     };
   }
 
-  Widget _buildLoadedContent(ClinicDetails clinic) {
+  Widget _buildLoadedContent(ClinicEntity clinic) {
     // Cache the last loaded clinic
     _lastLoadedClinic = clinic;
 

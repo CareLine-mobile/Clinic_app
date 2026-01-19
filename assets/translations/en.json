@@ -47,7 +47,11 @@
       "featured": "Failed to load featured clinics",
       "nearby": "Failed to load nearby clinics",
       "all": "Failed to load clinics list",
-      "toggleFavorite": "Failed to update favorites"
+      "details": "Failed to load clinic details",
+      "doctors": "Failed to load doctors list",
+      "toggleFavorite": "Failed to toggle favorite",
+      "booking": "Failed to book appointment",
+      "bookingFailed": "Booking failed. Please try again"
     }
   },
   "common": {
