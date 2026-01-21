@@ -41,9 +41,9 @@ class ApiErrorHandler {
       case DioExceptionType.unknown:
       return NetworkException(
           'errors.network.serverConnection'.tr(),
-          'CONNECTION_ERROR',
+          'CONNECTION_ERROR'.tr(),
         );
-    }
+      }
   }
 
   static Exception _handleResponseError(Response? response) {
@@ -135,7 +135,7 @@ class ApiErrorHandler {
       }
     }
 
-    if (data is String) return data;
+    if (data is String) return 'errors.server.subtitle'.tr();
 
     return '';
   }

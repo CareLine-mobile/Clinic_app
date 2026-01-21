@@ -1,3 +1,4 @@
+import 'package:clinic_app/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import '../errors/failure_message_mapper.dart';
 import '../errors/failures.dart';
@@ -58,8 +59,9 @@ class ErrorStateWidget extends StatelessWidget {
               SizedBox(height: sizeV.s12),
               Text(
                 subtitle,
+                maxLines: 2,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[600],
+                  color: ColorsManager.miscellaneous,
                 ),
                 textAlign: TextAlign.center,
               ),
