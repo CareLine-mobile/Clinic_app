@@ -33,16 +33,6 @@ class HomeRepositoryImpl implements HomeRepository {
   }
 
   @override
-  Future<Either<Failure, List<ClinicSummary>>> getNearbyClinics({
-    int page = 1,
-  }) async {
-    return ResultHandler.handle(() async {
-      final clinics = await remoteDataSource.getNearbyClinics();
-      return clinics.map((model) => model.toEntity()).toList();
-    });
-  }
-
-  @override
   Future<Either<Failure, Unit>> toggleFavorite(int clinicId) async {
     return ResultHandler.handleVoid(() async {
       await remoteDataSource.toggleFavorite(clinicId);
@@ -56,4 +46,16 @@ class HomeRepositoryImpl implements HomeRepository {
       return response.clinics.map((model) => model.toEntity()).toList();
     });
   }
+
+  @override
+  Future<Either<Failure, List<ClinicSummary>>> nearbyClinics({
+    required double latitude,
+    required double longitude,
+  }) {
+    return ResultHandler.handle(() async {
+      final response = await remoteDataSource.nearByClinics(latitude: latitude, longitude: longitude);
+      return response.clinics.map((model) => model.toEntity()).toList();
+    });
+  }
+
 }

@@ -10,11 +10,16 @@ abstract class HomeRepository {
 
   Future<Either<Failure, List<ClinicSummary>>> latestClinics();
 
+
   /// Get featured clinics todo:: (for future use when backend splits data)
   Future<Either<Failure, List<ClinicSummary>>> getFeaturedClinics({int page = 1});
 
-  /// Get nearby clinics todo:: (for future use when backend adds this)
-  Future<Either<Failure, List<ClinicSummary>>> getNearbyClinics({int page = 1});
+  /// Get nearby clinics
+  Future<Either<Failure, List<ClinicSummary>>> nearbyClinics({
+    required double latitude,
+    required double longitude,
+  });
+
 
   /// todo:: Toggle favorite status
   Future<Either<Failure, Unit>> toggleFavorite(int clinicId);

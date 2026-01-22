@@ -81,8 +81,9 @@ dependencies:
   # Charts (للـ adherence tracking)
   fl_chart: ^0.66.0
 
-  # Google
+  # Maps
   google_maps_flutter:
+  geolocator: ^12.0.0
 
   # Image Picker
   image_picker: ^1.0.7

@@ -1,4 +1,5 @@
 import 'package:clinic_app/core/api/api_service.dart';
+import 'package:clinic_app/features/home/domain/usecases/get_nearby_clinics_usecase.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,11 +15,16 @@ import '../../features/clinic_details/presentation/cubit/clinic_details_cubit.da
 import '../../features/clinic_details/presentation/cubit/clinic_ui_cubit.dart';
 
 // Features - Home
+import '../../features/home/data/datasources/localdatasource/location_data_source.dart';
+import '../../features/home/data/datasources/localdatasource/location_data_source_impl.dart';
 import '../../features/home/data/datasources/remotedatasource/remote_data_source.dart';
 import '../../features/home/data/repositories/home_repository_impl.dart';
+import '../../features/home/data/repositories/location_repository_impl.dart';
 import '../../features/home/domain/repositories/home_repository.dart';
+import '../../features/home/domain/repositories/location_repository.dart';
 import '../../features/home/domain/usecases/get_clinics_usecase.dart';
 import '../../features/home/domain/usecases/get_latest_clinics_usecase.dart';
+import '../../features/home/domain/usecases/location/get_current_location_usecase.dart';
 import '../../features/home/presentation/cubit/home_cubit.dart';
 import '../../features/home/presentation/cubit/home_ui_cubit.dart';
 
@@ -41,6 +47,20 @@ Future<void> init() async {
   // ApiService (will configure Dio internally)
   sl.registerLazySingleton<ApiService>(
         () => ApiService(sl()),
+  );
+
+  sl.registerLazySingleton<LocationDataSource>(
+        () => LocationDataSourceImpl(),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<LocationRepository>(
+        () => LocationRepositoryImpl(dataSource: sl()),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(
+        () => GetCurrentLocationUseCase(sl()),
   );
 
   // ==========================
@@ -68,12 +88,16 @@ Future<void> init() async {
   sl.registerLazySingleton<GetLatestClinicsUseCase>(
         () => GetLatestClinicsUseCase(sl()),
   );
+  sl.registerLazySingleton<GetNearByClinicsUseCase>(
+        () => GetNearByClinicsUseCase(getCurrentLocationUseCase: sl(),repository: sl()),
+  );
 
   // Cubits (Factory - new instance each time)
   sl.registerFactory<HomeCubit>(
         () => HomeCubit(
       getLatestClinicsUseCase: sl(),
       getClinicsUseCase: sl(),
+      getNearByClinicsUseCase: sl(),
       toggleFavoriteUseCase: sl(),
     ),
   );

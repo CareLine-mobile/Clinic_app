@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:clinic_app/features/home/domain/usecases/get_latest_clinics_usecase.dart';
+import 'package:clinic_app/features/home/domain/usecases/get_nearby_clinics_usecase.dart';
 import 'package:meta/meta.dart';
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/clinic_summary.dart';
@@ -11,12 +12,14 @@ part 'home_state.dart';
 class HomeCubit extends Cubit<HomeState> {
   final GetClinicsUseCase getClinicsUseCase;
   final GetLatestClinicsUseCase getLatestClinicsUseCase;
+  final GetNearByClinicsUseCase getNearByClinicsUseCase;
   final ToggleFavoriteUseCase toggleFavoriteUseCase;
 
   HomeCubit(
     {
       required this.getClinicsUseCase,
       required this.getLatestClinicsUseCase,
+      required this.getNearByClinicsUseCase,
       required this.toggleFavoriteUseCase,
   }) : super(HomeInitial());
 
@@ -39,7 +42,6 @@ class HomeCubit extends Cubit<HomeState> {
       },
           (clinics) {
         _allClinics = clinics;
-        _nearbyClinics = [];
         _currentPage = 1;
         _hasMorePages = true;
 
@@ -67,7 +69,33 @@ class HomeCubit extends Cubit<HomeState> {
       },
           (clinics) {
         _featuredClinics = clinics;
-        _nearbyClinics = [];
+        _currentPage = 1;
+        _hasMorePages = true;
+
+        emit(HomeLoaded(
+          featuredClinics: _featuredClinics,
+          nearbyClinics: _nearbyClinics,
+          allClinics: _allClinics,
+          currentPage: _currentPage,
+          hasMorePages: _hasMorePages,
+          isLoadingMore: false,
+        ));
+      },
+    );
+  }
+
+  /// Load nearbyClinics (page 1)
+  Future<void> loadNearByClinics() async {
+    emit(HomeLoading());
+
+    final result = await getNearByClinicsUseCase.call();
+
+    result.fold(
+          (failure) {
+        emit(HomeError(failure: failure));
+      },
+          (clinics) {
+        _nearbyClinics = clinics;
         _currentPage = 1;
         _hasMorePages = true;
 
@@ -189,6 +217,7 @@ class HomeCubit extends Cubit<HomeState> {
     _featuredClinics.clear();
     _nearbyClinics.clear();
     await loadClinics();
+    await loadNearByClinics();
     await loadLatestClinics();
   }
 }
