@@ -53,6 +53,9 @@ class _FeaturedClinicsSectionState extends State<FeaturedClinicsSection> {
 
   @override
   Widget build(BuildContext context) {
+    // تحديد اتجاه اللغة
+    final isRTL = Directionality.of(context) == TextDirection.rtl;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -66,32 +69,36 @@ class _FeaturedClinicsSectionState extends State<FeaturedClinicsSection> {
         SizedBox(height: 16.h),
         SizedBox(
           height: 420.h,
-          child: PageView.builder(
-            controller: _controller,
-            physics: const BouncingScrollPhysics(),
-            itemCount: widget.clinics.length,
-            itemBuilder: (context, index) {
-              final clinic = widget.clinics[index];
-              final double diff = (currentPage - index).abs();
-              final double parallax = (currentPage - index) * 80.w;
-              final double scale = 1.0 - (diff * 0.035).clamp(0.0, 0.15);
-              final double opacity = (1.0 - (diff * 0.15)).clamp(0.5, 1.0);
+          child: Directionality(
+            textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
+            child: PageView.builder(
+              controller: _controller,
+              physics: const BouncingScrollPhysics(),
+              itemCount: widget.clinics.length,
+              itemBuilder: (context, index) {
+                final clinic = widget.clinics[index];
+                final double diff = (currentPage - index).abs();
+                // عكس اتجاه الـ parallax في RTL
+                final double parallax = (currentPage - index) * 80.w * (isRTL ? -1 : 1);
+                final double scale = 1.0 - (diff * 0.035).clamp(0.0, 0.15);
+                final double opacity = (1.0 - (diff * 0.15)).clamp(0.5, 1.0);
 
-              return Transform.scale(
-                scale: scale,
-                child: Opacity(
-                  opacity: opacity,
-                  child: ClinicCard(
-                    clinic: clinic,
-                    layout: ClinicCardLayout.featured,
-                    horizontalParallaxOffset: parallax,
-                    onTap: () => widget.onTap(clinic),
-                    onFavoriteToggle: () => widget.onFavorite?.call(clinic),
-                    onBookNow: () => widget.onBook?.call(clinic),
+                return Transform.scale(
+                  scale: scale,
+                  child: Opacity(
+                    opacity: opacity,
+                    child: ClinicCard(
+                      clinic: clinic,
+                      layout: ClinicCardLayout.featured,
+                      horizontalParallaxOffset: parallax,
+                      onTap: () => widget.onTap(clinic),
+                      onFavoriteToggle: () => widget.onFavorite?.call(clinic),
+                      onBookNow: () => widget.onBook?.call(clinic),
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
         SizedBox(height: 20.h),
@@ -148,6 +155,9 @@ class _HorizontalClinicsCarouselState extends State<HorizontalClinicsCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    // تحديد اتجاه اللغة
+    final isRTL = Directionality.of(context) == TextDirection.rtl;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -156,38 +166,42 @@ class _HorizontalClinicsCarouselState extends State<HorizontalClinicsCarousel> {
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: Text(
               widget.title!,
-              style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
         if (widget.title != null) SizedBox(height: 16.h),
         SizedBox(
-          height: 280.h, // أصغر لأن الكارد compact
-          child: PageView.builder(
-            controller: _controller,
-            physics: const BouncingScrollPhysics(),
-            itemCount: widget.clinics.length,
-            itemBuilder: (context, index) {
-              final clinic = widget.clinics[index];
-              final double diff = (currentPage - index).abs();
-              final double parallax = (currentPage - index) * 60.w;
-              final double scale = 1.0 - (diff * 0.03).clamp(0.0, 0.12);
-              final double opacity = (1.0 - (diff * 0.12)).clamp(0.6, 1.0);
+          height: 280.h,
+          child: Directionality(
+            textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
+            child: PageView.builder(
+              controller: _controller,
+              physics: const BouncingScrollPhysics(),
+              itemCount: widget.clinics.length,
+              itemBuilder: (context, index) {
+                final clinic = widget.clinics[index];
+                final double diff = (currentPage - index).abs();
+                // عكس اتجاه الـ parallax في RTL
+                final double parallax = (currentPage - index) * 60.w * (isRTL ? -1 : 1);
+                final double scale = 1.0 - (diff * 0.03).clamp(0.0, 0.12);
+                final double opacity = (1.0 - (diff * 0.12)).clamp(0.6, 1.0);
 
-              return Transform.scale(
-                scale: scale,
-                child: Opacity(
-                  opacity: opacity,
-                  child: ClinicCard(
-                    clinic: clinic,
-                    layout: ClinicCardLayout.carousel,
-                    horizontalParallaxOffset: parallax,
-                    onTap: () => widget.onTap(clinic),
-                    onFavoriteToggle: () => widget.onFavorite?.call(clinic),
-                    onBookNow: () => widget.onBook?.call(clinic),
+                return Transform.scale(
+                  scale: scale,
+                  child: Opacity(
+                    opacity: opacity,
+                    child: ClinicCard(
+                      clinic: clinic,
+                      layout: ClinicCardLayout.carousel,
+                      horizontalParallaxOffset: parallax,
+                      onTap: () => widget.onTap(clinic),
+                      onFavoriteToggle: () => widget.onFavorite?.call(clinic),
+                      onBookNow: () => widget.onBook?.call(clinic),
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
         SizedBox(height: 20.h),

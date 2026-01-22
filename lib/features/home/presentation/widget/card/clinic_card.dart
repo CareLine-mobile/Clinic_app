@@ -87,6 +87,14 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    // Force LTR direction for the entire card
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: _buildLayoutSwitch(),
+    );
+  }
+
+  Widget _buildLayoutSwitch() {
     switch (widget.layout) {
       case ClinicCardLayout.list:
         return _buildListLayout();
@@ -120,13 +128,13 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
               Row(
                 children: [
                   _buildImage(
-                    width: 120.w,
-                    height: null,
-                    borderRadius: BorderRadius.horizontal(
-                      left: Radius.circular(_hSize.s16),
-                    ),
-                    showOverlay: true,
-                    showFavIcon: false
+                      width: 120.w,
+                      height: null,
+                      borderRadius: BorderRadius.horizontal(
+                        left: Radius.circular(_hSize.s16),
+                      ),
+                      showOverlay: true,
+                      showFavIcon: false
                   ),
                   Expanded(
                     child: Padding(
@@ -307,7 +315,6 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
   Widget _buildFeaturedLayout() {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final bool isRTL = Directionality.of(context) == TextDirection.rtl;
 
     return GestureDetector(
       onTap: _toggleExpanded,
@@ -400,18 +407,16 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
                 ),
               ),
 
-              // Side Panel
+              // Side Panel - Always slides from right (LTR behavior)
               AnimatedBuilder(
                 animation: _animationController,
                 builder: (context, child) {
-                  final double slideOffset = isRTL
-                      ? -(1.0 - _animationController.value) * 250.w
-                      : (1.0 - _animationController.value) * 300.w;
+                  final double slideOffset = (1.0 - _animationController.value) * 300.w;
 
                   return Transform.translate(
                     offset: Offset(slideOffset, 0),
                     child: Align(
-                      alignment: isRTL ? Alignment.centerLeft : Alignment.centerRight,
+                      alignment: Alignment.centerRight,
                       child: Container(
                         width: 200.w,
                         height: double.infinity,
@@ -636,7 +641,7 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
             top: _vSize.s10,
             right: _hSize.s10,
             child: AnimatedLottieIcon(
-              assetPath: Assets.favIcon, // Your Lottie animation file
+              assetPath: Assets.favIcon,
               size: _tSize.s32,
               isActive: widget.clinic.isFavorite,
               onTap: widget.onFavoriteToggle,
@@ -723,8 +728,8 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
             SizedBox(height: _vSize.s6),
             Row(
               children: [
-                  CustomIcon(
-                 assetPath: Assets.locationIcon,
+                CustomIcon(
+                  assetPath: Assets.locationIcon,
                   size: _tSize.s14,
                   color: theme.hintColor,
                 ),

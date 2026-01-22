@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 enum SnackBarType { success, error, warning, info }
@@ -57,30 +55,18 @@ class _CustomSnackBarWidget extends StatefulWidget {
 }
 
 class _CustomSnackBarWidgetState extends State<_CustomSnackBarWidget>
-    with TickerProviderStateMixin {
-  late AnimationController _slideController;
-  late AnimationController _progressController;
-  late AnimationController _pulseController;
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
   late Animation<Offset> _slideAnimation;
-  late Animation<double> _progressAnimation;
-  late Animation<double> _pulseAnimation;
+  late Animation<double> _fadeAnimation;
+  double _dragOffset = 0.0;
 
   @override
   void initState() {
     super.initState();
 
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-
-    _progressController = AnimationController(
-      duration: widget.duration,
-      vsync: this,
-    );
-
-    _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 350),
       vsync: this,
     );
 
@@ -88,64 +74,58 @@ class _CustomSnackBarWidgetState extends State<_CustomSnackBarWidget>
       begin: const Offset(0, -1),
       end: Offset.zero,
     ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.elasticOut,
+      parent: _controller,
+      curve: Curves.easeOutCubic,
     ));
 
-    _progressAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.0,
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
     ).animate(CurvedAnimation(
-      parent: _progressController,
-      curve: Curves.linear,
+      parent: _controller,
+      curve: Curves.easeOut,
     ));
 
-    _pulseAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.2,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
+    _controller.forward();
 
-    _slideController.forward();
-    _progressController.forward();
-    _pulseController.repeat(reverse: true);
-
-    _progressController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _dismiss();
-      }
-    });
+    // Auto dismiss
+    Future.delayed(widget.duration, _dismiss);
   }
 
   @override
   void dispose() {
-    _slideController.dispose();
-    _progressController.dispose();
-    _pulseController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   void _dismiss() async {
-    await _slideController.reverse();
-    widget.onDismiss();
-  }
-
-  Color _getBackgroundColor() {
-    switch (widget.type) {
-      case SnackBarType.success:
-        return const Color(0xFF10B981).withOpacity(0.15);
-      case SnackBarType.error:
-        return const Color(0xFFEF4444).withOpacity(0.15);
-      case SnackBarType.warning:
-        return const Color(0xFFF59E0B).withOpacity(0.15);
-      case SnackBarType.info:
-        return const Color(0xFF3B82F6).withOpacity(0.15);
+    if (mounted) {
+      await _controller.reverse();
+      widget.onDismiss();
     }
   }
 
-  Color _getAccentColor() {
+  void _handleDragUpdate(DragUpdateDetails details) {
+    setState(() {
+      _dragOffset += details.primaryDelta ?? 0;
+      // Clamp to only allow upward drag
+      _dragOffset = _dragOffset.clamp(-200.0, 0.0);
+    });
+  }
+
+  void _handleDragEnd(DragEndDetails details) {
+    // If dragged up more than 60px, dismiss
+    if (_dragOffset < -60) {
+      _dismiss();
+    } else {
+      // Spring back
+      setState(() {
+        _dragOffset = 0.0;
+      });
+    }
+  }
+
+  Color _getBackgroundColor() {
     switch (widget.type) {
       case SnackBarType.success:
         return const Color(0xFF10B981);
@@ -158,6 +138,19 @@ class _CustomSnackBarWidgetState extends State<_CustomSnackBarWidget>
     }
   }
 
+  Color _getIconBackground() {
+    switch (widget.type) {
+      case SnackBarType.success:
+        return const Color(0xFF059669);
+      case SnackBarType.error:
+        return const Color(0xFFDC2626);
+      case SnackBarType.warning:
+        return const Color(0xFFD97706);
+      case SnackBarType.info:
+        return const Color(0xFF2563EB);
+    }
+  }
+
   IconData _getIcon() {
     switch (widget.type) {
       case SnackBarType.success:
@@ -165,7 +158,7 @@ class _CustomSnackBarWidgetState extends State<_CustomSnackBarWidget>
       case SnackBarType.error:
         return Icons.error_rounded;
       case SnackBarType.warning:
-        return Icons.warning_rounded;
+        return Icons.warning_amber_rounded;
       case SnackBarType.info:
         return Icons.info_rounded;
     }
@@ -173,176 +166,178 @@ class _CustomSnackBarWidgetState extends State<_CustomSnackBarWidget>
 
   @override
   Widget build(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
+
     return Positioned(
-      top: MediaQuery.of(context).padding.top + 16,
-      left: 16,
-      right: 16,
-      child: SlideTransition(
-        position: _slideAnimation,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: _getAccentColor().withOpacity(0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
-                ),
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        _getBackgroundColor(),
-                        _getBackgroundColor().withOpacity(0.8),
+      top: topPadding + 12,
+      left: 12,
+      right: 12,
+      child: GestureDetector(
+        onVerticalDragUpdate: _handleDragUpdate,
+        onVerticalDragEnd: _handleDragEnd,
+        child: SlideTransition(
+          position: _slideAnimation,
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: Transform.translate(
+              offset: Offset(0, _dragOffset),
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: _dragOffset < -30 ? 0.6 : 1.0,
+                child: Material(
+                  color: Colors.transparent,
+                  elevation: 8,
+                  shadowColor: _getBackgroundColor().withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: _getBackgroundColor(),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _getBackgroundColor().withOpacity(0.4),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                          spreadRadius: 0,
+                        ),
                       ],
                     ),
-                    border: Border.all(
-                      color: _getAccentColor().withOpacity(0.3),
-                      width: 1,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Stack(
-                    children: [
-                      // Animated background pattern
-                      Positioned.fill(
-                        child: AnimatedBuilder(
-                          animation: _pulseController,
-                          builder: (context, child) {
-                            return Container(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Stack(
+                        children: [
+                          // Subtle gradient overlay
+                          Positioned.fill(
+                            child: Container(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                gradient: RadialGradient(
-                                  center: Alignment.topRight,
-                                  radius: _pulseAnimation.value,
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
                                   colors: [
-                                    _getAccentColor().withOpacity(0.1),
+                                    Colors.white.withOpacity(0.15),
                                     Colors.transparent,
                                   ],
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                      ),
-
-                      // Progress indicator
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: AnimatedBuilder(
-                          animation: _progressAnimation,
-                          builder: (context, child) {
-                            return LinearProgressIndicator(
-                              value: _progressAnimation.value,
-                              backgroundColor: Colors.transparent,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                _getAccentColor().withOpacity(0.6),
-                              ),
-                              minHeight: 3,
-                            );
-                          },
-                        ),
-                      ),
-
-                      // Main content
-                      Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Row(
-                          children: [
-                            // Animated icon
-                            AnimatedBuilder(
-                              animation: _pulseController,
-                              builder: (context, child) {
-                                return Transform.scale(
-                                  scale: _pulseAnimation.value,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: _getAccentColor().withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Icon(
-                                      _getIcon(),
-                                      color: _getAccentColor(),
-                                      size: 24,
-                                    ),
-                                  ),
-                                );
-                              },
                             ),
+                          ),
 
-                            const SizedBox(width: 16),
-
-                            // Message
-                            Expanded(
-                              child: Text(
-                                widget.message,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.4,
+                          // Top indicator for drag hint
+                          Positioned(
+                            top: 8,
+                            left: 0,
+                            right: 0,
+                            child: Center(
+                              child: Container(
+                                width: 32,
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.3),
+                                  borderRadius: BorderRadius.circular(2),
                                 ),
                               ),
                             ),
+                          ),
 
-                            // Action button
-                            if (widget.actionLabel != null) ...[
-                              const SizedBox(width: 12),
-                              TextButton(
-                                onPressed: widget.onActionPressed,
-                                style: TextButton.styleFrom(
-                                  backgroundColor: _getAccentColor().withOpacity(0.2),
-                                  foregroundColor: _getAccentColor(),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  shape: RoundedRectangleBorder(
+                          // Main content
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                // Icon with background
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: _getIconBackground(),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                ),
-                                child: Text(
-                                  widget.actionLabel!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
+                                  child: Icon(
+                                    _getIcon(),
+                                    color: Colors.white,
+                                    size: 24,
                                   ),
                                 ),
-                              ),
-                            ],
 
-                            // Close button
-                            if (widget.showCloseButton) ...[
-                              const SizedBox(width: 8),
-                              IconButton(
-                                onPressed: _dismiss,
-                                icon: const Icon(Icons.close_rounded),
-                                iconSize: 20,
-                                color: Colors.white70,
-                                splashRadius: 20,
-                              ),
-                            ],
-                          ],
-                        ),
+                                const SizedBox(width: 12),
+
+                                // Message
+                                Expanded(
+                                  child: Text(
+                                    widget.message,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.3,
+                                      letterSpacing: 0.1,
+                                    ),
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+
+                                // Action button
+                                if (widget.actionLabel != null) ...[
+                                  const SizedBox(width: 8),
+                                  Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: widget.onActionPressed,
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.25),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: Text(
+                                          widget.actionLabel!,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+
+                                // Close button
+                                if (widget.showCloseButton) ...[
+                                  const SizedBox(width: 4),
+                                  Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: _dismiss,
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Container(
+                                        width: 32,
+                                        height: 32,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.2),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: const Icon(
+                                          Icons.close_rounded,
+                                          color: Colors.white,
+                                          size: 18,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),

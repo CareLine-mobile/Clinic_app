@@ -74,6 +74,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final isRTL = Localizations.localeOf(context).languageCode == 'ar';
 
     const Color activeColor = ColorsManager.primaryColor;
     final Color inactiveColor = theme.colorScheme.onSurfaceVariant;
@@ -84,6 +85,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     final Color borderColor = isDark
         ? Colors.white.withOpacity(0.15)
         : Colors.black.withOpacity(0.1);
+
+    // عكس ترتيب الأيقونات في حالة RTL
+    final displayIcons = isRTL ? _icons.reversed.toList() : _icons;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -122,11 +126,16 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: List.generate(_icons.length, (index) {
-                      bool isSelected = _currentIndex == index;
+                    children: List.generate(displayIcons.length, (displayIndex) {
+                      // حساب الـ index الحقيقي
+                      final actualIndex = isRTL
+                          ? (_icons.length - 1 - displayIndex)
+                          : displayIndex;
+                      bool isSelected = _currentIndex == actualIndex;
+
                       return Expanded(
                         child: GestureDetector(
-                          onTap: () => setState(() => _currentIndex = index),
+                          onTap: () => setState(() => _currentIndex = actualIndex),
                           behavior: HitTestBehavior.opaque,
                           child: Padding(
                             padding: EdgeInsets.symmetric(vertical: SizeApp.s8),
@@ -147,7 +156,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                     BorderRadius.circular(SizeApp.s12),
                                   ),
                                   child: CustomIcon(
-                                    assetPath: _icons[index],
+                                    assetPath: displayIcons[displayIndex],
                                     size: SizeApp.s24 + SizeApp.s2,
                                     color: isSelected
                                         ? activeColor
