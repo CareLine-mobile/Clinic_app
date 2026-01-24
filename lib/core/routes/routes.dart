@@ -1,6 +1,6 @@
 abstract class Routes {
   static const String onboarding = '/onboarding';
-  static const String login = '/login';
+  static const String auth = '/auth';
   static const String dashBoard = '/dashBoard';
   static const String clinicDetails = '/clinic-details';
 

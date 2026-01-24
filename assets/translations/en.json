@@ -1,4 +1,29 @@
 {
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "fullName": "Full Name",
+    "phone": "Phone Number",
+    "forgotPassword": "Forgot Password?",
+    "continueAsGuest": "Continue as Guest",
+    "createAccount": "Create Account",
+    "welcomeBack": "Welcome Back",
+    "loginSubtitle": "Login to continue your health journey",
+    "createAccountTitle": "Create Account",
+    "signupSubtitle": "Join us for better healthcare"
+  },
+  "validation": {
+    "emailRequired": "Email is required",
+    "emailInvalid": "Invalid email format",
+    "passwordRequired": "Password is required",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "passwordMismatch": "Passwords do not match",
+    "nameRequired": "Name is required",
+    "phoneRequired": "Phone number is required"
+  },
   "errors": {
     "network": {
       "title": "No Internet Connection",
@@ -24,9 +49,9 @@
       "unexpected": "Unexpected error occurred"
     },
     "auth": {
-      "title": "Session Expired",
-      "subtitle": "Please login again to continue",
-      "action": "Login"
+      "title": "Authentication Error",
+      "invalidCredentials": "Invalid email or password",
+      "sessionExpired": "Session expired, please login again"
     },
     "cache": {
       "title": "Local Data Error",
@@ -62,3 +87,6 @@
     "login": "Login"
   }
 }
+
+
+

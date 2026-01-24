@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../features/auth/data/model/user_model.dart';
 import '../../features/user_data/user_model.dart';
 import '../utils/app_constans.dart';
 

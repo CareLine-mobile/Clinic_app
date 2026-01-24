@@ -5,6 +5,17 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Features - Clinic Details
+import '../../features/auth/data/datasources/auth_local_data_source.dart';
+import '../../features/auth/data/datasources/auth_local_data_source_impl.dart';
+import '../../features/auth/data/datasources/auth_remote_data_source.dart';
+import '../../features/auth/data/datasources/auth_remote_data_source_impl.dart';
+import '../../features/auth/data/repositories/auth_repository_impl.dart';
+import '../../features/auth/domain/repositories/auth_repository.dart';
+import '../../features/auth/domain/usecases/get_current_user_usecase.dart';
+import '../../features/auth/domain/usecases/login_usecase.dart';
+import '../../features/auth/domain/usecases/logout_usecase.dart';
+import '../../features/auth/domain/usecases/signup_usecase.dart';
+import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../features/clinic_details/data/datasources/clinic_local_data_source.dart';
 import '../../features/clinic_details/data/datasources/clinic_remote_data_source.dart';
 import '../../features/clinic_details/data/repositories/clinic_repository_impl.dart';
@@ -151,5 +162,42 @@ Future<void> init() async {
 
   sl.registerFactory<ClinicUiCubit>(
         () => ClinicUiCubit(),
+  );
+
+
+
+  // Data Sources
+  sl.registerLazySingleton<AuthRemoteDataSource>(
+        () => AuthRemoteDataSourceImpl(apiService: sl()),
+  );
+
+  sl.registerLazySingleton<AuthLocalDataSource>(
+        () => AuthLocalDataSourceImpl(
+      sharedPreferences: sl(),
+    ),
+  );
+
+  // Repository
+  sl.registerLazySingleton<AuthRepository>(
+        () => AuthRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+    ),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(() => LoginUseCase(sl()));
+  sl.registerLazySingleton(() => SignupUseCase(sl()));
+  sl.registerLazySingleton(() => LogoutUseCase(sl()));
+  sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
+
+  // Cubit
+  sl.registerFactory(
+        () => AuthCubit(
+      loginUseCase: sl(),
+      signupUseCase: sl(),
+      logoutUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+    ),
   );
 }

@@ -1,4 +1,29 @@
 {
+  "auth": {
+    "login": "تسجيل الدخول",
+    "signup": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "fullName": "الاسم الكامل",
+    "phone": "رقم الهاتف",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "continueAsGuest": "المتابعة كضيف",
+    "createAccount": "إنشاء حساب",
+    "welcomeBack": "مرحباً بعودتك",
+    "loginSubtitle": "سجل دخولك لمتابعة رحلتك الصحية",
+    "createAccountTitle": "إنشاء حساب جديد",
+    "signupSubtitle": "انضم إلينا للحصول على رعاية صحية أفضل"
+  },
+  "validation": {
+    "emailRequired": "البريد الإلكتروني مطلوب",
+    "emailInvalid": "صيغة البريد الإلكتروني غير صحيحة",
+    "passwordRequired": "كلمة المرور مطلوبة",
+    "passwordMinLength": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+    "passwordMismatch": "كلمات المرور غير متطابقة",
+    "nameRequired": "الاسم مطلوب",
+    "phoneRequired": "رقم الهاتف مطلوب"
+  },
   "errors": {
     "network": {
       "title": "لا يوجد اتصال بالإنترنت",
@@ -24,9 +49,9 @@
       "unexpected": "حدث خطأ غير متوقع"
     },
     "auth": {
-      "title": "انتهت صلاحية الجلسة",
-      "subtitle": "يرجى تسجيل الدخول مرة أخرى للمتابعة",
-      "action": "تسجيل الدخول"
+      "title": "خطأ في المصادقة",
+      "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+      "sessionExpired": "انتهت الجلسة، يرجى تسجيل الدخول مرة أخرى"
     },
     "cache": {
       "title": "خطأ في البيانات المحلية",
