@@ -41,7 +41,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
     } catch (e) {
       if (e is ServerException) rethrow;
-      throw ServerException(e.toString());
+      throw ServerException(e.toString()); ///todo :: متنساش دي يا زياد تهندلي الايرور {"message":"Please verify your email first.","status":400,"data":null}
     }
   }
 

@@ -12,6 +12,8 @@ import 'features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
 import 'features/clinic_details/presentation/cubit/clinic_ui_cubit.dart';
 import 'features/home/presentation/cubit/home_ui_cubit.dart';
 
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
  await AppInitializer.init();
