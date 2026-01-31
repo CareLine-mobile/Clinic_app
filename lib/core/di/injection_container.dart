@@ -1,4 +1,5 @@
-import 'package:clinic_app/core/api/api_service.dart';
+import 'package:clinic_app/core/api/base_api_services.dart';
+import 'package:clinic_app/core/api/dio_client.dart';
 import 'package:clinic_app/features/home/domain/usecases/get_nearby_clinics_usecase.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
@@ -7,8 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // Features - Clinic Details
 import '../../features/auth/data/datasources/auth_local_data_source.dart';
 import '../../features/auth/data/datasources/auth_local_data_source_impl.dart';
-import '../../features/auth/data/datasources/auth_remote_data_source.dart';
-import '../../features/auth/data/datasources/auth_remote_data_source_impl.dart';
+
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/get_current_user_usecase.dart';
@@ -17,18 +17,15 @@ import '../../features/auth/domain/usecases/logout_usecase.dart';
 import '../../features/auth/domain/usecases/signup_usecase.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../features/clinic_details/data/datasources/clinic_local_data_source.dart';
-import '../../features/clinic_details/data/datasources/clinic_remote_data_source.dart';
 import '../../features/clinic_details/data/repositories/clinic_repository_impl.dart';
 import '../../features/clinic_details/domain/repositories/clinic_repository.dart';
 import '../../features/clinic_details/domain/usecases/get_clinic_details_usecase.dart';
 import '../../features/clinic_details/domain/usecases/toggle_favorite_usecase.dart' as clinic_details;
 import '../../features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
 import '../../features/clinic_details/presentation/cubit/clinic_ui_cubit.dart';
-
 // Features - Home
 import '../../features/home/data/datasources/localdatasource/location_data_source.dart';
 import '../../features/home/data/datasources/localdatasource/location_data_source_impl.dart';
-import '../../features/home/data/datasources/remotedatasource/remote_data_source.dart';
 import '../../features/home/data/repositories/home_repository_impl.dart';
 import '../../features/home/data/repositories/location_repository_impl.dart';
 import '../../features/home/domain/repositories/home_repository.dart';
@@ -38,6 +35,7 @@ import '../../features/home/domain/usecases/get_latest_clinics_usecase.dart';
 import '../../features/home/domain/usecases/location/get_current_location_usecase.dart';
 import '../../features/home/presentation/cubit/home_cubit.dart';
 import '../../features/home/presentation/cubit/home_ui_cubit.dart';
+import '../api/model/endpoints.dart';
 
 final sl = GetIt.instance;
 
@@ -53,13 +51,20 @@ Future<void> init() async {
   // ==========================
 
   // Dio instance
-  sl.registerLazySingleton<Dio>(() => Dio());
+  final dio = Dio(BaseOptions(
+    baseUrl: Endpoints.baseUrl,
+    connectTimeout: const Duration(seconds: 30),
+    receiveTimeout: const Duration(seconds: 30),
+  ));
+  sl.registerLazySingleton(() => dio);
 
   // ApiService (will configure Dio internally)
-  sl.registerLazySingleton<ApiService>(
-        () => ApiService(sl()),
+  // sl.registerLazySingleton<ApiService>(
+  //       () => ApiService(sl()),
+  // );
+  sl.registerLazySingleton<BaseApiServices>(
+        () => DioApiService(sl()),
   );
-
   sl.registerLazySingleton<LocationDataSource>(
         () => LocationDataSourceImpl(),
   );
@@ -79,16 +84,16 @@ Future<void> init() async {
   // ==========================
 
   // Data Sources
-  sl.registerLazySingleton<HomeRemoteDataSource>(
-        () => HomeRemoteDataSourceImpl(
-      apiService: sl(),
-    ),
-  );
+  // sl.registerLazySingleton<HomeRemoteDataSource>(
+  //       () => HomeRemoteDataSourceImpl(
+  //     apiService: sl(),
+  //   ),
+  // );
 
   // Repository
   sl.registerLazySingleton<HomeRepository>(
         () => HomeRepositoryImpl(
-      remoteDataSource: sl(),
+      apiServices: sl(),
     ),
   );
 
@@ -122,11 +127,11 @@ Future<void> init() async {
   // ==========================
 
   // Data Sources
-  sl.registerLazySingleton<ClinicRemoteDataSource>(
-        () => ClinicRemoteDataSourceImpl(
-      apiService: sl(),
-    ),
-  );
+  // sl.registerLazySingleton<ClinicRemoteDataSource>(
+  //       () => ClinicRemoteDataSourceImpl(
+  //     apiService: sl(),
+  //   ),
+  // );
 
   sl.registerLazySingleton<ClinicLocalDataSource>(
         () => ClinicLocalDataSourceImpl(
@@ -137,7 +142,7 @@ Future<void> init() async {
   // Repository
   sl.registerLazySingleton<ClinicRepository>(
         () => ClinicRepositoryImpl(
-      remoteDataSource: sl(),
+      apiServices: sl(),
       localDataSource: sl(),
     ),
   );
@@ -167,9 +172,9 @@ Future<void> init() async {
 
 
   // Data Sources
-  sl.registerLazySingleton<AuthRemoteDataSource>(
-        () => AuthRemoteDataSourceImpl(apiService: sl()),
-  );
+  // sl.registerLazySingleton<AuthRemoteDataSource>(
+  //       () => AuthRemoteDataSourceImpl(apiService: sl()),
+  // );
 
   sl.registerLazySingleton<AuthLocalDataSource>(
         () => AuthLocalDataSourceImpl(
@@ -180,7 +185,7 @@ Future<void> init() async {
   // Repository
   sl.registerLazySingleton<AuthRepository>(
         () => AuthRepositoryImpl(
-      remoteDataSource: sl(),
+      apiServices: sl(),
       localDataSource: sl(),
     ),
   );

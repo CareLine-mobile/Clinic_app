@@ -1,61 +1,76 @@
-import 'package:clinic_app/core/errors/failures.dart';
-import 'package:clinic_app/core/errors/result_handler.dart';
-import 'package:dartz/dartz.dart';
+import '../../../../core/api/base_api_services.dart';
+import '../../../../core/api/model/endpoints.dart';
+import '../../../../core/api/model/http_method.dart';
 import '../../domain/entities/clinic_summary.dart';
 import '../../domain/repositories/home_repository.dart';
-import '../datasources/remotedatasource/remote_data_source.dart';
+import '../model/clinics_response.dart';
 
 
-// lib/features/home/data/repositories/home_repository_impl.dart
+
 class HomeRepositoryImpl implements HomeRepository {
-  final HomeRemoteDataSource remoteDataSource;
+  final BaseApiServices apiServices;
 
-  HomeRepositoryImpl({required this.remoteDataSource});
+  HomeRepositoryImpl({required this.apiServices});
 
   @override
-  Future<Either<Failure, List<ClinicSummary>>> getAllClinics({
-    int page = 1,
-  }) async {
-    return ResultHandler.handle(() async {
-      final response = await remoteDataSource.getAllClinics(page: page);
-      return response.clinics.map((model) => model.toEntity()).toList();
-    });
+  Future<List<ClinicSummary>> getAllClinics({int page = 1}) async {
+    final response = await apiServices.request(
+      method: HttpMethod.get,
+      url: Endpoints.allClinics,
+      queryParams: {'page': page},
+    );
+
+    final clinicsResponse = ClinicsResponse.fromJson(response);
+    return clinicsResponse.clinics.map((model) => model.toEntity()).toList();
   }
 
   @override
-  Future<Either<Failure, List<ClinicSummary>>> getFeaturedClinics({
-    int page = 1,
-  }) async {
-    return ResultHandler.handle(() async {
-      final clinics = await remoteDataSource.getFeaturedClinics();
-      return clinics.map((model) => model.toEntity()).toList();
-    });
+  Future<List<ClinicSummary>> getFeaturedClinics({int page = 1}) async {
+    final response = await apiServices.request(
+      method: HttpMethod.get,
+      url: Endpoints.allClinics,
+      queryParams: {'page': page},
+    );
+
+    final clinicsResponse = ClinicsResponse.fromJson(response);
+    return clinicsResponse.clinics.map((model) => model.toEntity()).toList();
   }
 
   @override
-  Future<Either<Failure, Unit>> toggleFavorite(int clinicId) async {
-    return ResultHandler.handleVoid(() async {
-      await remoteDataSource.toggleFavorite(clinicId);
-    });
+  Future<List<ClinicSummary>> latestClinics() async {
+    final response = await apiServices.request(
+      method: HttpMethod.get,
+      url: Endpoints.latestBooking,
+    );
+
+    final clinicsResponse = ClinicsResponse.fromJson(response);
+    return clinicsResponse.clinics.map((model) => model.toEntity()).toList();
   }
 
   @override
-  Future<Either<Failure, List<ClinicSummary>>> latestClinics() {
-    return ResultHandler.handle(() async {
-      final response = await remoteDataSource.latestClinics();
-      return response.clinics.map((model) => model.toEntity()).toList();
-    });
-  }
-
-  @override
-  Future<Either<Failure, List<ClinicSummary>>> nearbyClinics({
+  Future<List<ClinicSummary>> nearbyClinics({
     required double latitude,
     required double longitude,
-  }) {
-    return ResultHandler.handle(() async {
-      final response = await remoteDataSource.nearByClinics(latitude: latitude, longitude: longitude);
-      return response.clinics.map((model) => model.toEntity()).toList();
-    });
+  }) async {
+    final response = await apiServices.request(
+      method: HttpMethod.get,
+      url: Endpoints.nearbyClinics,
+      queryParams: {
+        'per_page': 15,
+        'lat': latitude,
+        'lng': longitude,
+      },
+    );
+
+    final clinicsResponse = ClinicsResponse.fromJson(response);
+    return clinicsResponse.clinics.map((model) => model.toEntity()).toList();
   }
 
+  @override
+  Future<void> toggleFavorite(int clinicId) async {
+    await apiServices.request(
+      method: HttpMethod.post,
+      url: '/clinics/$clinicId/favorite',
+    );
+  }
 }
