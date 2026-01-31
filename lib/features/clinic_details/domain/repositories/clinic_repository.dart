@@ -6,11 +6,11 @@ import '../entites/time_slot_entity.dart';
 
 
 abstract class ClinicRepository {
-  Future<Either<Failure, ClinicEntity>> getClinicDetails(int clinicId);
+  Future<ClinicEntity> getClinicDetails(int clinicId);
 
-  Future<Either<Failure, List<TimeSlotEntity>>> getDoctorSlots(int clinicId, String day);
+  Future< List<TimeSlotEntity>> getDoctorSlots(int clinicId, String day);
 
-  ///todo:: remove this when impl singleton
-  Future<Either<Failure, bool>> toggleFavorite(String clinicId);
+
+  Future<bool> toggleFavorite(String clinicId);
 
 }
