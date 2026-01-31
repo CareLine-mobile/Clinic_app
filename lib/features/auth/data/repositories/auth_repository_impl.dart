@@ -1,95 +1,147 @@
 // lib/features/auth/data/repositories/auth_repository_impl.dart
 // ============================================
-import 'package:dartz/dartz.dart';
-import '../../../../core/errors/failures.dart';
-import '../../../../core/errors/result_handler.dart';
+import 'package:clinic_app/core/api/base_api_services.dart';
+
+import '../../../../core/api/model/endpoints.dart';
+import '../../../../core/api/model/http_method.dart';
+import '../../../../core/errors/exceptions.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../datasources/auth_remote_data_source.dart';
 import '../datasources/auth_local_data_source.dart';
+import '../model/auth_response_model.dart';
 import '../model/user_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final AuthRemoteDataSource remoteDataSource;
+  final BaseApiServices apiServices;
   final AuthLocalDataSource localDataSource;
 
   AuthRepositoryImpl({
-    required this.remoteDataSource,
+    required this.apiServices,
     required this.localDataSource,
   });
 
   @override
-  Future<Either<Failure, User>> login({
+  Future<User> login({
     required String email,
     required String password,
   }) async {
-    return await ResultHandler.handle(() async {
-      final userModel = await remoteDataSource.login(
-        email: email,
-        password: password,
-      );
+
+    final response = await apiServices.request(
+      method: HttpMethod.post,
+      url: Endpoints.login,
+      body: {
+        'email': email,
+        'password': password,
+      },
+    );
+
+    final authResponse = AuthResponseModel.fromJson(response);
+
+    if (authResponse.data != null) {
+      final userModel = authResponse.user!;
+
+      // Cache user locally
       await localDataSource.cacheUser(userModel);
+
       return userModel.toEntity();
-    });
+    } else {
+
+      // Throw exception with proper message
+      throw ServerException(
+        authResponse.message.isNotEmpty
+            ? authResponse.message
+            : 'Login failed',
+        'LOGIN_FAILED',
+      );
+    }
   }
 
   @override
-  Future<Either<Failure, String>> signup({
+  Future<String> signup({
     required String name,
     required String email,
     required String phone,
     required String password,
   }) async {
-    return await ResultHandler.handle(() async {
-      return await remoteDataSource.signup(
-        name: name,
-        email: email,
-        phone: phone,
-        password: password,
-      );
-    });
+    // No try-catch - just data operations
+    final response = await apiServices.request(
+      method: HttpMethod.post,
+      url: Endpoints.register,
+      body: {
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'password': password,
+        'password_confirmation': password,
+      },
+    );
+
+    final authResponse = AuthResponseModel.fromJson(response);
+
+    // Return email for OTP verification
+    if (authResponse.data != null &&
+        authResponse.data!.containsKey('email')) {
+      return authResponse.data!['email'] as String;
+    }
+
+    // If user is directly returned (no OTP)
+    if (authResponse.user != null) {
+      return email;
+    }
+
+    // Throw exception with proper message
+    throw ServerException(
+      authResponse.message.isNotEmpty
+          ? authResponse.message
+          : 'Signup failed',
+      'SIGNUP_FAILED',
+    );
   }
 
   @override
-  Future<Either<Failure, User>> getCurrentUser() async {
-    return await ResultHandler.handle(() async {
-      final userModel = await localDataSource.getCachedUser();
-      if (userModel == null) {
-        throw Exception('No cached user found');
-      }
-      return userModel.toEntity();
-    });
+  Future<void> logout() async {
+    // No try-catch - just data operations
+    await apiServices.request(
+      method: HttpMethod.post,
+      url: Endpoints.logout,
+    );
+
+    // Clear local cache
+    await localDataSource.clearCache();
   }
 
   @override
-  Future<Either<Failure, User?>> getCachedUser() async {
-    return await ResultHandler.handle(() async {
-      final userModel = await localDataSource.getCachedUser();
-      return userModel?.toEntity();
-    });
+  Future<User> getCurrentUser() async {
+    // No try-catch - just data operations
+    final userModel = await localDataSource.getCachedUser();
+
+    if (userModel == null) {
+      throw CacheException('No cached user found', 'NO_CACHED_USER');
+    }
+
+    return userModel.toEntity();
   }
 
   @override
-  Future<Either<Failure, void>> logout() async {
-    return await ResultHandler.handleVoid(() async {
-      await remoteDataSource.logout();
-      await localDataSource.clearCache();
-    });
+  Future<User?> getCachedUser() async {
+    // No try-catch - just data operations
+    final userModel = await localDataSource.getCachedUser();
+    return userModel?.toEntity();
   }
 
   @override
-  Future<Either<Failure, void>> saveUserLocally(User user) async {
-    return await ResultHandler.handleVoid(() async {
-      final userModel = UserModel(
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        avatar: user.avatar,
-        token: user.token,
-        emailVerifiedAt: user.emailVerifiedAt,
-      );
-      await localDataSource.cacheUser(userModel);
-    });
+  Future<void> saveUserLocally(User user) async {
+    // No try-catch - just data operations
+    final userModel = UserModel(
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      avatar: user.avatar,
+      token: user.token,
+      emailVerifiedAt: user.emailVerifiedAt,
+    );
+
+    await localDataSource.cacheUser(userModel);
   }
 }
