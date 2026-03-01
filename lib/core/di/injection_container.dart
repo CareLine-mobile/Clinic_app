@@ -41,6 +41,7 @@ import '../../features/home/domain/usecases/get_latest_clinics_usecase.dart';
 import '../../features/home/domain/usecases/location/get_current_location_usecase.dart';
 import '../../features/home/presentation/cubit/home_cubit.dart';
 import '../../features/home/presentation/cubit/home_ui_cubit.dart';
+import '../../features/user_data/user_repo.dart';
 import '../api/model/endpoints.dart';
 
 final sl = GetIt.instance;
@@ -219,7 +220,6 @@ Future<void> init() async {
   sl.registerLazySingleton<AuthRepository>(
         () => AuthRepositoryImpl(
       apiServices: sl(),
-      localDataSource: sl(),
     ),
   );
 
@@ -227,15 +227,16 @@ Future<void> init() async {
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => SignupUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
-  sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
+  sl.registerLazySingleton(() => UserRepository());
+
 
   // Cubit
   sl.registerFactory(
         () => AuthCubit(
       loginUseCase: sl(),
       signupUseCase: sl(),
-      logoutUseCase: sl(),
-      getCurrentUserUseCase: sl(),
-    ),
+      userRepository: sl(),
+      authRepository: sl(),
+        ),
   );
 }

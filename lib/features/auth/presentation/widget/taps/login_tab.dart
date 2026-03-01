@@ -133,8 +133,8 @@ class _LoginTabState extends State<LoginTab> {
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthCubit>().login(
-        _emailController.text.trim(),
-        _passwordController.text,
+        email:  _emailController.text.trim(),
+        password: _passwordController.text,
       );
     }
   }

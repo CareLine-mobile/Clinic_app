@@ -55,13 +55,13 @@ class BookingModel {
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
     return BookingModel(
-      id: json['id'],
-      clinicalId: json['clinical_id'],
-      doctorId: json['doctor_id'],
-      date: json['date'],
-      time: json['time'],
-      turnNumber: json['turn_number'],
-      status: json['status'],
+      id: json['id'] is String ? int.parse(json['id']) : json['id'] ?? 0,
+      clinicalId: json['clinical_id'] is String ? int.parse(json['clinical_id']) : json['clinical_id'] ?? 0,
+      doctorId: json['doctor_id'] is String ? int.parse(json['doctor_id']) : json['doctor_id'] ?? 0,
+      date: json['date'] ?? '',
+      time: json['time'] ?? '',
+      turnNumber: json['turn_number'] is String ? int.parse(json['turn_number']) : json['turn_number'] ?? 0,
+      status: json['status'] ?? '',
       notes: json['notes'],
       clinical: ClinicalModel.fromJson(json['clinical']),
       doctor: DoctorModel.fromJson(json['doctor']),
@@ -105,17 +105,18 @@ class ClinicalModel {
     required this.doctorsCount,
   });
 
+
   factory ClinicalModel.fromJson(Map<String, dynamic> json) {
     return ClinicalModel(
-      id: json['id'],
-      name: json['name'],
+      id: json['id'] is String ? int.parse(json['id']) : json['id'] ?? 0,
+      name: json['name'] ?? '',
       imageUrls: List<String>.from(json['image_urls'] ?? []),
-      specialty: json['specialty'],
-      reviewsCount: json['reviews_count'],
-      location: json['location'],
-      rating: (json['rating'] as num).toDouble(),
-      isOpen: json['is_open'],
-      doctorsCount: json['doctors_count'],
+      specialty: json['specialty'] ?? '',
+      reviewsCount: int.tryParse(json['reviews_count']?.toString() ?? '0') ?? 0,
+      location: json['location'] ?? '',
+      rating: double.tryParse(json['rating']?.toString() ?? '0') ?? 0.0,
+      isOpen: json['is_open'] ?? false,
+      doctorsCount: int.tryParse(json['doctors_count']?.toString() ?? '0') ?? 0,
     );
   }
 

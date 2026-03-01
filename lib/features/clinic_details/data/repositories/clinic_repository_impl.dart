@@ -30,7 +30,7 @@ class ClinicRepositoryImpl implements ClinicRepository {
     );
 
     // Handle response data
-    final data = response.data['data'] ?? response.data;
+    final data = response['data'] ?? response;
     final clinicModel = ClinicModel.fromJson(data);
 
     // Cache the result
@@ -49,7 +49,7 @@ class ClinicRepositoryImpl implements ClinicRepository {
     );
 
     // Handle response data
-    final List<dynamic> slotsData = response.data['data'] ?? response.data;
+    final List<dynamic> slotsData = response['data'] ?? response;
 
     // Map to TimeSlotModel
     final slots = slotsData
