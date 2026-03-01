@@ -5,22 +5,21 @@ import '../entities/clinic_summary.dart';
 
 
 abstract class HomeRepository {
-  /// Get all clinics with pagination
-  Future<Either<Failure, List<ClinicSummary>>> getAllClinics({int page = 1});
+  /// Get all clinics with pagination - Throws exceptions on error
+  Future<List<ClinicSummary>> getAllClinics({int page = 1});
 
-  Future<Either<Failure, List<ClinicSummary>>> latestClinics();
+  /// Get latest clinics - Throws exceptions on error
+  Future<List<ClinicSummary>> latestClinics();
 
+  /// Get featured clinics - Throws exceptions on error
+  Future<List<ClinicSummary>> getFeaturedClinics({int page = 1});
 
-  /// Get featured clinics todo:: (for future use when backend splits data)
-  Future<Either<Failure, List<ClinicSummary>>> getFeaturedClinics({int page = 1});
-
-  /// Get nearby clinics
-  Future<Either<Failure, List<ClinicSummary>>> nearbyClinics({
+  /// Get nearby clinics - Throws exceptions on error
+  Future<List<ClinicSummary>> nearbyClinics({
     required double latitude,
     required double longitude,
   });
 
-
-  /// todo:: Toggle favorite status
-  Future<Either<Failure, Unit>> toggleFavorite(int clinicId);
+  /// Toggle favorite status - Throws exceptions on error
+  Future<void> toggleFavorite(int clinicId);
 }

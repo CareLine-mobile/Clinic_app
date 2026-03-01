@@ -1,71 +1,74 @@
-// lib/features/clinics/data/repositories/clinic_repository_impl.dart
 import 'package:clinic_app/features/clinic_details/domain/entites/clinic_entities.dart';
-import 'package:dartz/dartz.dart';
-import '../../../../core/errors/failures.dart';
-import '../../../../core/errors/result_handler.dart';
+
+import '../../../../core/api/base_api_services.dart';
+import '../../../../core/api/model/http_method.dart';
 import '../../domain/entites/time_slot_entity.dart';
 import '../../domain/repositories/clinic_repository.dart';
-import '../datasources/clinic_remote_data_source.dart';
 import '../datasources/clinic_local_data_source.dart';
+import '../model/clinic_model.dart';
+import '../model/time_slot_model.dart';
 
 class ClinicRepositoryImpl implements ClinicRepository {
-  final ClinicRemoteDataSource remoteDataSource;
+  final BaseApiServices apiServices;
   final ClinicLocalDataSource localDataSource;
 
   ClinicRepositoryImpl({
-    required this.remoteDataSource,
+    required this.apiServices,
     required this.localDataSource,
   });
 
   @override
-  Future<Either<Failure, ClinicEntity>> getClinicDetails(int clinicId) async {
-    return ResultHandler.handle(() async {
-      try {
-        // Try to get from remote
-        final remoteClinic = await remoteDataSource.getClinicDetails(clinicId);
+  Future<ClinicEntity> getClinicDetails(int clinicId, {String? day}) async {
+    // Build query parameters
+    final queryParams = day != null ? {'day': day} : null;
 
-        // Cache the result
-        await localDataSource.cacheClinic(remoteClinic);
+    // Make API call (might throw exception)
+    final response = await apiServices.request(
+      method: HttpMethod.get,
+      url: '/clinicals/$clinicId',
+      queryParams: queryParams,
+    );
 
-        return remoteClinic;
-      } catch (e) {
-        // If remote fails, try cache
-        final cachedClinic = await localDataSource.getCachedClinic(clinicId);
+    // Handle response data
+    final data = response.data['data'] ?? response.data;
+    final clinicModel = ClinicModel.fromJson(data);
 
-        if (cachedClinic != null) {
-          return cachedClinic;
-        }
+    // Cache the result
+    await localDataSource.cacheClinic(clinicModel);
 
-        // If cache also fails, rethrow the original error
-        rethrow;
-      }
-    });
+    return clinicModel;
   }
 
   @override
-  Future<Either<Failure, List<TimeSlotEntity>>> getDoctorSlots(
-      int doctorId,
-      String day,
-      ) async {
-    return ResultHandler.handle(() async {
-      final slots = await remoteDataSource.getDoctorSlots(
-        doctorId: doctorId,
-        day: day,
-      );
+  Future<List<TimeSlotEntity>> getDoctorSlots(int doctorId, String day) async {
+    // Make API call (might throw exception)
+    final response = await apiServices.request(
+      method: HttpMethod.get,
+      url: '/doctors/$doctorId/slots',
+      queryParams: {'day': day},
+    );
 
-      return slots;
-    });
+    // Handle response data
+    final List<dynamic> slotsData = response.data['data'] ?? response.data;
+
+    // Map to TimeSlotModel
+    final slots = slotsData
+        .map((json) => TimeSlotModel.fromJson(json))
+        .toList();
+
+    return slots;
   }
 
-@override
-Future<Either<Failure, bool>> toggleFavorite(String clinicId) async {
-  try {
-    final result = await remoteDataSource.toggleFavorite(clinicId);
-    return Right(result);
-  } catch (e) {
-    return Left(ServerFailure( 'فشل في تغيير الحالة: ${e.toString()}'));
-  }
-}
+  @override
+  Future<bool> toggleFavorite(String clinicId) async {
+    // Make API call (might throw exception)
+    await apiServices.request(
+      method: HttpMethod.post,
+      url: '/clinicals/$clinicId/favorite',
+    );
 
+    // If no exception thrown, it was successful
+    return true;
+  }
 }
 

@@ -1,13 +1,11 @@
 // lib/features/auth/data/datasources/auth_remote_data_source_impl.dart
 // ============================================
 
-import 'package:clinic_app/core/api/api_error_handler.dart';
 import 'package:clinic_app/core/api/endpoints.dart';
-import 'package:dio/dio.dart';
 import '../../../../core/api/api_service.dart';
 import '../../../../core/errors/exceptions.dart';
-import '../../../user_data/user_model.dart';
 import '../model/auth_response_model.dart';
+import '../model/user_model.dart';
 import 'auth_remote_data_source.dart';
 
 
@@ -41,10 +39,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
               : 'Login failed',
         );
       }
-    } on DioException catch (e) {
-      throw ApiErrorHandler.handleDioException(e);
-    } on ServerException {
-      rethrow;
+    } catch (e) {
+      if (e is ServerException) rethrow;
+      throw ServerException(e.toString()); ///todo :: متنساش دي يا زياد تهندلي الايرور {"message":"Please verify your email first.","status":400,"data":null}
     }
   }
 
@@ -85,10 +82,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             ? authResponse.message
             : 'Signup failed',
       );
-    } on DioException catch (e) {
-      throw ApiErrorHandler.handleDioException(e);
-    } on ServerException {
-      rethrow;
+    } catch (e) {
+      if (e is ServerException) rethrow;
+      throw ServerException(e.toString());
     }
   }
 
@@ -96,10 +92,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<void> logout() async {
     try {
       await apiService.post(Endpoints.logout);
-    } on DioException catch (e) {
-      throw ApiErrorHandler.handleDioException(e);
-    } on ServerException {
-      rethrow;
+    } catch (e) {
+      throw ServerException(e.toString());
     }
   }
 }

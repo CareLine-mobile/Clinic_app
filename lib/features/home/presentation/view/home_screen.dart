@@ -106,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // ERROR STATE - Show Error with Retry
           // ============================================
           if (state is HomeError) {
+            print('zzzzzzzzzzzzzzzzzzzzzz ${state.failure}');
             return CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [

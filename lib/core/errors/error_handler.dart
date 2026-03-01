@@ -71,7 +71,9 @@ class ErrorHandler {
   }
 
   static Failure _handleResponseError(Response? response) {
+
     if (response == null) {
+
       return ServerFailure(
         'errors.network.noResponse'.tr(),
         'NO_RESPONSE',
@@ -83,6 +85,7 @@ class ErrorHandler {
 
     switch (statusCode) {
       case 400:
+        print('dsfdsfdsfdsfdsfdsfdsfdsf');
         return ServerFailure(
           message.isNotEmpty ? message : 'errors.server.badRequest'.tr(),
           ErrorMessages.badRequest,
@@ -167,8 +170,8 @@ class ErrorHandler {
 
   static void _logError(Object error, StackTrace? stackTrace) {
     // TODO: Implement logging (Firebase Crashlytics, Sentry, etc.)
-    // print('Error: $error');
-    // if (stackTrace != null) print('StackTrace: $stackTrace');
+     print('Error: $error');
+     if (stackTrace != null) print('StackTrace: $stackTrace');
   }
 }
 
