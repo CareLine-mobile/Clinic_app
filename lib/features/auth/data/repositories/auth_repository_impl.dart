@@ -5,11 +5,12 @@ import 'package:clinic_app/core/api/base_api_services.dart';
 import '../../../../core/api/model/endpoints.dart';
 import '../../../../core/api/model/http_method.dart';
 import '../../../../core/errors/exceptions.dart';
+import '../../../user_data/user_model.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_local_data_source.dart';
 import '../model/auth_response_model.dart';
-import '../model/user_model.dart';
+
 
 class AuthRepositoryImpl implements AuthRepository {
   final BaseApiServices apiServices;

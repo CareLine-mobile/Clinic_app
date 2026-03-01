@@ -1,10 +1,6 @@
-import 'package:clinic_app/core/api/endpoints.dart';
-import 'package:dio/dio.dart';
-import 'package:easy_localization/easy_localization.dart';
-
-import '../../../../core/api/api_service.dart';
-import '../../../../core/api/api_error_handler.dart';
-import '../../../../core/errors/exceptions.dart';
+import 'package:clinic_app/core/api/base_api_services.dart';
+import '../../../../core/api/model/endpoints.dart';
+import '../../../../core/api/model/http_method.dart';
 import '../model/appointment_request_model.dart';
 import '../model/booking_model.dart';
 
@@ -14,38 +10,31 @@ abstract class BookingRemoteDataSource {
 }
 
 class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
-  final ApiService apiService;
+  final BaseApiServices apiServices;
 
-  BookingRemoteDataSourceImpl({required this.apiService});
+  BookingRemoteDataSourceImpl({
+    required this.apiServices,
+  });
 
   @override
   Future<BookingListModel> getUserBookings({int page = 1}) async {
-    try {
-      final response = await apiService.get(
-        Endpoints.getListBooking,
-        queryParameters: {'page': page},
-      );
+    // No try-catch - just data operations
+    final response = await apiServices.request(
+      method: HttpMethod.get,
+      url: Endpoints.getListBooking,
+      queryParams: {'page': page},
+    );
 
-      final data = response.data['data'] ?? response.data;
-      return BookingListModel.fromJson(data);
-    } on DioException catch (e) {
-      throw ApiErrorHandler.handleDioException(e);
-    } catch (e) {
-      throw ServerException('errors.booking.list'.tr());
-    }
+    final data = response['data'] ?? response;
+    return BookingListModel.fromJson(data);
   }
 
   @override
   Future<void> makeAppointment(AppointmentRequestModel request) async {
-    try {
-      await apiService.post(
-        Endpoints.bookAppointment,
-        data: request.toJson(),
-      );
-    } on DioException catch (e) {
-      throw ApiErrorHandler.handleDioException(e);
-    } catch (e) {
-      throw ServerException('errors.booking.create'.tr());
-    }
+    await apiServices.request(
+      method: HttpMethod.post,
+      url: Endpoints.bookAppointment,
+      body: request.toJson(),
+    );
   }
 }

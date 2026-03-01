@@ -182,7 +182,7 @@ Future<void> init() async {
 
 // Data Sources
   sl.registerLazySingleton<BookingRemoteDataSource>(
-        () => BookingRemoteDataSourceImpl(apiService: sl()),
+        () => BookingRemoteDataSourceImpl(apiServices: sl()),
   );
 
 // Repository
