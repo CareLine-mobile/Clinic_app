@@ -1,4 +1,4 @@
-import 'user_model.dart';
+import '../../../user_data/user_model.dart';
 
 class AuthResponseModel {
   final String message;
@@ -16,38 +16,39 @@ class AuthResponseModel {
   });
 
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) {
+    final rawStatus = json['status'];
+    final bool parsedStatus = rawStatus is bool
+        ? rawStatus
+        : rawStatus is int
+        ? rawStatus >= 200 && rawStatus < 300
+        : false;
+
     // Handle login response
     if (json.containsKey('user') && json['user'] != null) {
       final userJson = json['user'] as Map<String, dynamic>;
       final token = json['token'] as String? ?? '';
 
-      // Add token to user model
-      final userWithToken = {
-        ...userJson,
-        'token': token,
-      };
-
       return AuthResponseModel(
         message: json['message'] as String? ?? '',
-        status: json['status'] as bool? ?? true,
-        user: UserModel.fromJson(userWithToken),
+        status: parsedStatus,
+        user: UserModel.fromJson({...userJson, 'token': token}),
         token: token,
       );
     }
 
-    // Handle signup response (OTP case)
+    // Handle signup / OTP response
     if (json.containsKey('data') && json['data'] != null) {
       return AuthResponseModel(
         message: json['message'] as String? ?? '',
-        status: json['status'] as bool? ?? true,
+        status: parsedStatus,
         data: json['data'] as Map<String, dynamic>,
       );
     }
 
-    // Default case
+    // Default
     return AuthResponseModel(
       message: json['message'] as String? ?? '',
-      status: json['status'] as bool? ?? false,
+      status: parsedStatus,
     );
   }
 }

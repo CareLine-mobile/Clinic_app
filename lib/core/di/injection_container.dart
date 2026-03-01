@@ -16,6 +16,12 @@ import '../../features/auth/domain/usecases/login_usecase.dart';
 import '../../features/auth/domain/usecases/logout_usecase.dart';
 import '../../features/auth/domain/usecases/signup_usecase.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
+import '../../features/booking/data/datasources/booking_remote_data_source.dart';
+import '../../features/booking/data/repository/booking_repository_impl.dart';
+import '../../features/booking/domain/repository/booking_repository.dart';
+import '../../features/booking/domain/usecases/get_user_bookings_usecase.dart';
+import '../../features/booking/domain/usecases/make_appointment_usecase.dart';
+import '../../features/booking/presentation/cubit/booking_cubit.dart';
 import '../../features/clinic_details/data/datasources/clinic_local_data_source.dart';
 import '../../features/clinic_details/data/datasources/clinic_remote_data_source.dart';
 import '../../features/clinic_details/data/repositories/clinic_repository_impl.dart';
@@ -165,6 +171,33 @@ Future<void> init() async {
   );
 
 
+// ==========================
+// Feature: Booking
+// ==========================
+
+// Data Sources
+  sl.registerLazySingleton<BookingRemoteDataSource>(
+        () => BookingRemoteDataSourceImpl(apiService: sl()),
+  );
+
+// Repository
+  sl.registerLazySingleton<BookingRepository>(
+        () => BookingRepositoryImpl(remoteDataSource: sl()),
+  );
+
+// Use Cases
+  sl.registerLazySingleton(
+        () => GetUserBookingsUseCase(sl()),
+  );
+
+  sl.registerLazySingleton(
+        () => MakeAppointmentUseCase(sl()),
+  );
+
+// Cubit
+  sl.registerFactory(
+        () => BookingCubit(getUserBookingsUseCase: sl(), makeAppointmentUseCase: sl()),
+  );
 
   // Data Sources
   sl.registerLazySingleton<AuthRemoteDataSource>(

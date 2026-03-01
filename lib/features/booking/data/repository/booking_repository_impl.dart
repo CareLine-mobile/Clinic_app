@@ -1,21 +1,37 @@
-import '../../domain/entities/booking_date_entity.dart';
-import '../../domain/entities/time_slot_entity.dart';
+import 'package:dartz/dartz.dart';
+import '../../../../core/errors/failures.dart';
+import '../../../../core/errors/result_handler.dart';
+import '../../domain/entities/appointment_request_entity.dart';
+import '../../domain/entities/booking_entity.dart';
 import '../../domain/repository/booking_repository.dart';
-import '../datasources/booking_mock_datasource.dart';
+import '../datasources/booking_remote_data_source.dart';
+import '../model/appointment_request_model.dart';
 
 class BookingRepositoryImpl implements BookingRepository {
-  final BookingMockDataSource dataSource;
+  final BookingRemoteDataSource remoteDataSource;
 
-  BookingRepositoryImpl(this.dataSource);
+  BookingRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<List<BookingDateEntity>> getBookingDates() {
-    return dataSource.getBookingDates();
+  Future<Either<Failure, BookingListEntity>> getUserBookings({int page = 1}) async {
+    return ResultHandler.handle(() async {
+      final result = await remoteDataSource.getUserBookings(page: page);
+      return result.toEntity();
+    });
   }
 
   @override
-  Future<List<TimeSlotBookingEntity>> getTimeSlots(DateTime date) {
-    // In a real app, we'd fetch based on date. Here just return dummy list.
-    return dataSource.getTimeSlots();
+  Future<Either<Failure, void>> makeAppointment(AppointmentRequestEntity request) async {
+    return ResultHandler.handle(() async {
+      await remoteDataSource.makeAppointment(
+        AppointmentRequestModel(
+          clinicalId: request.clinicalId,
+          doctorId: request.doctorId,
+          date: request.date,
+          time: request.time,
+          notes: request.notes,
+        ),
+      );
+    });
   }
 }

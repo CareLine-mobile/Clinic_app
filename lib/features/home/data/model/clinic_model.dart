@@ -26,11 +26,11 @@ class ClinicsHomeModel extends ClinicSummary {
           .toList() ??
           [],
       specialty: json['specialty'] as String?,
-      reviewsCount: json['reviews_count'] as int? ?? 0,
+      reviewsCount: json['reviews_count']?.toString() ?? '0',
       location: json['location'] as String? ?? '',
-      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+      rating: json['rating']?.toString() ?? '0',
       isOpen: json['is_open'] as bool? ?? true,
-      doctorsCount: json['doctors_count'] as int? ?? 0,
+      doctorsCount: json['doctors_count'] as String? ?? '0',
       isFavorite: json['is_favorite'] as bool? ?? false,
     );
   }
@@ -58,11 +58,11 @@ class ClinicsHomeModel extends ClinicSummary {
     String? name,
     List<String>? imageUrls,
     String? specialty,
-    int? reviewsCount,
+    String? reviewsCount,
     String? location,
-    double? rating,
+    String? rating,
     bool? isOpen,
-    int? doctorsCount,
+    String? doctorsCount,
     bool? isFavorite,
   }) {
     return ClinicsHomeModel(

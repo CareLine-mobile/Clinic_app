@@ -7,11 +7,11 @@ class ClinicSummary extends Equatable {
   final String name;
   final List<String> imageUrls;
   final String? specialty;
-  final int reviewsCount;
+  final String reviewsCount;
   final String location;
-  final double rating;
+  final String rating;
   final bool isOpen;
-  final int doctorsCount;
+  final String doctorsCount;
   final bool isFavorite;
 
   const ClinicSummary({
@@ -42,11 +42,11 @@ class ClinicSummary extends Equatable {
     String? name,
     List<String>? imageUrls,
     String? specialty,
-    int? reviewsCount,
+    String? reviewsCount,
     String? location,
-    double? rating,
+    String? rating,
     bool? isOpen,
-    int? doctorsCount,
+    String? doctorsCount,
     bool? isFavorite,
   }) {
     return ClinicSummary(

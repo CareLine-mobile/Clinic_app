@@ -1,82 +1,84 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/repository/booking_repository.dart';
-import 'booking_state.dart';
+import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
+
+import '../../domain/entities/appointment_request_entity.dart';
+import '../../domain/entities/booking_entity.dart';
+import '../../domain/usecases/get_user_bookings_usecase.dart';
+import '../../domain/usecases/make_appointment_usecase.dart';
+
+part 'booking_state.dart';
 
 class BookingCubit extends Cubit<BookingState> {
-  final BookingRepository repository;
+  final GetUserBookingsUseCase getUserBookingsUseCase;
+  final MakeAppointmentUseCase makeAppointmentUseCase;
 
-  BookingCubit(this.repository) : super(BookingInitial());
+  BookingCubit({
+    required this.getUserBookingsUseCase,
+    required this.makeAppointmentUseCase,
+  }) : super(BookingInitial());
 
-  Future<void> loadBookingData() async {
-    try {
-      emit(BookingLoading());
-      final dates = await repository.getBookingDates();
-      // Select the first date by default
-      final initialDate = dates.first.date;
-      final timeSlots = await repository.getTimeSlots(initialDate);
+  int _currentPage = 1;
 
-      // Deselect all times initially? Or select none.
-      // Assuming mock data has one selected, we should probably reset it or respect it.
-      // Let's reset selections for clean state.
-      // For this UI demo, let's just use the data as is but clean up selections logic here.
-      
-      emit(BookingLoaded(
-        dates: dates,
-        timeSlots: timeSlots,
-        selectedDate: initialDate,
-        selectedTime: null, // No time selected initially
-      ));
-    } catch (e) {
-      emit(BookingError("Failed to load booking data"));
-    }
+  Future<void> loadBookings() async {
+    emit(BookingLoading());
+    _currentPage = 1;
+
+    final result = await getUserBookingsUseCase(page: _currentPage);
+
+    result.fold(
+          (failure) => emit(BookingError(failure.message)),
+          (bookingList) => emit(BookingLoaded(
+        bookings: bookingList.data,
+        hasNextPage: bookingList.hasNextPage,
+      )),
+    );
   }
 
-  Future<void> selectDate(DateTime date) async {
+  Future<void> loadMoreBookings() async {
     final currentState = state;
-    if (currentState is BookingLoaded) {
-      if (currentState.selectedDate == date) return;
+    if (currentState is! BookingLoaded) return;
+    if (!currentState.hasNextPage || currentState.isPaginating) return;
 
-      emit(BookingLoading()); // fast loading or just update
-      // Real app might fetch specific slots for this date
-      final timeSlots = await repository.getTimeSlots(date);
-      
-      emit(currentState.copyWith(
-        selectedDate: date,
-        timeSlots: timeSlots,
-        selectedTime: null, // Reset time on date change
-      ));
-    }
+    emit(currentState.copyWith(isPaginating: true));
+    _currentPage++;
+
+    final result = await getUserBookingsUseCase(page: _currentPage);
+
+    result.fold(
+          (failure) {
+        _currentPage--;
+        emit(currentState.copyWith(isPaginating: false));
+        emit(BookingError(failure.message));
+      },
+          (bookingList) => emit(BookingLoaded(
+        bookings: [...currentState.bookings, ...bookingList.data],
+        hasNextPage: bookingList.hasNextPage,
+      )),
+    );
   }
 
-  void selectTime(String time) {
-    final currentState = state;
-    if (currentState is BookingLoaded) {
-      emit(currentState.copyWith(selectedTime: time));
-    }
-  }
+  Future<void> makeAppointment({
+    required int clinicalId,
+    required String doctorId,
+    required String date,
+    required String time,
+    String? notes,
+  }) async {
+    emit(AppointmentLoading());
 
-  void updatePatientDetails({required String name, required String phone}) {
-    final currentState = state;
-    if (currentState is BookingLoaded) {
-      emit(currentState.copyWith(patientName: name, patientPhone: phone));
-    }
-  }
+    final result = await makeAppointmentUseCase(
+      AppointmentRequestEntity(
+        clinicalId: clinicalId,
+        doctorId: doctorId,
+        date: date,
+        time: time,
+        notes: notes,
+      ),
+    );
 
-  void nextStep() {
-    final currentState = state;
-    if (currentState is BookingLoaded) {
-      if (currentState.currentStep < 2) {
-        emit(currentState.copyWith(currentStep: currentState.currentStep + 1));
-      }
-    }
-  }
-
-  void previousStep() {
-    final currentState = state;
-    if (currentState is BookingLoaded) {
-      if (currentState.currentStep > 0) {
-        emit(currentState.copyWith(currentStep: currentState.currentStep - 1));
-      }
-    }
+    result.fold(
+          (failure) => emit(AppointmentError(failure.message)),
+          (_) => emit(AppointmentSuccess()),
+    );
   }
 }

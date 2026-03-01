@@ -22,6 +22,7 @@
     "passwordMinLength": "Password must be at least 6 characters",
     "passwordMismatch": "Passwords do not match",
     "nameRequired": "Name is required",
+    "nameTooShort": "Name must be at least 2 characters",
     "phoneRequired": "Phone number is required"
   },
   "errors": {
@@ -45,8 +46,15 @@
       "forbidden": "You are not authorized for this action",
       "notFound": "Requested data not found",
       "invalidData": "Invalid data",
-      "internal": "Server error",
-      "unexpected": "Unexpected error occurred"
+      "internal": "Server error, please try again later",
+      "unexpected": "Unexpected error occurred",
+      "noResponse": "No response from server",
+      "invalidCredentials": "Invalid email or password",
+      "emailTaken": "Email is already in use",
+      "userNotFound": "User not found",
+      "accountNotVerified": "Account not verified, check your email",
+      "tokenExpired": "Session expired, please log in again",
+      "tooManyRequests": "Too many attempts, please wait and try again"
     },
     "auth": {
       "title": "Authentication Error",
@@ -77,6 +85,16 @@
       "toggleFavorite": "Failed to toggle favorite",
       "booking": "Failed to book appointment",
       "bookingFailed": "Booking failed. Please try again"
+    },
+    "booking": {
+      "list": "Failed to load bookings",
+      "create": "Failed to create appointment"
+    },
+    "doctor": {
+      "slots": "Failed to load doctor slots"
+    },
+    "clinic": {
+      "details": "Failed to load clinic details"
     }
   },
   "common": {
@@ -87,6 +105,3 @@
     "login": "Login"
   }
 }
-
-
-

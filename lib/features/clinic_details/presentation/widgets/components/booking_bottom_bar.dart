@@ -46,7 +46,7 @@ class BookingBottomBar extends StatelessWidget {
               flex: 2,
               child: BookButton(
                 doctor: doctor,
-                accentColor: Theme.of(context).primaryColor,
+                accentColor: Theme.of(context).primaryColor, clinic: clinic,
               ),
             ),
           ],

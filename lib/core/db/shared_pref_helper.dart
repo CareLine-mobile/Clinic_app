@@ -1,49 +1,40 @@
 import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-import '../../features/auth/data/model/user_model.dart';
 import '../../features/user_data/user_model.dart';
 import '../utils/app_constans.dart';
 
 class SharedPrefHelper {
   static const FlutterSecureStorage storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(
-      encryptedSharedPreferences: true,
-    ),
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
   );
 
+  // ── Write ─────────────────────────────────────────────────
 
-
-  // Save an object as JSON string
   static Future<bool> saveJson({
     required String key,
     required Map<String, dynamic> value,
   }) async {
     try {
-      final jsonString = jsonEncode(value);
-      await storage.write(key: key, value: jsonString);
-   //   DebuggerHelper.success('JSON saved successfully');
+      await storage.write(key: key, value: jsonEncode(value));
       return true;
-    } catch (e,s) {
-    //  DebuggerHelper.error('Error saving JSON: $e',stackTrace: s);
+    } catch (e) {
       return false;
     }
   }
 
-  // Retrieve data as string
-  static Future<String?> getData({required String key}) async {
+  // ── Read ──────────────────────────────────────────────────
+
+  /// Returns raw String (token, simple values)
+  static Future<String?> getString({required String key}) async {
     try {
       return await storage.read(key: key);
-    } catch (e,s) {
-    //  DebuggerHelper.error('ErrorgetData : $e',stackTrace: s);
+    } catch (e) {
       return null;
     }
   }
 
-
-
-  // Retrieve JSON object
+  /// Returns decoded JSON map
   static Future<Map<String, dynamic>?> getJson({required String key}) async {
     try {
       final jsonString = await storage.read(key: key);
@@ -51,52 +42,46 @@ class SharedPrefHelper {
         return jsonDecode(jsonString) as Map<String, dynamic>;
       }
       return null;
-    } catch (e,s) {
-   //   DebuggerHelper.error('Error getJson : $e',stackTrace: s);
+    } catch (e) {
       return null;
     }
   }
+
+  /// Returns the persisted user (uses auth UserModel)
   static Future<UserModel?> getUserData() async {
     try {
-      final jsonString = await storage.read(key: AppConstants.userKey);
-      if (jsonString != null && jsonString.isNotEmpty) {
-        return UserModel.fromJson(jsonDecode(jsonString));
-      }
+      final json = await getJson(key: AppConstants.userKey);
+      if (json != null) return UserModel.fromJson(json);
       return null;
-    } catch (e,s) {
- //     DebuggerHelper.error('Error getUserData : $e',stackTrace: s);
-
+    } catch (e) {
       return null;
     }
   }
 
+  // ── Delete ────────────────────────────────────────────────
 
-
-  // Delete specific key
   static Future<void> delete({required String key}) async {
     try {
       await storage.delete(key: key);
     } catch (e) {
-      print('Error deleting key: $e');
+      return;
     }
   }
 
-  // Clear all data
   static Future<void> clearAll() async {
     try {
       await storage.deleteAll();
     } catch (e) {
-      print('Error clearing all data: $e');
+      return;
     }
   }
 
-  // Check if key exists
+  // ── Utils ─────────────────────────────────────────────────
+
   static Future<bool> containsKey({required String key}) async {
     try {
-      final value = await storage.read(key: key);
-      return value != null;
+      return await storage.containsKey(key: key);
     } catch (e) {
-      print('Error checking key: $e');
       return false;
     }
   }

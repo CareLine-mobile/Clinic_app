@@ -238,7 +238,7 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
                             ),
                             SizedBox(width: _hSize.s4),
                             Text(
-                              widget.clinic.rating.toStringAsFixed(1),
+                              widget.clinic.rating,
                               style: textTheme.labelMedium?.copyWith(
                                 fontSize: _tSize.s12 + 1.sp,
                                 fontWeight: FontWeight.bold,
@@ -672,7 +672,7 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
                   ),
                   SizedBox(width: _hSize.s4),
                   Text(
-                    widget.clinic.rating.toStringAsFixed(1),
+                    widget.clinic.rating,
                     style: TextStyle(
                       fontSize: _tSize.s10 + 1.sp,
                       fontWeight: FontWeight.bold,

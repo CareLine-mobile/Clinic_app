@@ -1,54 +1,62 @@
-import '../../domain/entities/booking_date_entity.dart';
-import '../../domain/entities/time_slot_entity.dart';
+part of 'booking_cubit.dart';
 
-abstract class BookingState {}
+abstract class BookingState extends Equatable {
+  const BookingState();
+
+  @override
+  List<Object?> get props => [];
+}
 
 class BookingInitial extends BookingState {}
 
 class BookingLoading extends BookingState {}
 
 class BookingLoaded extends BookingState {
-  final List<BookingDateEntity> dates;
-  final List<TimeSlotBookingEntity> timeSlots;
-  final DateTime selectedDate;
-  final String? selectedTime;
-  final int currentStep;
-  final String? patientName;
-  final String? patientPhone;
+  final List<BookingEntity> bookings;
+  final bool hasNextPage;
+  final bool isPaginating;
 
-  BookingLoaded({
-    required this.dates,
-    required this.timeSlots,
-    required this.selectedDate,
-    this.selectedTime,
-    this.currentStep = 0,
-    this.patientName,
-    this.patientPhone,
+  const BookingLoaded({
+    required this.bookings,
+    required this.hasNextPage,
+    this.isPaginating = false,
   });
 
   BookingLoaded copyWith({
-    List<BookingDateEntity>? dates,
-    List<TimeSlotBookingEntity>? timeSlots,
-    DateTime? selectedDate,
-    String? selectedTime,
-    int? currentStep,
-    String? patientName,
-    String? patientPhone,
+    List<BookingEntity>? bookings,
+    bool? hasNextPage,
+    bool? isPaginating,
   }) {
     return BookingLoaded(
-      dates: dates ?? this.dates,
-      timeSlots: timeSlots ?? this.timeSlots,
-      selectedDate: selectedDate ?? this.selectedDate,
-      selectedTime: selectedTime ?? this.selectedTime,
-      currentStep: currentStep ?? this.currentStep,
-      patientName: patientName ?? this.patientName,
-      patientPhone: patientPhone ?? this.patientPhone,
+      bookings: bookings ?? this.bookings,
+      hasNextPage: hasNextPage ?? this.hasNextPage,
+      isPaginating: isPaginating ?? this.isPaginating,
     );
   }
+
+  @override
+  List<Object?> get props => [bookings, hasNextPage, isPaginating];
 }
 
 class BookingError extends BookingState {
   final String message;
 
-  BookingError(this.message);
+  const BookingError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+// Appointment states
+class AppointmentLoading extends BookingState {}
+
+class AppointmentSuccess extends BookingState {}
+
+class AppointmentError extends BookingState {
+  final String message;
+
+  const AppointmentError(this.message);
+
+  @override
+  List<Object?> get props => [message];
 }

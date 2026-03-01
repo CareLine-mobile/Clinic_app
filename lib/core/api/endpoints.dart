@@ -1,7 +1,7 @@
 // ==================== endpoints.dart ====================
 class Endpoints {
   // Base URL
-  static const String baseUrl = 'http://clinicalapp22-001-site1.ltempurl.com/api';
+  static const String baseUrl = 'https://clinical.khorogat.com/api';
 
   // Auth
   static const String login = '/auth/login';
@@ -20,9 +20,9 @@ class Endpoints {
   static const String getFavorites = '/favorites';
 
   // Bookings
-  static const String bookAppointment = '/bookings';
-  static const String getBookings = '/bookings';
-  static const String cancelBooking = '/bookings'; // + /{id}/cancel
+  static const String bookAppointment = '/auth/bookings'; // POST Method
+  static const String getListBooking = '/auth/bookings'; // GET Method
+  static const String cancelBooking = '/auth/bookings/{bookingId}/cancel'; //  /{id}/cancel
 
   // Profile
   static const String profile = '/profile';

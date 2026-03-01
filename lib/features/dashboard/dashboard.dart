@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theme/colors.dart';
 import '../../../../core/utils/app_size.dart';
+import '../booking/presentation/pages/booking_list/booking_list_screen.dart';
 import '../settings/presentation/view/settings_screen.dart';
 
 class PatientHomeScreen extends StatefulWidget {
@@ -21,13 +22,12 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
   bool _isNavBarVisible = true;
   double _lastScrollPosition = 0;
 
-  // الصفحات مع تمرير callback للـ HomeScreen
   late final List<Widget> _screens;
 
   final List<String> _icons = [
     Assets.homeIcon,
     Assets.pillsIcon,
-    Assets.chatsIcon,
+    Assets.chatsIcon, // حجوزاتي
     Assets.settingIcon,
   ];
 
@@ -41,9 +41,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         },
       ),
       const MedicationsTabScreen(),
-      const RemindersTabScreen(),
+      const BookingListScreen(), // ← هنا بدل RemindersTabScreen
       const SettingsTabScreen(),
-      const ProfileTabScreen(),
     ];
   }
 
@@ -54,9 +53,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
         if ((currentPosition - _lastScrollPosition).abs() > 5) {
           if (currentPosition > _lastScrollPosition && currentPosition > 100) {
-            if (_isNavBarVisible) {
-              setState(() => _isNavBarVisible = false);
-            }
+            if (_isNavBarVisible) setState(() => _isNavBarVisible = false);
           } else if (currentPosition < _lastScrollPosition) {
             if (!_isNavBarVisible &&
                 currentPosition < notification.metrics.maxScrollExtent - 100) {
@@ -86,7 +83,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         ? Colors.white.withOpacity(0.15)
         : Colors.black.withOpacity(0.1);
 
-    // عكس ترتيب الأيقونات في حالة RTL
     final displayIcons = isRTL ? _icons.reversed.toList() : _icons;
 
     return Scaffold(
@@ -102,7 +98,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             ),
           ),
 
-          // Floating Bottom Nav Bar
+          // ── Floating Bottom Nav Bar ──────────────────────
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
@@ -119,19 +115,15 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   decoration: BoxDecoration(
                     color: glassColor,
                     borderRadius: BorderRadius.circular(SizeApp.s30),
-                    border: Border.all(
-                      color: borderColor,
-                      width: 1,
-                    ),
+                    border: Border.all(color: borderColor, width: 1),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: List.generate(displayIcons.length, (displayIndex) {
-                      // حساب الـ index الحقيقي
                       final actualIndex = isRTL
                           ? (_icons.length - 1 - displayIndex)
                           : displayIndex;
-                      bool isSelected = _currentIndex == actualIndex;
+                      final isSelected = _currentIndex == actualIndex;
 
                       return Expanded(
                         child: GestureDetector(
@@ -146,21 +138,17 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                                 AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
                                   curve: Curves.easeInOut,
-                                  padding: EdgeInsets.all(
-                                      isSelected ? SizeApp.s8 : 0),
+                                  padding: EdgeInsets.all(isSelected ? SizeApp.s8 : 0),
                                   decoration: BoxDecoration(
                                     color: isSelected
                                         ? activeColor.withOpacity(0.15)
                                         : Colors.transparent,
-                                    borderRadius:
-                                    BorderRadius.circular(SizeApp.s12),
+                                    borderRadius: BorderRadius.circular(SizeApp.s12),
                                   ),
                                   child: CustomIcon(
                                     assetPath: displayIcons[displayIndex],
                                     size: SizeApp.s24 + SizeApp.s2,
-                                    color: isSelected
-                                        ? activeColor
-                                        : inactiveColor,
+                                    color: isSelected ? activeColor : inactiveColor,
                                   ),
                                 ),
                               ],
@@ -175,66 +163,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-// ===== الصفحات الوهمية =====
-
-class RemindersTabScreen extends StatelessWidget {
-  const RemindersTabScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'التنبيهات',
-          style: textTheme.titleLarge?.copyWith(
-            color: theme.colorScheme.onPrimary,
-          ),
-        ),
-        backgroundColor: ColorsManager.primaryColor,
-        iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
-      ),
-      body: Center(
-        child: Text(
-          'Reminders Screen',
-          style: textTheme.bodyLarge,
-        ),
-      ),
-    );
-  }
-}
-
-class ProfileTabScreen extends StatelessWidget {
-  const ProfileTabScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'الملف الشخصي',
-          style: textTheme.titleLarge?.copyWith(
-            color: theme.colorScheme.onPrimary,
-          ),
-        ),
-        backgroundColor: ColorsManager.primaryColor,
-        iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
-      ),
-      body: Center(
-        child: Text(
-          'Profile Screen',
-          style: textTheme.bodyLarge,
-        ),
       ),
     );
   }

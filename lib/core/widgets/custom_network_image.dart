@@ -160,10 +160,10 @@ class CustomNetworkImage extends StatelessWidget {
     }
 
     return Image.asset(
-      Assets.drugsIcon,
+      Assets.hospitalIcon,
       width: width,
       height: height,
-      fit: fit,
+      fit: BoxFit.fitHeight,
     );
   }
 

@@ -1,120 +1,141 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+
 import '../../../../core/theme/colors.dart';
-
 import '../../../../core/widgets/app_buton.dart';
-import '../../../../core/widgets/app_text_feild.dart';
-import '../cubit/booking_cubit.dart';
-import '../cubit/booking_state.dart';
+import '../cubit/booking_flow_cubit.dart';
 
-class BookingYourInfoPage extends StatelessWidget {
-   BookingYourInfoPage({super.key});
+class BookingYourInfoPage extends StatefulWidget {
+  const BookingYourInfoPage({super.key});
+
+  @override
+  State<BookingYourInfoPage> createState() => _BookingYourInfoPageState();
+}
+
+class _BookingYourInfoPageState extends State<BookingYourInfoPage> {
+  late final TextEditingController _nameController;
+  late final TextEditingController _phoneController;
+  late final TextEditingController _notesController;
+
+  @override
+  void initState() {
+    super.initState();
+    final state = context.read<BookingFlowCubit>().state;
+    _nameController = TextEditingController(text: state.patientName);
+    _phoneController = TextEditingController(text: state.patientPhone);
+    _notesController = TextEditingController(text: state.notes);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Note: In a real app, use a Form and TextEditingControllers managed by the Cubit or internally.
-    // For this UI implementation, we'll setup the UI structure.
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Patient Information",
-            style: TextStyle(
-              fontSize: 16,
-              color: ColorsManager.primaryColor,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 16),
-          AppTextField(
-            hintText: "Enter your full name",
-            title: "Full Name *",
-          ),
-          const SizedBox(height: 16),
-          AppTextField(
-            hintText: "Enter your phone number",
-            title: "Phone Number *",
-            keyboardType: TextInputType.phone,
-          ),
-          const SizedBox(height: 16),
-
-
-
-          // AppTextField.textArea(
-          //   hintText: "Briefly describe your symptoms or reason for visit",
-          //   title: "Reason for Visit (Optional)",
-          //   maxLines: 4,
-          // ),
-          const SizedBox(height: 32),
-          // Booking Summary Section (simplified for this step as per image)
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: ColorsManager.backgroundSurface, // Light grey/blue background
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Booking Summary",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+    return BlocBuilder<BookingFlowCubit, BookingFlowState>(
+      builder: (context, state) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Your Information",
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: ColorsManager.primaryColor,
                 ),
-                const SizedBox(height: 12),
-                _buildSummaryRow("Clinic:", "City Medical Center"),
-                const SizedBox(height: 8),
-                _buildSummaryRow("Doctor:", "Dr. Sarah Johnson"), // Hardcoded for now
-                const SizedBox(height: 8),
-                 BlocBuilder<BookingCubit, BookingState>(
-                  builder: (context, state) {
-                    if (state is BookingLoaded) {
-                       return Column(children: [
-                           _buildSummaryRow("Date:", DateFormat('EEE, MMM d').format(state.selectedDate)),
-                           const SizedBox(height: 8),
-                           _buildSummaryRow("Time:", state.selectedTime ?? "Not Selected"),
-                       ]);
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12.0),
-                  child: Divider(),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text("Consultation Fee:", style: TextStyle(fontWeight: FontWeight.w500)),
-                    Text("\$50", style: TextStyle(color: ColorsManager.primaryColor, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 24),
+
+              _buildField(
+                label: "Full Name",
+                hint: "Enter your full name",
+                controller: _nameController,
+                icon: Icons.person_outline,
+                onChanged: (v) => context.read<BookingFlowCubit>().updatePatientName(v),
+              ),
+              const SizedBox(height: 16),
+
+              _buildField(
+                label: "Phone Number",
+                hint: "Enter your phone number",
+                controller: _phoneController,
+                icon: Icons.phone_outlined,
+                keyboardType: TextInputType.phone,
+                onChanged: (v) => context.read<BookingFlowCubit>().updatePatientPhone(v),
+              ),
+              const SizedBox(height: 16),
+
+              _buildField(
+                label: "Notes (Optional)",
+                hint: "Any symptoms or notes for the doctor...",
+                controller: _notesController,
+                icon: Icons.notes_outlined,
+                maxLines: 3,
+                onChanged: (v) => context.read<BookingFlowCubit>().updateNotes(v),
+              ),
+
+              const SizedBox(height: 32),
+
+              AppButton(
+                text: "Continue",
+                onPressed: state.canProceedStep2
+                    ? () => context.read<BookingFlowCubit>().nextStep()
+                    : null,
+              ),
+              const SizedBox(height: 20),
+            ],
           ),
-          const SizedBox(height: 24),
-          AppButton(
-            text: "Confirm Booking",
-            onPressed: () {
-               context.read<BookingCubit>().nextStep();
-            },
-            // disabledColor: Colors.grey, // If form invalid
-            horizontalPadding: 0,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildSummaryRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildField({
+    required String label,
+    required String hint,
+    required TextEditingController controller,
+    required IconData icon,
+    required ValueChanged<String> onChanged,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.grey)),
-        Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+        const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          keyboardType: keyboardType,
+          maxLines: maxLines,
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+            prefixIcon: Icon(icon, color: Colors.grey[500], size: 20),
+            filled: true,
+            fillColor: Colors.grey[50],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: ColorsManager.primaryColor, width: 2),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          ),
+        ),
       ],
     );
   }
