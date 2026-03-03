@@ -30,7 +30,7 @@ class ClinicSummary extends Equatable {
   // Helper getters for UI
   String get firstImageUrl => imageUrls.isNotEmpty
       ? imageUrls.first
-      : 'https://via.placeholder.com/400x300?text=No+Image';
+      : 'https://systass.org/placeholder-2-1-png/';
 
   bool get hasSpecialty => specialty != null && specialty!.isNotEmpty;
 

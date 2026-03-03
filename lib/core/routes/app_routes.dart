@@ -3,6 +3,7 @@ import 'package:clinic_app/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/auth/presentation/view/auth_screen.dart';
+import '../../features/auth/presentation/view/otp_verification_page.dart';
 import '../../features/dashboard/dashboard.dart';
 import '../../features/clinic_details/presentation/view/clinic_details_screen.dart';
 import '../di/injection_container.dart' as di;
@@ -19,6 +20,15 @@ class AppRouter {
           builder: (_) => BlocProvider<AuthCubit>(
             create: (context) => di.sl<AuthCubit>(),
             child: const AuthScreen(),
+          ),
+        );
+
+      case Routes.verification:
+        final email = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider<AuthCubit>(
+            create: (_) => di.sl<AuthCubit>(),
+            child: OtpVerificationPage(email: email),
           ),
         );
 

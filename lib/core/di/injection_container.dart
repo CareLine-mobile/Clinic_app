@@ -15,6 +15,7 @@ import '../../features/auth/domain/usecases/get_current_user_usecase.dart';
 import '../../features/auth/domain/usecases/login_usecase.dart';
 import '../../features/auth/domain/usecases/logout_usecase.dart';
 import '../../features/auth/domain/usecases/signup_usecase.dart';
+import '../../features/auth/domain/usecases/verify_otp_usecase.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../features/booking/data/datasources/booking_remote_data_source.dart';
 import '../../features/booking/data/repository/booking_repository_impl.dart';
@@ -29,6 +30,7 @@ import '../../features/clinic_details/domain/usecases/get_clinic_details_usecase
 import '../../features/clinic_details/domain/usecases/toggle_favorite_usecase.dart' as clinic_details;
 import '../../features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
 import '../../features/clinic_details/presentation/cubit/clinic_ui_cubit.dart';
+
 // Features - Home
 import '../../features/home/data/datasources/localdatasource/location_data_source.dart';
 import '../../features/home/data/datasources/localdatasource/location_data_source_impl.dart';
@@ -210,12 +212,6 @@ Future<void> init() async {
   //       () => AuthRemoteDataSourceImpl(apiService: sl()),
   // );
 
-  sl.registerLazySingleton<AuthLocalDataSource>(
-        () => AuthLocalDataSourceImpl(
-      sharedPreferences: sl(),
-    ),
-  );
-
   // Repository
   sl.registerLazySingleton<AuthRepository>(
         () => AuthRepositoryImpl(
@@ -228,7 +224,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SignupUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
   sl.registerLazySingleton(() => UserRepository());
-
+  sl.registerLazySingleton(() => VerifyOtpUseCase(sl()));
 
   // Cubit
   sl.registerFactory(
@@ -236,7 +232,9 @@ Future<void> init() async {
       loginUseCase: sl(),
       signupUseCase: sl(),
       userRepository: sl(),
+      verifyOtpUseCase: sl(),
       authRepository: sl(),
+      logoutUseCase: sl(),
         ),
   );
 }

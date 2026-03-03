@@ -83,13 +83,22 @@ class _LoginTabState extends State<LoginTab> {
 
   Widget _buildLoginButton() {
     return BlocConsumer<AuthCubit, AuthState>(
-      listenWhen: (_, current) => current is AuthFailure || current is LoginSuccess,
+      listenWhen: (_, current) =>
+      current is AuthFailure ||
+          current is LoginSuccess ||
+          current is AccountNotVerified,
+
       listener: (context, state) {
         if (state is AuthFailure) {
-          log(state.message);
           _showErrorSnackBar(state.message);
         } else if (state is LoginSuccess) {
           Navigator.pushNamedAndRemoveUntil(context, Routes.dashBoard, (_) => false);
+        } else if (state is AccountNotVerified) {
+          Navigator.pushNamed(
+            context,
+            Routes.verification,
+            arguments: state.email,
+          );
         }
       },
       builder: (context, state) {
@@ -133,8 +142,8 @@ class _LoginTabState extends State<LoginTab> {
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthCubit>().login(
-        email:  _emailController.text.trim(),
-        password: _passwordController.text,
+          _emailController.text.trim(),
+          _passwordController.text,
       );
     }
   }

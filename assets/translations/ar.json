@@ -13,7 +13,15 @@
     "welcomeBack": "مرحباً بعودتك",
     "loginSubtitle": "سجل دخولك لمتابعة رحلتك الصحية",
     "createAccountTitle": "إنشاء حساب جديد",
-    "signupSubtitle": "انضم إلينا للحصول على رعاية صحية أفضل"
+    "signupSubtitle": "انضم إلينا للحصول على رعاية صحية أفضل",
+    "otp": {
+      "title": "التحقق",
+      "headline": "تحقق من بريدك الإلكتروني",
+      "subtitle": "أرسلنا رمزاً مكوناً من 6 أرقام إلى\n{email}",
+      "verify": "تحقق",
+      "noCode": "لم تستلم الرمز؟",
+      "resend": "إعادة الإرسال"
+    }
   },
   "validation": {
     "emailRequired": "البريد الإلكتروني مطلوب",

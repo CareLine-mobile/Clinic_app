@@ -68,4 +68,20 @@ class UnauthorizedFailure extends Failure {
   String get errorType => 'unauthorized_error'.tr();
 }
 
+class AccountNotVerifiedFailure extends Failure {
+  final String email;
+
+  const AccountNotVerifiedFailure(this.email)
+      : super('errors.server.accountNotVerified');
+
+  @override
+  String get errorKey => 'errors.server.accountNotVerified'.tr();
+
+  @override
+  String get errorType => 'account_not_verified';
+
+  @override
+  List<Object?> get props => [email, message, code];
+}
+
 

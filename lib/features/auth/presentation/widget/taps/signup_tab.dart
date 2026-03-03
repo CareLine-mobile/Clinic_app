@@ -4,7 +4,6 @@ import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:clinic_app/core/theme/colors.dart';
 import 'package:clinic_app/core/widgets/app_buton.dart';
 import 'package:clinic_app/core/widgets/app_text_feild.dart';
 import 'package:clinic_app/core/routes/routes.dart';
@@ -47,6 +46,7 @@ class _SignupTabState extends State<SignupTab> {
           _showErrorSnackBar(state.message);
         } else if (state is SignupSuccess) {
           CustomSnackBar.show(context, message: 'errors.server.accountNotVerified'.tr() ,type: SnackBarType.success);
+          Navigator.pushNamed(context, Routes.verification,arguments: state.email,);
         } else if (state is AuthAuthenticated) {
           Navigator.pushNamedAndRemoveUntil(context, Routes.dashBoard, (_) => false);
         }

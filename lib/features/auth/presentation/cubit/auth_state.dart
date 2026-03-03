@@ -27,14 +27,7 @@ class AuthAuthenticated extends AuthState {
 
 class AuthUnauthenticated extends AuthState {}
 
-class LoginSuccess extends AuthState {
-  final User user;
-
-  const LoginSuccess({required this.user});
-
-  @override
-  List<Object?> get props => [user];
-}
+class LoginSuccess extends AuthState {}
 
 class SignupSuccess extends AuthState {
   final String email;
@@ -52,4 +45,26 @@ class AuthFailure extends AuthState {
 
   @override
   List<Object?> get props => [message];
+}
+
+class OtpLoading extends AuthState {
+  const OtpLoading();
+}
+
+class OtpFailure extends AuthState {
+  final String message;
+
+  const OtpFailure({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class AccountNotVerified extends AuthState {
+  final String email;
+
+  const AccountNotVerified({required this.email});
+
+  @override
+  List<Object?> get props => [email];
 }

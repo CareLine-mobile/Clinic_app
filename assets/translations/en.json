@@ -13,7 +13,15 @@
     "welcomeBack": "Welcome Back",
     "loginSubtitle": "Login to continue your health journey",
     "createAccountTitle": "Create Account",
-    "signupSubtitle": "Join us for better healthcare"
+    "signupSubtitle": "Join us for better healthcare",
+    "otp": {
+      "title": "Verification",
+      "headline": "Check your email",
+      "subtitle": "We sent a 6-digit code to\n{email}",
+      "verify": "Verify",
+      "noCode": "Didn't receive the code?",
+      "resend": "Resend"
+    }
   },
   "validation": {
     "emailRequired": "Email is required",

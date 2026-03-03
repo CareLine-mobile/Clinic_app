@@ -9,6 +9,8 @@ class Assets {
   static const String favIcon = 'assets/icons/heart_Pop.json';
   // NavBar Icon
   static const String settingIcon = 'assets/icons/settings_icon.svg';
+  // auth
+  static const String verifiedIcon = 'assets/icons/verified.svg';
 
   static const String homeIcon = 'assets/icons/home.svg';
   static const String hospitalIcon = 'assets/images/hospital.png';
