@@ -1,3 +1,5 @@
+// lib/features/booking/data/models/booking_model.dart
+
 import '../../domain/entities/booking_entity.dart';
 
 class BookingListModel {
@@ -13,18 +15,18 @@ class BookingListModel {
 
   factory BookingListModel.fromJson(Map<String, dynamic> json) {
     return BookingListModel(
+      currentPage: json['current_page'] as int,
+      lastPage:    json['last_page'] as int,
       data: (json['data'] as List)
-          .map((e) => BookingModel.fromJson(e))
+          .map((e) => BookingModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-      currentPage: json['current_page'],
-      lastPage: json['last_page'],
     );
   }
 
   BookingListEntity toEntity() => BookingListEntity(
-    data: data.map((e) => e.toEntity()).toList(),
+    data:        data.map((e) => e.toEntity()).toList(),
     currentPage: currentPage,
-    lastPage: lastPage,
+    lastPage:    lastPage,
   );
 }
 
@@ -34,9 +36,11 @@ class BookingModel {
   final int doctorId;
   final String date;
   final String time;
-  final int turnNumber;
+  final int? turnNumber;
   final String status;
   final String? notes;
+  final String? patientName;
+  final String? patientPhone;
   final ClinicalModel clinical;
   final DoctorModel doctor;
 
@@ -46,39 +50,45 @@ class BookingModel {
     required this.doctorId,
     required this.date,
     required this.time,
-    required this.turnNumber,
+    this.turnNumber,
     required this.status,
     this.notes,
+    this.patientName,
+    this.patientPhone,
     required this.clinical,
     required this.doctor,
   });
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
     return BookingModel(
-      id: json['id'] is String ? int.parse(json['id']) : json['id'] ?? 0,
-      clinicalId: json['clinical_id'] is String ? int.parse(json['clinical_id']) : json['clinical_id'] ?? 0,
-      doctorId: json['doctor_id'] is String ? int.parse(json['doctor_id']) : json['doctor_id'] ?? 0,
-      date: json['date'] ?? '',
-      time: json['time'] ?? '',
-      turnNumber: json['turn_number'] is String ? int.parse(json['turn_number']) : json['turn_number'] ?? 0,
-      status: json['status'] ?? '',
-      notes: json['notes'],
-      clinical: ClinicalModel.fromJson(json['clinical']),
-      doctor: DoctorModel.fromJson(json['doctor']),
+      id:           _parseInt(json['id'])!,
+      clinicalId:   _parseInt(json['clinical_id'])!,
+      doctorId:     _parseInt(json['doctor_id'])!,
+      date:         json['date'] as String,
+      time:         json['time'] as String,
+      turnNumber:   _parseInt(json['turn_number']),   // nullable
+      status:       json['status'] as String,
+      notes:        json['notes'] as String?,
+      patientName:  json['name'] as String?,          // nullable
+      patientPhone: json['phone'] as String?,         // nullable
+      clinical:     ClinicalModel.fromJson(json['clinical'] as Map<String, dynamic>),
+      doctor:       DoctorModel.fromJson(json['doctor'] as Map<String, dynamic>),
     );
   }
 
   BookingEntity toEntity() => BookingEntity(
-    id: id,
-    clinicalId: clinicalId,
-    doctorId: doctorId,
-    date: date,
-    time: time,
-    turnNumber: turnNumber,
-    status: status,
-    notes: notes,
-    clinical: clinical.toEntity(),
-    doctor: doctor.toEntity(),
+    id:           id,
+    clinicalId:   clinicalId,
+    doctorId:     doctorId,
+    date:         date,
+    time:         time,
+    turnNumber:   turnNumber,
+    status:       status,
+    notes:        notes,
+    patientName:  patientName,
+    patientPhone: patientPhone,
+    clinical:     clinical.toEntity(),
+    doctor:       doctor.toEntity(),
   );
 }
 
@@ -105,30 +115,29 @@ class ClinicalModel {
     required this.doctorsCount,
   });
 
-
   factory ClinicalModel.fromJson(Map<String, dynamic> json) {
     return ClinicalModel(
-      id: json['id'] is String ? int.parse(json['id']) : json['id'] ?? 0,
-      name: json['name'] ?? '',
-      imageUrls: List<String>.from(json['image_urls'] ?? []),
-      specialty: json['specialty'] ?? '',
-      reviewsCount: int.tryParse(json['reviews_count']?.toString() ?? '0') ?? 0,
-      location: json['location'] ?? '',
-      rating: double.tryParse(json['rating']?.toString() ?? '0') ?? 0.0,
-      isOpen: json['is_open'] ?? false,
-      doctorsCount: int.tryParse(json['doctors_count']?.toString() ?? '0') ?? 0,
+      id:           _parseInt(json['id'])!,
+      name:         json['name'] as String,
+      imageUrls:    List<String>.from(json['image_urls'] as List? ?? []),
+      specialty:    json['specialty'] as String,
+      reviewsCount: _parseInt(json['reviews_count']) ?? 0,
+      location:     json['location'] as String,
+      rating:       _parseDouble(json['rating']) ?? 0.0,
+      isOpen:       json['is_open'] as bool? ?? false,
+      doctorsCount: _parseInt(json['doctors_count']) ?? 0,
     );
   }
 
   ClinicalEntity toEntity() => ClinicalEntity(
-    id: id,
-    name: name,
-    imageUrls: imageUrls,
-    specialty: specialty,
+    id:           id,
+    name:         name,
+    imageUrls:    imageUrls,
+    specialty:    specialty,
     reviewsCount: reviewsCount,
-    location: location,
-    rating: rating,
-    isOpen: isOpen,
+    location:     location,
+    rating:       rating,
+    isOpen:       isOpen,
     doctorsCount: doctorsCount,
   );
 }
@@ -146,15 +155,31 @@ class DoctorModel {
 
   factory DoctorModel.fromJson(Map<String, dynamic> json) {
     return DoctorModel(
-      id: json['id'],
-      name: json['name'],
-      specialty: json['specialty'],
+      id:        _parseInt(json['id'])!,
+      name:      json['name'] as String,
+      specialty: json['specialty'] as String,
     );
   }
 
   DoctorEntity toEntity() => DoctorEntity(
-    id: id,
-    name: name,
+    id:        id,
+    name:      name,
     specialty: specialty,
   );
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+// API returns IDs and numbers sometimes as strings, sometimes as int
+
+int? _parseInt(dynamic v) {
+  if (v == null) return null;
+  if (v is int) return v;
+  return int.tryParse(v.toString());
+}
+
+double? _parseDouble(dynamic v) {
+  if (v == null) return null;
+  if (v is double) return v;
+  if (v is int) return v.toDouble();
+  return double.tryParse(v.toString());
 }

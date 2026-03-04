@@ -24,6 +24,51 @@
       "resend": "إعادة الإرسال"
     }
   },
+  "home": {
+    "header": {
+      "title": "احجز في عيادتك بسهولة",
+      "subtitle": "تابع دورك دون انتظار"
+    },
+    "last_booking": {
+      "badge": "آخر حجز",
+      "queue_position": "دورك",
+      "people_ahead": "{count} قدامك",
+      "no_bookings_title": "لا توجد حجوزات",
+      "no_bookings_subtitle": "ليس لديك أي حجوزات مؤكدة حالياً"
+    }
+  },
+  "bookings": {
+    "title": "حجوزاتي",
+    "auth_required_title": "تسجيل الدخول مطلوب",
+    "auth_required_subtitle": "سجّل دخولك لعرض حجوزاتك والتحكم فيها",
+    "empty_title": "لا توجد حجوزات",
+    "empty_subtitle": "لم تقم بحجز أي موعد حتى الآن",
+    "find_clinic": "ابحث عن عيادة",
+    "retry": "إعادة المحاولة",
+    "doctor": "الطبيب",
+    "date": "التاريخ",
+    "time": "الوقت",
+    "turn_number": "رقم الدور",
+    "detail": {
+      "title": "تفاصيل الحجز",
+      "appointment_info": "معلومات الموعد",
+      "patient_info": "معلومات المريض",
+      "patient_name": "الاسم",
+      "patient_phone": "رقم الهاتف",
+      "specialty": "التخصص",
+      "notes": "الملاحظات",
+      "cancel_booking": "إلغاء الحجز",
+      "cancel_confirm_title": "إلغاء الحجز",
+      "cancel_confirm_body": "هل أنت متأكد أنك تريد إلغاء هذا الموعد؟",
+      "cancel_confirm_yes": "نعم، إلغاء",
+      "cancel_success": "تم إلغاء الحجز بنجاح"
+    },
+    "status": {
+      "confirmed": "مؤكد",
+      "cancelled": "ملغي",
+      "pending": "قيد الانتظار"
+    }
+  },
   "validation": {
     "emailRequired": "البريد الإلكتروني مطلوب",
     "emailInvalid": "صيغة البريد الإلكتروني غير صحيحة",
@@ -111,6 +156,7 @@
     "tryAgain": "حاول مرة أخرى",
     "cancel": "إلغاء",
     "ok": "حسناً",
+    "no": "لا",
     "login": "تسجيل الدخول"
   }
 }

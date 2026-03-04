@@ -23,7 +23,7 @@ class Endpoints {
   // Bookings
   static const String bookAppointment = '/auth/bookings'; // POST Method
   static const String getListBooking = '/auth/bookings'; // GET Method
-  static const String cancelBooking = '/auth/bookings/{bookingId}/cancel'; //  /{id}/cancel
+  static String cancelBooking(int id) => '/auth/bookings/$id/cancel';
 
   // Profile
   static const String profile = '/profile';

@@ -1,4 +1,5 @@
 {
+
   "auth": {
     "user": "User",
     "login": "Login",
@@ -22,6 +23,51 @@
       "verify": "Verify",
       "noCode": "Didn't receive the code?",
       "resend": "Resend"
+    }
+  },
+  "home": {
+    "header": {
+      "title": "Quick clinic bookings",
+      "subtitle": "Follow your turn without waiting"
+    },
+    "last_booking": {
+      "badge": "Last Booking",
+      "queue_position": "Your Turn",
+      "people_ahead": "{count} ahead",
+      "no_bookings_title": "No Bookings",
+      "no_bookings_subtitle": "You have no confirmed bookings at the moment"
+    }
+  },
+  "bookings": {
+    "title": "My Bookings",
+    "auth_required_title": "Login Required",
+    "auth_required_subtitle": "Sign in to view and manage your bookings",
+    "empty_title": "No Bookings",
+    "empty_subtitle": "You haven't made any appointments yet",
+    "find_clinic": "Find a Clinic",
+    "retry": "Try Again",
+    "doctor": "Doctor",
+    "date": "Date",
+    "time": "Time",
+    "turn_number": "Turn Number",
+    "detail": {
+      "title": "Booking Details",
+      "appointment_info": "Appointment Info",
+      "patient_info": "Patient Info",
+      "patient_name": "Name",
+      "patient_phone": "Phone",
+      "specialty": "Specialty",
+      "notes": "Notes",
+      "cancel_booking": "Cancel Booking",
+      "cancel_confirm_title": "Cancel Booking",
+      "cancel_confirm_body": "Are you sure you want to cancel this appointment?",
+      "cancel_confirm_yes": "Yes, Cancel",
+      "cancel_success": "Booking cancelled successfully"
+    },
+    "status": {
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "pending": "Pending"
     }
   },
   "validation": {
@@ -111,6 +157,7 @@
     "tryAgain": "Try Again",
     "cancel": "Cancel",
     "ok": "OK",
+    "no": "No",
     "login": "Login"
   }
 }

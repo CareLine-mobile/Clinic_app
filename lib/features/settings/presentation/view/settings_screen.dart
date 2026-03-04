@@ -1,8 +1,6 @@
 // lib/features/settings/presentation/screens/settings_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../../../core/routes/routes.dart';
 import '../../../../core/theme/colors.dart';
 import '../../../../core/utils/app_size.dart';
@@ -13,7 +11,6 @@ import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
 import '../../../user_data/user_repo.dart';
 import '../cubit/settings_cubit.dart';
-import '../widgets/logout_button.dart';
 import '../widgets/settings_card.dart';
 import '../widgets/settings_header.dart';
 import '../widgets/settings_item.dart';

@@ -1,3 +1,5 @@
+// lib/features/booking/domain/entities/booking_entity.dart
+
 import 'package:equatable/equatable.dart';
 
 class BookingListEntity extends Equatable {
@@ -23,9 +25,11 @@ class BookingEntity extends Equatable {
   final int doctorId;
   final String date;
   final String time;
-  final int turnNumber;
+  final int? turnNumber;      // nullable — API returns null when pending
   final String status;
   final String? notes;
+  final String? patientName;  // nullable — API returns null
+  final String? patientPhone; // nullable — API returns null
   final ClinicalEntity clinical;
   final DoctorEntity doctor;
 
@@ -35,29 +39,24 @@ class BookingEntity extends Equatable {
     required this.doctorId,
     required this.date,
     required this.time,
-    required this.turnNumber,
+    this.turnNumber,
     required this.status,
     this.notes,
+    this.patientName,
+    this.patientPhone,
     required this.clinical,
     required this.doctor,
   });
 
   bool get isConfirmed => status == 'confirmed';
   bool get isCancelled => status == 'cancelled';
-  bool get isPending => status == 'pending';
+  bool get isPending   => status == 'pending';
 
   @override
   List<Object?> get props => [
-    id,
-    clinicalId,
-    doctorId,
-    date,
-    time,
-    turnNumber,
-    status,
-    notes,
-    clinical,
-    doctor,
+    id, clinicalId, doctorId, date, time,
+    turnNumber, status, notes, patientName, patientPhone,
+    clinical, doctor,
   ];
 }
 
@@ -88,15 +87,8 @@ class ClinicalEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-    id,
-    name,
-    imageUrls,
-    specialty,
-    reviewsCount,
-    location,
-    rating,
-    isOpen,
-    doctorsCount,
+    id, name, imageUrls, specialty,
+    reviewsCount, location, rating, isOpen, doctorsCount,
   ];
 }
 

@@ -1,7 +1,4 @@
-// ============================================
-// HOME SCREEN - REFACTORED
 // lib/features/home/presentation/screens/home_screen.dart
-// ============================================
 
 import 'package:clinic_app/core/utils/enums.dart';
 import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
@@ -10,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/app_size.dart';
 import '../../../../core/theme/colors.dart';
 import '../../../../core/widgets/error_state_widget.dart';
+import '../../../booking/presentation/cubit/booking_cubit.dart';
 import '../../../clinic_details/presentation/view/clinic_details_screen.dart';
 import '../../../user_data/user_repo.dart';
 import '../../domain/entities/clinic_summary.dart';
@@ -24,10 +22,7 @@ import '../widget/home_shimmer_loading.dart';
 class HomeScreen extends StatefulWidget {
   final Function(int)? onNavigateToSearch;
 
-  const HomeScreen({
-    Key? key,
-    this.onNavigateToSearch,
-  }) : super(key: key);
+  const HomeScreen({Key? key, this.onNavigateToSearch}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -40,9 +35,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _scrollController = ScrollController()..addListener(_onScroll);
-
-    // Initialize home (first load only)
     context.read<HomeCubit>().initHome();
+
+    // Load bookings only if user is logged in
+    if (UserRepository().isLoggedIn) {
+      context.read<BookingCubit>().loadBookings();
+    }
   }
 
   @override
@@ -52,16 +50,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onScroll() {
-    if (_isBottom) {
-      context.read<HomeCubit>().loadMoreClinics();
-    }
+    if (_isBottom) context.read<HomeCubit>().loadMoreClinics();
   }
 
   bool get _isBottom {
     if (!_scrollController.hasClients) return false;
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.offset;
-    return currentScroll >= (maxScroll * 0.9);
+    final max = _scrollController.position.maxScrollExtent;
+    return _scrollController.offset >= (max * 0.9);
   }
 
   @override
@@ -69,13 +64,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: ColorsManager.backgroundSurface,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: BlocConsumer<HomeCubit, HomeState>(
         listener: _handleStateChanges,
         builder: (context, state) {
-          // ============================================
-          // LOADED STATE - Show Data with RefreshIndicator
-          // ============================================
           if (state is HomeLoaded) {
             return ClinicRefreshIndicator(
               onRefresh: () => context.read<HomeCubit>().refresh(),
@@ -83,35 +75,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 controller: _scrollController,
                 physics: const BouncingScrollPhysics(),
                 slivers: [
-                  _buildHeader(state),
+                  _buildHeader(),
                   ..._buildLoadedBody(state, textTheme),
                 ],
               ),
             );
           }
 
-          // ============================================
-          // LOADING STATE - Show Shimmer (First Load Only)
-          // ============================================
           if (state is HomeLoading) {
             return CustomScrollView(
               physics: const NeverScrollableScrollPhysics(),
               slivers: [
-                _buildHeader(state),
-                ..._buildShimmerBody(),
+                _buildHeader(),
+                const SliverFillRemaining(child: HomeBodyShimmer()),
               ],
             );
           }
 
-          // ============================================
-          // ERROR STATE - Show Error with Retry
-          // ============================================
           if (state is HomeError) {
-            print('zzzzzzzzzzzzzzzzzzzzzz ${state.failure}');
             return CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
-                _buildHeader(state),
+                _buildHeader(),
                 SliverFillRemaining(
                   child: ErrorStateWidget(
                     failure: state.failure,
@@ -122,16 +107,11 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           }
 
-          // ============================================
-          // INITIAL STATE - Show Empty
-          // ============================================
           return CustomScrollView(
             slivers: [
-              _buildHeader(state),
+              _buildHeader(),
               const SliverFillRemaining(
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
+                child: Center(child: CircularProgressIndicator()),
               ),
             ],
           );
@@ -140,9 +120,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ============================================
-  // STATE CHANGE HANDLER
-  // ============================================
+  // ── Header — reads user from singleton, booking from BookingCubit ─────────
+
+  Widget _buildHeader() {
+    return HomeHeaderWidget(
+      userName: UserRepository().currentUser?.name,
+      userPhotoUrl: UserRepository().currentUser?.avatar,
+      onNotificationTap: _handleNotificationTap,
+      onBookingCardTap: () {
+        // BookingCubit state is accessible here if needed for navigation
+      },
+      onSearchTap: () => widget.onNavigateToSearch?.call(1),
+    );
+  }
+
+  // ── State listener ────────────────────────────────────────────────────────
 
   void _handleStateChanges(BuildContext context, HomeState state) {
     if (state is HomeError) {
@@ -154,58 +146,12 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // ============================================
-  // HEADER BUILDER
-  // ============================================
-
-  Widget _buildHeader(HomeState state) {
-    return BlocBuilder<HomeUiCubit, HomeUiState>(
-      builder: (context, uiState) {
-        ClinicSummary? lastBooking;
-        if (state is HomeLoaded && state.allClinics.isNotEmpty) {
-          lastBooking = state.allClinics.first;
-        }
-
-        return HomeHeaderWidget(
-          userName: UserRepository().currentUser?.name,
-          userPhotoUrl: UserRepository().currentUser?.avatar,
-          lastBooking: lastBooking,
-          queuePosition: 5,
-          peopleAhead: 4,
-          onNotificationTap: _handleNotificationTap,
-          onBookingCardTap: () {
-            if (lastBooking != null) {
-              _navigateToClinicDetails(lastBooking);
-            }
-          },
-          onSearchTap: () => widget.onNavigateToSearch?.call(1),
-          isLoading: uiState.isBookingLoading,
-        );
-      },
-    );
-  }
-
-  // ============================================
-  // SHIMMER BODY (First Load Only)
-  // ============================================
-
-  List<Widget> _buildShimmerBody() {
-    return [
-      const SliverFillRemaining(
-        child: HomeBodyShimmer(),
-      ),
-    ];
-  }
-
-  // ============================================
-  // LOADED BODY (Data + RefreshIndicator)
-  // ============================================
+  // ── Loaded body ───────────────────────────────────────────────────────────
 
   List<Widget> _buildLoadedBody(HomeLoaded state, TextTheme textTheme) {
     return [
       SliverToBoxAdapter(child: SizedBox(height: SizeApp.s50)),
 
-      // Featured Clinics Section
       if (state.featuredClinics.isNotEmpty)
         SliverToBoxAdapter(
           child: FeaturedClinicsSection(
@@ -216,19 +162,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
-      // Nearby Clinics Section
       if (state.nearbyClinics.isNotEmpty)
         SliverToBoxAdapter(
           child: HorizontalClinicsCarousel(
             clinics: state.nearbyClinics,
-            title: "العيادات القريبة",
+            title: 'العيادات القريبة',
             onTap: _navigateToClinicDetails,
             onFavorite: _toggleFavorite,
             onBook: _bookAppointment,
           ),
         ),
 
-      // All Clinics Header
       SliverToBoxAdapter(
         child: Padding(
           padding: EdgeInsets.symmetric(
@@ -236,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
             vertical: SizeApp.s8,
           ),
           child: Text(
-            "جميع العيادات",
+            'جميع العيادات',
             style: textTheme.headlineLarge?.copyWith(
               fontSize: SizeApp.s24,
               fontWeight: FontWeight.bold,
@@ -246,21 +190,16 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      // All Clinics List
       _buildClinicsList(state.allClinics),
 
-      // Loading More Indicator
       if (state.isLoadingMore)
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.all(SizeApp.s16),
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
+            child: const Center(child: CircularProgressIndicator()),
           ),
         ),
 
-      // No More Data Message
       if (!state.hasMorePages && state.allClinics.isNotEmpty)
         SliverToBoxAdapter(
           child: Padding(
@@ -268,15 +207,12 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Center(
               child: Text(
                 'لا توجد المزيد من العيادات',
-                style: textTheme.bodySmall?.copyWith(
-                  color: Colors.grey,
-                ),
+                style: textTheme.bodySmall?.copyWith(color: Colors.grey),
               ),
             ),
           ),
         ),
 
-      // Empty State (if no clinics at all)
       if (state.allClinics.isEmpty &&
           state.featuredClinics.isEmpty &&
           state.nearbyClinics.isEmpty)
@@ -285,17 +221,12 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.local_hospital_outlined,
-                  size: 80,
-                  color: Colors.grey[400],
-                ),
+                Icon(Icons.local_hospital_outlined,
+                    size: 80, color: Colors.grey[400]),
                 SizedBox(height: SizeApp.s16),
                 Text(
                   'لا توجد عيادات متاحة',
-                  style: textTheme.bodyLarge?.copyWith(
-                    color: Colors.grey,
-                  ),
+                  style: textTheme.bodyLarge?.copyWith(color: Colors.grey),
                 ),
               ],
             ),
@@ -306,9 +237,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
   }
 
-  // ============================================
-  // CLINICS LIST BUILDER
-  // ============================================
+  // ── Clinics list ──────────────────────────────────────────────────────────
 
   Widget _buildClinicsList(List<ClinicSummary> clinics) {
     return SliverPadding(
@@ -332,17 +261,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ============================================
-  // EVENT HANDLERS
-  // ============================================
+  // ── Event handlers ────────────────────────────────────────────────────────
 
   void _navigateToClinicDetails(ClinicSummary clinic) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ClinicDetailsScreen(
-          clinicId: clinic.id,
-        ),
+        builder: (_) => ClinicDetailsScreen(clinicId: clinic.id),
       ),
     );
   }

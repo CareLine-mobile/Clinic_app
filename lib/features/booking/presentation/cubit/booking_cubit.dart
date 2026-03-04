@@ -1,8 +1,11 @@
+// lib/features/booking/presentation/cubit/booking_cubit.dart
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../domain/entities/appointment_request_entity.dart';
 import '../../domain/entities/booking_entity.dart';
+import '../../domain/usecases/cancel_booking_usecase.dart';
 import '../../domain/usecases/get_user_bookings_usecase.dart';
 import '../../domain/usecases/make_appointment_usecase.dart';
 
@@ -11,10 +14,12 @@ part 'booking_state.dart';
 class BookingCubit extends Cubit<BookingState> {
   final GetUserBookingsUseCase getUserBookingsUseCase;
   final MakeAppointmentUseCase makeAppointmentUseCase;
+  final CancelBookingUseCase cancelBookingUseCase; // ← new
 
   BookingCubit({
     required this.getUserBookingsUseCase,
     required this.makeAppointmentUseCase,
+    required this.cancelBookingUseCase,
   }) : super(BookingInitial());
 
   int _currentPage = 1;
@@ -24,7 +29,6 @@ class BookingCubit extends Cubit<BookingState> {
     _currentPage = 1;
 
     final result = await getUserBookingsUseCase(page: _currentPage);
-
     result.fold(
           (failure) => emit(BookingError(failure.message)),
           (bookingList) => emit(BookingLoaded(
@@ -43,7 +47,6 @@ class BookingCubit extends Cubit<BookingState> {
     _currentPage++;
 
     final result = await getUserBookingsUseCase(page: _currentPage);
-
     result.fold(
           (failure) {
         _currentPage--;
@@ -79,6 +82,18 @@ class BookingCubit extends Cubit<BookingState> {
     result.fold(
           (failure) => emit(AppointmentError(failure.message)),
           (_) => emit(AppointmentSuccess()),
+    );
+  }
+
+  // ─── Cancel booking — only callable for 'pending' status ───────────────
+  Future<void> cancelBooking(int bookingId) async {
+    emit(CancelBookingLoading());
+
+    final result = await cancelBookingUseCase(bookingId);
+
+    result.fold(
+          (failure) => emit(CancelBookingError(failure.message)),
+          (_) => emit(CancelBookingSuccess()),
     );
   }
 }

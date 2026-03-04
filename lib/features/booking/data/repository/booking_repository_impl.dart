@@ -1,3 +1,5 @@
+// lib/features/booking/data/repository/booking_repository_impl.dart
+
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/errors/result_handler.dart';
@@ -32,6 +34,13 @@ class BookingRepositoryImpl implements BookingRepository {
           notes: request.notes,
         ),
       );
+    });
+  }
+
+  @override
+  Future<Either<Failure, void>> cancelBooking(int bookingId) async {
+    return ResultHandler.handle(() async {
+      await remoteDataSource.cancelBooking(bookingId);
     });
   }
 }

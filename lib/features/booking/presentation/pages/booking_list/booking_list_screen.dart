@@ -1,44 +1,55 @@
+// lib/features/booking/presentation/pages/booking_list/booking_list_screen.dart
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-
-import '../../../../../core/di/injection_container.dart' as di;
 import '../../../../../core/routes/routes.dart';
 import '../../../../../core/theme/colors.dart';
 import '../../../../../core/utils/app_size.dart';
 import '../../../../../core/widgets/Loading_widget.dart';
+import '../../../../../core/widgets/custom_app_bar.dart';
 import '../../../../../core/widgets/empty_state_widget.dart';
-import '../../../../../features/user_data/user_cubit.dart';
 import '../../../domain/entities/booking_entity.dart';
 import '../../cubit/booking_cubit.dart';
+import '../../../../../features/user_data/user_repo.dart';
+import 'booking_detail_screen.dart';
 
+// ════════════════════════════════════════════════════════════════════════════
+// Screen — reads BookingCubit from PatientHomeScreen (already provided above)
+// ════════════════════════════════════════════════════════════════════════════
 
 class BookingListScreen extends StatelessWidget {
   const BookingListScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // ── Guard: guest users see a prompt, not the list ──────
-    final isLoggedIn = context.read<UserCubit>().isLoggedIn;
-
-    if (!isLoggedIn) {
-      return EmptyStateWidget(
-        icon: Icons.lock_outline_rounded,
-        title: 'تسجيل الدخول مطلوب',
-        subtitle: 'سجّل دخولك لعرض حجوزاتك والتحكم فيها',
-        enableBackButton: false,
-        actionLabel: 'تسجيل الدخول',
-        onActionPressed: () => Navigator.pushNamed(context, Routes.auth),
+    // Guest guard — no BlocProvider needed, just show prompt
+    if (!UserRepository().isLoggedIn) {
+      return Scaffold(
+        appBar: CustomAppBar(
+          title: 'bookings.title'.tr(),
+          showBackIcon: false,
+        ),
+        body: EmptyStateWidget(
+          icon: Icons.lock_outline_rounded,
+          title: 'bookings.auth_required_title'.tr(),
+          subtitle: 'bookings.auth_required_subtitle'.tr(),
+          enableBackButton: false,
+          actionLabel: 'auth.login'.tr(),
+          onActionPressed: () => Navigator.pushNamed(context, Routes.auth),
+        ),
       );
     }
 
-    return BlocProvider(
-      create: (_) => di.sl<BookingCubit>()..loadBookings(),
-      child: const _BookingListBody(),
-    );
+    return const _BookingListBody();
   }
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// Body — StatefulWidget for scroll pagination only
+// ════════════════════════════════════════════════════════════════════════════
 
 class _BookingListBody extends StatefulWidget {
   const _BookingListBody();
@@ -63,8 +74,8 @@ class _BookingListBodyState extends State<_BookingListBody> {
   }
 
   void _onScroll() {
-    final position = _scrollController.position;
-    if (position.pixels >= position.maxScrollExtent - 200) {
+    final pos = _scrollController.position;
+    if (pos.pixels >= pos.maxScrollExtent - 200) {
       context.read<BookingCubit>().loadMoreBookings();
     }
   }
@@ -72,78 +83,105 @@ class _BookingListBodyState extends State<_BookingListBody> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorsManager.backgroundSurface,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: false,
-        title: const Text(
-          'حجوزاتي',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: CustomAppBar(
+        title: 'bookings.title'.tr(),
+        showBackIcon: false,
       ),
       body: BlocBuilder<BookingCubit, BookingState>(
-        builder: (context, state) {
-          if (state is BookingLoading) {
-            return const Center(child: LoadingSpinner());
-          }
-
-          if (state is BookingError) {
-            return EmptyStateWidget(
-              icon: Icons.error_outline_rounded,
-              title: 'حدث خطأ',
-              subtitle: state.message,
-              enableBackButton: false,
-              actionLabel: 'إعادة المحاولة',
-              onActionPressed: () => context.read<BookingCubit>().loadBookings(),
-            );
-          }
-
-          if (state is BookingLoaded) {
-            if (state.bookings.isEmpty) {
-              return EmptyStateWidget(
-                icon: Icons.calendar_today_outlined,
-                title: 'لا توجد حجوزات',
-                subtitle: 'لم تقم بحجز أي موعد حتى الآن',
-                enableBackButton: false,
-                actionLabel: 'ابحث عن عيادة',
-                onActionPressed: () => Navigator.pushNamed(context, Routes.dashBoard),
-              );
-            }
-
-            return RefreshIndicator(
-              color: ColorsManager.primaryColor,
-              onRefresh: () => context.read<BookingCubit>().loadBookings(),
-              child: ListView.builder(
-                controller: _scrollController,
-                padding: EdgeInsets.symmetric(
-                  horizontal: SizeApp.s16,
-                  vertical: SizeApp.s12,
-                ),
-                itemCount: state.bookings.length + (state.isPaginating ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index == state.bookings.length) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      child: Center(child: LoadingSpinner()),
-                    );
-                  }
-                  return _BookingCard(booking: state.bookings[index]);
-                },
-              ),
-            );
-          }
-
-          return const SizedBox.shrink();
+        buildWhen: (prev, curr) =>
+        curr is BookingLoading ||
+            curr is BookingLoaded ||
+            curr is BookingError,
+        builder: (context, state) => switch (state) {
+          BookingLoading() => const Center(child: LoadingSpinner()),
+          BookingError(:final message) => _ErrorView(message: message),
+          BookingLoaded() => _BookingList(
+            state: state,
+            scrollController: _scrollController,
+          ),
+          _ => const SizedBox.shrink(),
         },
       ),
     );
   }
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// Booking list
+// ════════════════════════════════════════════════════════════════════════════
+
+class _BookingList extends StatelessWidget {
+  final BookingLoaded state;
+  final ScrollController scrollController;
+
+  const _BookingList({
+    required this.state,
+    required this.scrollController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (state.bookings.isEmpty) {
+      return EmptyStateWidget(
+        icon: Icons.calendar_today_outlined,
+        title: 'bookings.empty_title'.tr(),
+        subtitle: 'bookings.empty_subtitle'.tr(),
+        enableBackButton: false,
+        actionLabel: 'bookings.find_clinic'.tr(),
+        onActionPressed: () =>
+            Navigator.pushNamed(context, Routes.dashBoard),
+      );
+    }
+
+    return RefreshIndicator(
+      color: ColorsManager.primaryColor,
+      onRefresh: () => context.read<BookingCubit>().loadBookings(),
+      child: ListView.builder(
+        controller: scrollController,
+        padding: EdgeInsets.symmetric(
+          horizontal: SizeApp.s16,
+          vertical: SizeApp.s12,
+        ),
+        itemCount: state.bookings.length + (state.isPaginating ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index == state.bookings.length) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(child: LoadingSpinner()),
+            );
+          }
+          return _BookingCard(booking: state.bookings[index]);
+        },
+      ),
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Error view
+// ════════════════════════════════════════════════════════════════════════════
+
+class _ErrorView extends StatelessWidget {
+  final String message;
+  const _ErrorView({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return EmptyStateWidget(
+      icon: Icons.error_outline_rounded,
+      title: 'errors.server.title'.tr(),
+      subtitle: message,
+      enableBackButton: false,
+      actionLabel: 'bookings.retry'.tr(),
+      onActionPressed: () => context.read<BookingCubit>().loadBookings(),
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Booking card
+// ════════════════════════════════════════════════════════════════════════════
 
 class _BookingCard extends StatelessWidget {
   final BookingEntity booking;
@@ -152,74 +190,46 @@ class _BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(bottom: SizeApp.s12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    final theme = Theme.of(context);
+
+    return InkWell(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: context.read<BookingCubit>(), // ← reuse the existing cubit
+            child: BookingDetailScreen(booking: booking),
           ),
-        ],
+        ),
       ),
-      child: Column(
-        children: [
-          // ── Clinic Header ──────────────────────────────
-          _CardHeader(booking: booking),
-
-          const Divider(height: 1, indent: 16, endIndent: 16),
-
-          // ── Details Row ────────────────────────────────
-          Padding(
-            padding: EdgeInsets.all(SizeApp.s16),
-            child: Column(
-              children: [
-                _DetailRow(
-                  icon: Icons.person_outline_rounded,
-                  label: 'الطبيب',
-                  value: booking.doctor.name,
-                ),
-                SizedBox(height: SizeApp.s8),
-                _DetailRow(
-                  icon: Icons.calendar_today_outlined,
-                  label: 'التاريخ',
-                  value: _formatDate(booking.date),
-                ),
-                SizedBox(height: SizeApp.s8),
-                _DetailRow(
-                  icon: Icons.access_time_rounded,
-                  label: 'الوقت',
-                  value: booking.time,
-                ),
-                SizedBox(height: SizeApp.s8),
-                _DetailRow(
-                  icon: Icons.format_list_numbered_rounded,
-                  label: 'رقم الدور',
-                  value: '${booking.turnNumber}',
-                ),
-              ],
+      child: Container(
+        margin: EdgeInsets.only(bottom: SizeApp.s12),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-          ),
-
-          // ── Status Footer ──────────────────────────────
-          _StatusFooter(status: booking.status),
-        ],
+          ],
+        ),
+        child: Column(
+          children: [
+            _CardHeader(booking: booking),
+            Divider(height: 1, indent: SizeApp.s16, endIndent: SizeApp.s16),
+            _CardDetails(booking: booking),
+            _StatusFooter(status: booking.status),
+          ],
+        ),
       ),
     );
   }
-
-  String _formatDate(String date) {
-    try {
-      final parsed = DateTime.parse(date);
-      return DateFormat('EEE، d MMM yyyy', 'ar').format(parsed);
-    } catch (_) {
-      return date;
-    }
-  }
 }
+
+// ─────────────────────────────────────────────
+// Card header: clinic image + name + specialty
+// ─────────────────────────────────────────────
 
 class _CardHeader extends StatelessWidget {
   final BookingEntity booking;
@@ -227,59 +237,69 @@ class _CardHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Padding(
       padding: EdgeInsets.all(SizeApp.s16),
       child: Row(
         children: [
-          // Clinic image or placeholder
-          Container(
-            width: 48.w,
-            height: 48.w,
-            decoration: BoxDecoration(
-              color: ColorsManager.primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: booking.clinical.thumbnailUrl != null
-                ? ClipRRect(
-              borderRadius: BorderRadius.circular(12.r),
-              child: Image.network(
-                booking.clinical.thumbnailUrl!,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const _ClinicPlaceholder(),
-              ),
-            )
-                : const _ClinicPlaceholder(),
-          ),
-
+          _ClinicAvatar(thumbnailUrl: booking.clinical.thumbnailUrl),
           SizedBox(width: SizeApp.s12),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   booking.clinical.name,
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+                  style: theme.textTheme.titleSmall
+                      ?.copyWith(fontWeight: FontWeight.bold),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 2.h),
                 Text(
                   booking.clinical.specialty,
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: Colors.grey[500],
-                  ),
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: theme.hintColor),
                 ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// Clinic avatar
+// ─────────────────────────────────────────────
+
+class _ClinicAvatar extends StatelessWidget {
+  final String? thumbnailUrl;
+  const _ClinicAvatar({this.thumbnailUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      width: 48.w,
+      height: 48.w,
+      decoration: BoxDecoration(
+        color: theme.primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: thumbnailUrl != null
+          ? ClipRRect(
+        borderRadius: BorderRadius.circular(12.r),
+        child: Image.network(
+          thumbnailUrl!,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => const _ClinicPlaceholder(),
+        ),
+      )
+          : const _ClinicPlaceholder(),
     );
   }
 }
@@ -289,12 +309,67 @@ class _ClinicPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Icon(
+    return Icon(
       Icons.local_hospital_outlined,
-      color: ColorsManager.primaryColor,
+      color: Theme.of(context).primaryColor,
     );
   }
 }
+
+// ─────────────────────────────────────────────
+// Card details: doctor, date, time, turn
+// ─────────────────────────────────────────────
+
+class _CardDetails extends StatelessWidget {
+  final BookingEntity booking;
+  const _CardDetails({required this.booking});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(SizeApp.s16),
+      child: Column(
+        children: [
+          _DetailRow(
+            icon: Icons.person_outline_rounded,
+            label: 'bookings.doctor'.tr(),
+            value: booking.doctor.name,
+          ),
+          SizedBox(height: SizeApp.s8),
+          _DetailRow(
+            icon: Icons.calendar_today_outlined,
+            label: 'bookings.date'.tr(),
+            value: _formatDate(booking.date),
+          ),
+          SizedBox(height: SizeApp.s8),
+          _DetailRow(
+            icon: Icons.access_time_rounded,
+            label: 'bookings.time'.tr(),
+            value: booking.time,
+          ),
+          SizedBox(height: SizeApp.s8),
+          _DetailRow(
+            icon: Icons.format_list_numbered_rounded,
+            label: 'bookings.turn_number'.tr(),
+            value: '${booking.turnNumber}',
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(String date) {
+    try {
+      return DateFormat('EEE، d MMM yyyy', 'ar').format(DateTime.parse(date));
+    } catch (_) {
+      return date;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
+// Detail row
+// ─────────────────────────────────────────────
 
 class _DetailRow extends StatelessWidget {
   final IconData icon;
@@ -309,27 +384,23 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Row(
       children: [
-        Icon(icon, size: 16.sp, color: ColorsManager.primaryColor),
+        Icon(icon, size: 16.sp, color: theme.primaryColor),
         SizedBox(width: SizeApp.s8),
         Text(
           '$label:',
-          style: TextStyle(
-            fontSize: 13.sp,
-            color: Colors.grey[500],
-            fontWeight: FontWeight.w500,
-          ),
+          style: theme.textTheme.bodySmall
+              ?.copyWith(color: theme.hintColor, fontWeight: FontWeight.w500),
         ),
         SizedBox(width: SizeApp.s4),
         Expanded(
           child: Text(
             value,
-            style: TextStyle(
-              fontSize: 13.sp,
-              color: Colors.black87,
-              fontWeight: FontWeight.w600,
-            ),
+            style: theme.textTheme.bodySmall
+                ?.copyWith(fontWeight: FontWeight.w600),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.end,
@@ -340,13 +411,17 @@ class _DetailRow extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────
+// Status footer
+// ─────────────────────────────────────────────
+
 class _StatusFooter extends StatelessWidget {
   final String status;
   const _StatusFooter({required this.status});
 
   @override
   Widget build(BuildContext context) {
-    final config = _statusConfig(status);
+    final config = _StatusConfig.from(status);
 
     return Container(
       width: double.infinity,
@@ -375,40 +450,11 @@ class _StatusFooter extends StatelessWidget {
       ),
     );
   }
-
-  _StatusConfig _statusConfig(String status) {
-    switch (status) {
-      case 'confirmed':
-        return _StatusConfig(
-          label: 'مؤكد',
-          icon: Icons.check_circle_outline_rounded,
-          color: const Color(0xFF2E7D32),
-          bgColor: const Color(0xFFE8F5E9),
-        );
-      case 'cancelled':
-        return _StatusConfig(
-          label: 'ملغي',
-          icon: Icons.cancel_outlined,
-          color: const Color(0xFFC62828),
-          bgColor: const Color(0xFFFFEBEE),
-        );
-      case 'pending':
-        return _StatusConfig(
-          label: 'قيد الانتظار',
-          icon: Icons.hourglass_empty_rounded,
-          color: const Color(0xFFE65100),
-          bgColor: const Color(0xFFFFF3E0),
-        );
-      default:
-        return _StatusConfig(
-          label: status,
-          icon: Icons.info_outline_rounded,
-          color: Colors.grey[600]!,
-          bgColor: Colors.grey[100]!,
-        );
-    }
-  }
 }
+
+// ─────────────────────────────────────────────
+// Status config — data class with factory
+// ─────────────────────────────────────────────
 
 class _StatusConfig {
   final String label;
@@ -422,4 +468,31 @@ class _StatusConfig {
     required this.color,
     required this.bgColor,
   });
+
+  factory _StatusConfig.from(String status) => switch (status) {
+    'confirmed' => const _StatusConfig(
+      label: 'مؤكد',
+      icon: Icons.check_circle_outline_rounded,
+      color: Color(0xFF2E7D32),
+      bgColor: Color(0xFFE8F5E9),
+    ),
+    'cancelled' => const _StatusConfig(
+      label: 'ملغي',
+      icon: Icons.cancel_outlined,
+      color: Color(0xFFC62828),
+      bgColor: Color(0xFFFFEBEE),
+    ),
+    'pending' => const _StatusConfig(
+      label: 'قيد الانتظار',
+      icon: Icons.hourglass_empty_rounded,
+      color: Color(0xFFE65100),
+      bgColor: Color(0xFFFFF3E0),
+    ),
+    _ => _StatusConfig(
+      label: status,
+      icon: Icons.info_outline_rounded,
+      color: Colors.grey[600]!,
+      bgColor: Colors.grey[100]!,
+    ),
+  };
 }

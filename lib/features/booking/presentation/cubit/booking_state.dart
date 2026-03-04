@@ -47,7 +47,7 @@ class BookingError extends BookingState {
   List<Object?> get props => [message];
 }
 
-// Appointment states
+// ───  Appointment states ───────────────────────────────────────
 class AppointmentLoading extends BookingState {}
 
 class AppointmentSuccess extends BookingState {}
@@ -56,6 +56,18 @@ class AppointmentError extends BookingState {
   final String message;
 
   const AppointmentError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+// ─── Cancel states ───────────────────────────────────────
+class CancelBookingLoading extends BookingState {}
+class CancelBookingSuccess extends BookingState {}
+
+class CancelBookingError extends BookingState {
+  final String message;
+  const CancelBookingError(this.message);
 
   @override
   List<Object?> get props => [message];
