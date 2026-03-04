@@ -10,6 +10,9 @@ class AppConstants {
   static const String languageKey = 'languageKey';
   static const String themeKey = 'themeKey';
   static const String onboardingKey = 'onboardingKey';
+  static const String themeMode       = 'settings_theme_mode';
+  static const String languageCode    = 'settings_language_code';
+  static const String notifications   = 'settings_notifications';
 
   // ==================== API Constants ====================
   static const int connectionTimeout = 30000; // 30 seconds

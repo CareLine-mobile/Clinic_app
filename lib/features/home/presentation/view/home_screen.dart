@@ -167,8 +167,8 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         return HomeHeaderWidget(
-          userName: UserRepository().currentUser!.name,
-          userPhotoUrl: UserRepository().currentUser!.avatar,
+          userName: UserRepository().currentUser?.name,
+          userPhotoUrl: UserRepository().currentUser?.avatar,
           lastBooking: lastBooking,
           queuePosition: 5,
           peopleAhead: 4,

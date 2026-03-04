@@ -1,3 +1,5 @@
+// lib/main.dart
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,6 +15,7 @@ import 'features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
 import 'features/clinic_details/presentation/cubit/clinic_ui_cubit.dart';
 import 'features/home/presentation/cubit/home_cubit.dart';
 import 'features/home/presentation/cubit/home_ui_cubit.dart';
+import 'features/settings/presentation/cubit/settings_cubit.dart';
 import 'features/user_data/user_cubit.dart';
 import 'features/user_data/user_repo.dart';
 
@@ -42,9 +45,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        // ── Global: user state accessible everywhere ──────────
+        // ── Global: current user accessible everywhere ────────
         BlocProvider<UserCubit>(
           create: (_) => UserCubit(UserRepository()),
+        ),
+
+        // ── Settings: theme, language, notifications ──────────
+        BlocProvider<SettingsCubit>(
+          create: (_) => SettingsCubit()..loadSettings(),
         ),
 
         // ── Auth ──────────────────────────────────────────────
@@ -61,8 +69,6 @@ class MyApp extends StatelessWidget {
         ),
 
         // ── Clinic Details ────────────────────────────────────
-        // ⚠️ These are better created per-route (registerFactory in DI)
-        // but keeping them here if your routing requires it
         BlocProvider<ClinicDetailsCubit>(
           create: (_) => di.sl<ClinicDetailsCubit>(),
         ),
@@ -70,19 +76,29 @@ class MyApp extends StatelessWidget {
           create: (_) => di.sl<ClinicUiCubit>(),
         ),
       ],
-      child: ScreenUtilInit(
-        designSize: const Size(375, 812),
-        minTextAdapt: true,
-        splitScreenMode: true,
-        builder: (context, child) {
-          return MaterialApp(
-            navigatorKey: AppRouter.navigatorKey,
-            theme: AppTheme.light,
-            localizationsDelegates: context.localizationDelegates,
-            supportedLocales: context.supportedLocales,
-            locale: context.locale,
-            initialRoute: UserRepository().isLoggedIn ? Routes.dashBoard : Routes.auth,
-            onGenerateRoute: AppRouter.onGenerateRoute,
+      // BlocBuilder here so themeMode changes rebuild MaterialApp immediately
+      child: BlocBuilder<SettingsCubit, SettingsState>(
+        buildWhen: (prev, curr) => prev.themeMode != curr.themeMode,
+        builder: (context, settings) {
+          return ScreenUtilInit(
+            designSize: const Size(375, 812),
+            minTextAdapt: true,
+            splitScreenMode: true,
+            builder: (context, child) {
+              return MaterialApp(
+                navigatorKey: AppRouter.navigatorKey,
+                theme: AppTheme.light,
+                darkTheme: AppTheme.dark,         // make sure this exists
+                themeMode: settings.themeMode,    // driven by SettingsCubit
+                localizationsDelegates: context.localizationDelegates,
+                supportedLocales: context.supportedLocales,
+                locale: context.locale,           // driven by easy_localization
+                initialRoute: UserRepository().isLoggedIn
+                    ? Routes.dashBoard
+                    : Routes.auth,
+                onGenerateRoute: AppRouter.onGenerateRoute,
+              );
+            },
           );
         },
       ),
