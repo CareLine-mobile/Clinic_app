@@ -11,6 +11,7 @@ import '../../../../core/utils/app_size.dart';
 import '../../../../core/theme/colors.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../clinic_details/presentation/view/clinic_details_screen.dart';
+import '../../../user_data/user_repo.dart';
 import '../../domain/entities/clinic_summary.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_ui_cubit.dart';
@@ -166,8 +167,8 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         return HomeHeaderWidget(
-          userName: 'أحمد محمد',
-          userPhotoUrl: null,
+          userName: UserRepository().currentUser!.name,
+          userPhotoUrl: UserRepository().currentUser!.avatar,
           lastBooking: lastBooking,
           queuePosition: 5,
           peopleAhead: 4,

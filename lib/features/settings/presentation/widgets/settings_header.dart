@@ -1,5 +1,6 @@
 // lib/features/settings/presentation/widgets/settings_header.dart
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theme/colors.dart';
@@ -7,8 +8,8 @@ import '../../../../core/utils/app_size.dart';
 import '../../../../core/utils/assets.dart';
 
 class SettingsHeader extends StatelessWidget {
-  final String userName;
-  final String userEmail;
+  final String? userName;
+  final String? userEmail;
   final String? userPhotoUrl;
   final String? location;
   final VoidCallback? onEditPressed;
@@ -185,7 +186,7 @@ class SettingsHeader extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  userName,
+                  userName ?? "auth.user".tr(),
                   style: textTheme.titleLarge?.copyWith(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
@@ -204,7 +205,7 @@ class SettingsHeader extends StatelessWidget {
                 ),
                 SizedBox(height: AppSizeVertical.instance.s4),
                 Text(
-                  userEmail,
+                  userEmail ?? "",
                   style: textTheme.bodyMedium?.copyWith(
                     fontSize: 13.sp,
                     color: Colors.white.withOpacity(0.9),

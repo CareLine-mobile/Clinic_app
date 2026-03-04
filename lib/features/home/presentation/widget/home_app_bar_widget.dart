@@ -1,6 +1,7 @@
 import 'package:clinic_app/core/utils/app_size.dart';
 import 'package:clinic_app/core/utils/assets.dart';
 import 'package:clinic_app/core/widgets/app_text_feild.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
@@ -123,7 +124,7 @@ class HomeHeaderWidget extends StatelessWidget {
               SizedBox(width: isExpanded ? SizeApp.s12 : SizeApp.s8),
               Expanded(
                 child: Text(
-                  userName ?? "مستخدم",
+                  userName ?? "auth.user".tr(),
                   style: textTheme.titleLarge?.copyWith(
                     color: Colors.white,
                     fontSize: isExpanded ? SizeApp.s16 + SizeApp.s2 : SizeApp.s16,
