@@ -10,4 +10,8 @@ abstract class Routes {
   // Patient sub-routes
   static const String patientHome = '/patient-home';
   static const String medicationDetails = '/medication-details';
+  // booking
+  static const String booking = '/booking';
+  static const String bookingDetails = '/booking-details';
+
 }
