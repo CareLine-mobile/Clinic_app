@@ -63,7 +63,7 @@ dependencies:
   skeletonizer:
 
   # Utilities
-  intl: ^0.20.2
+  intl:
   easy_localization: ^3.0.8
   dartz:
   flutter_screenutil:
@@ -75,7 +75,6 @@ dependencies:
   # mobile_scanner: ^3.5.5
 
   # HTTP & API
-  http: ^1.1.2
   dio: ^5.4.0
 
   # Charts (للـ adherence tracking)

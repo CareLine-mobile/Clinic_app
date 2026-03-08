@@ -1,4 +1,5 @@
 // ==================== tabs/booking_tab.dart ====================
+import 'package:clinic_app/features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entites/clinic_entities.dart';
@@ -16,27 +17,29 @@ class BookingTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ClinicUiCubit, ClinicUiState>(
+    return BlocBuilder<ClinicDetailsCubit, ClinicDetailsState>(
       builder: (context, state) {
+        final clinicCubit = context.read<ClinicDetailsCubit>();
+
         return SingleChildScrollView(
           padding: EdgeInsets.all(AppSizeHorizontal.instance.s20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ClinicCalendarWidget(
-                selectedDate: state.selectedDate,
+                selectedDate: clinicCubit.selectedDate,
                 onDateSelected: (date) {
-                  context.read<ClinicUiCubit>().selectDate(date);
+                  clinicCubit.selectDate(date);
                 },
                 accentColor: Theme.of(context).primaryColor,
               ),
               SizedBox(height: AppSizeVertical.instance.s24),
               DoctorListWidget(
                 doctors: clinic.doctors,
-                selectedDate: state.selectedDate,
-                selectedDoctor: state.selectedDoctor,
+                selectedDate: clinicCubit.selectedDate,
+                selectedDoctor: clinicCubit.selectedDoctor,
                 onDoctorSelected: (doctor) {
-                  context.read<ClinicUiCubit>().selectDoctor(doctor);
+                  clinicCubit.selectDoctor(doctor);
                 },
                 accentColor: Theme.of(context).primaryColor,
               ),

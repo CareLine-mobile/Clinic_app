@@ -31,7 +31,7 @@ class BookingEntity extends Equatable {
   final String? patientName;  // nullable — API returns null
   final String? patientPhone; // nullable — API returns null
   final ClinicalEntity clinical;
-  final DoctorEntity doctor;
+  final BookingDoctorEntity doctor;
 
   const BookingEntity({
     required this.id,
@@ -92,12 +92,12 @@ class ClinicalEntity extends Equatable {
   ];
 }
 
-class DoctorEntity extends Equatable {
+class BookingDoctorEntity extends Equatable {
   final int id;
   final String name;
   final String specialty;
 
-  const DoctorEntity({
+  const BookingDoctorEntity({
     required this.id,
     required this.name,
     required this.specialty,

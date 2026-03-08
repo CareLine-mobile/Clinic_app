@@ -29,7 +29,7 @@ class UserRepository {
     final json = await SharedPrefHelper.getJson(key: AppConstants.userKey);
     if (json != null) {
       _currentUser = UserModel.fromJson(json).toEntity();
-      _controller.add(_currentUser);
+
     }
   }
 

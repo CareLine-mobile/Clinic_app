@@ -1,5 +1,6 @@
 // lib/features/home/presentation/screens/home_screen.dart
 
+import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/core/utils/enums.dart';
 import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
@@ -264,12 +265,13 @@ class _HomeScreenState extends State<HomeScreen> {
   // ── Event handlers ────────────────────────────────────────────────────────
 
   void _navigateToClinicDetails(ClinicSummary clinic) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ClinicDetailsScreen(clinicId: clinic.id),
-      ),
-    );
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (_) => ClinicDetailsScreen(clinicId: clinic.id),
+    //   ),
+    // );
+    Navigator.pushNamed(context, Routes.clinicDetails, arguments: clinic.id);
   }
 
   void _toggleFavorite(ClinicSummary clinic) {

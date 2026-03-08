@@ -161,7 +161,7 @@ class DoctorModel {
     );
   }
 
-  DoctorEntity toEntity() => DoctorEntity(
+  BookingDoctorEntity toEntity() => BookingDoctorEntity(
     id:        id,
     name:      name,
     specialty: specialty,
