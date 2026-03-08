@@ -56,26 +56,7 @@ class MyApp extends StatelessWidget {
           create: (_) => SettingsCubit()..loadSettings(),
         ),
 
-        // ── Auth ──────────────────────────────────────────────
-        BlocProvider<AuthCubit>(
-          create: (_) => di.sl<AuthCubit>(),
-        ),
 
-        // ── Home ──────────────────────────────────────────────
-        BlocProvider<HomeCubit>(
-          create: (_) => di.sl<HomeCubit>(),
-        ),
-        BlocProvider<HomeUiCubit>(
-          create: (_) => di.sl<HomeUiCubit>(),
-        ),
-
-        // ── Clinic Details ────────────────────────────────────
-        BlocProvider<ClinicDetailsCubit>(
-          create: (_) => di.sl<ClinicDetailsCubit>(),
-        ),
-        BlocProvider<ClinicUiCubit>(
-          create: (_) => di.sl<ClinicUiCubit>(),
-        ),
       ],
       // BlocBuilder here so themeMode changes rebuild MaterialApp immediately
       child: BlocBuilder<SettingsCubit, SettingsState>(
