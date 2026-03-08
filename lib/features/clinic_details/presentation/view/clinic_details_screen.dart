@@ -53,7 +53,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
 
   void _handleScroll() {
     final isTransparent = _scrollController.offset < _appBarTransitionOffset.h;
-    context.read<ClinicUiCubit>().updateAppBarTransparency(isTransparent);
+    context.read<ClinicDetailsCubit>().updateAppBarTransparency(isTransparent);
   }
 
   @override

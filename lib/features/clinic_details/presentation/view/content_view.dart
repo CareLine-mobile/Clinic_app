@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entites/clinic_entities.dart';
+import '../cubit/clinic_details_cubit.dart';
 import '../cubit/clinic_ui_cubit.dart';
 import '../widgets/components/booking_bottom_bar.dart';
 import '../widgets/components/clinic_app_bar.dart';
@@ -25,13 +26,16 @@ class ContentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ClinicUiCubit, ClinicUiState>(
+    return BlocBuilder<ClinicDetailsCubit, ClinicDetailsState>(
       builder: (context, uiState) {
+        final clinicCubit = context.read<ClinicDetailsCubit>();
+
+
         return Scaffold(
           extendBodyBehindAppBar: true,
           appBar: ClinicAppBar(
             clinic: clinic,
-            isTransparent: uiState.isAppBarTransparent,
+            isTransparent: clinicCubit.isAppBarTransparent,
             isFavorite: clinic.isOpen,
             onFavoriteToggle: () {
 
@@ -52,10 +56,10 @@ class ContentView extends StatelessWidget {
               tabController: tabController,
             ),
           ),
-          bottomNavigationBar: uiState.selectedDoctor != null
+          bottomNavigationBar: clinicCubit.selectedDoctor != null
               ? BookingBottomBar(
             clinic: clinic,
-            doctor: uiState.selectedDoctor!,
+            doctor: clinicCubit.selectedDoctor!,
           )
               : null,
         );

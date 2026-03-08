@@ -1,5 +1,6 @@
 part of 'clinic_details_cubit.dart';
 
+
 @immutable
 sealed class ClinicDetailsState {}
 
@@ -10,10 +11,7 @@ class ClinicDetailsLoading extends ClinicDetailsState {}
 class ClinicDetailsLoaded extends ClinicDetailsState {
   final ClinicEntity clinic;
 
-   ClinicDetailsLoaded({
-    required this.clinic,
-
-  });
+  ClinicDetailsLoaded({required this.clinic});
 
   List<Object?> get props => [clinic];
 
@@ -29,30 +27,23 @@ class ClinicDetailsLoaded extends ClinicDetailsState {
 
 class ClinicDetailsError extends ClinicDetailsState {
   final String message;
+  ClinicDetailsError(this.message);
 
-   ClinicDetailsError(this.message);
-
-  @override
   List<Object?> get props => [message];
 }
 
-// Booking States
 class BookingInProgress extends ClinicDetailsState {}
 
 class BookingSuccess extends ClinicDetailsState {
   final String message;
+  BookingSuccess(this.message);
 
-   BookingSuccess(this.message);
-
-  @override
   List<Object?> get props => [message];
 }
 
 class BookingError extends ClinicDetailsState {
   final String message;
+  BookingError(this.message);
 
-   BookingError(this.message);
-
-  @override
   List<Object?> get props => [message];
 }

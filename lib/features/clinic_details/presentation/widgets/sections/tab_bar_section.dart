@@ -1,4 +1,5 @@
 // ==================== sections/tab_bar_section.dart ====================
+import 'package:clinic_app/features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entites/clinic_entities.dart';
@@ -40,7 +41,7 @@ class TabBarSection extends StatelessWidget {
         fontWeight: FontWeight.bold,
       ),
       onTap: (index) {
-        context.read<ClinicUiCubit>().changeTab(index);
+        context.read<ClinicDetailsCubit>().changeTab(index);
       },
       tabs: const [
         Tab(text: 'الحجز'),
