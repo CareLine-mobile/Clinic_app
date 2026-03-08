@@ -51,7 +51,19 @@ Future<void> init() async {
   // ==========================
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
+  setUpDio();
+  setUpLocalDb();
+  setUpAuthModule();
+  setUpHomeModule();
+  setUpBookingModule();
+  setUpClinicModule();
 
+  sl.registerLazySingleton(() => UserRepository());
+
+
+
+}
+void setUpDio(){
   // ==========================
   // Core - Network & API
   // ==========================
@@ -71,6 +83,8 @@ Future<void> init() async {
   sl.registerLazySingleton<BaseApiServices>(
         () => DioApiService(sl()),
   );
+}
+void setUpLocalDb(){
   sl.registerLazySingleton<LocationDataSource>(
         () => LocationDataSourceImpl(),
   );
@@ -79,22 +93,31 @@ Future<void> init() async {
   sl.registerLazySingleton<LocationRepository>(
         () => LocationRepositoryImpl(dataSource: sl()),
   );
-
-  // Use Cases
-  sl.registerLazySingleton(
-        () => GetCurrentLocationUseCase(sl()),
+}
+void setUpAuthModule(){
+  // Repository
+  sl.registerLazySingleton<AuthRepository>(
+        () => AuthRepositoryImpl(
+      apiServices: sl(),
+    ),
   );
-
-  // ==========================
-  // Feature: Home
-  // ==========================
-
-  // Data Sources
-  // sl.registerLazySingleton<HomeRemoteDataSource>(
-  //       () => HomeRemoteDataSourceImpl(
-  //     apiService: sl(),
-  //   ),
-  // );
+  sl.registerLazySingleton(() => LoginUseCase(sl()));
+  sl.registerLazySingleton(() => SignupUseCase(sl()));
+  sl.registerLazySingleton(() => LogoutUseCase(sl()));
+  sl.registerLazySingleton(() => VerifyOtpUseCase(sl()));
+  // Cubit
+  sl.registerLazySingleton(
+        () => AuthCubit(
+      loginUseCase: sl(),
+      signupUseCase: sl(),
+      userRepository: sl(),
+      verifyOtpUseCase: sl(),
+      authRepository: sl(),
+      logoutUseCase: sl(),
+    ),
+  );
+}
+void setUpHomeModule(){
 
   // Repository
   sl.registerLazySingleton<HomeRepository>(
@@ -104,6 +127,10 @@ Future<void> init() async {
   );
 
   // Use Cases
+  sl.registerLazySingleton(
+        () => GetCurrentLocationUseCase(sl()),
+  );
+
   sl.registerLazySingleton<GetClinicsUseCase>(
         () => GetClinicsUseCase(sl()),
   );
@@ -128,17 +155,35 @@ Future<void> init() async {
         () => HomeUiCubit(),
   );
 
-  // ==========================
-  // Feature: Clinic Details
-  // ==========================
+}
+void setUpBookingModule(){
+  sl.registerLazySingleton<BookingRemoteDataSource>(
+        () => BookingRemoteDataSourceImpl(apiServices: sl()),
+  );
 
-  // Data Sources
-  // sl.registerLazySingleton<ClinicRemoteDataSource>(
-  //       () => ClinicRemoteDataSourceImpl(
-  //     apiService: sl(),
-  //   ),
-  // );
+// Repository
+  sl.registerLazySingleton<BookingRepository>(
+        () => BookingRepositoryImpl(remoteDataSource: sl()),
+  );
 
+  // Use Cases
+  sl.registerLazySingleton(
+        () => GetUserBookingsUseCase(sl()),
+  );
+
+  sl.registerLazySingleton(
+        () => MakeAppointmentUseCase(sl()),
+  );
+
+  sl.registerLazySingleton(
+        () => CancelBookingUseCase(sl()),
+  );
+  // Cubit
+  sl.registerFactory(
+        () => BookingCubit(getUserBookingsUseCase: sl(), makeAppointmentUseCase: sl(), cancelBookingUseCase: sl()),
+  );
+}
+void setUpClinicModule(){
   sl.registerLazySingleton<ClinicLocalDataSource>(
         () => ClinicLocalDataSourceImpl(
       sharedPreferences: sl(),
@@ -157,13 +202,10 @@ Future<void> init() async {
   sl.registerLazySingleton<GetClinicDetailsUseCase>(
         () => GetClinicDetailsUseCase(sl()),
   );
-
   sl.registerLazySingleton<clinic_details.ToggleFavoriteUseCase>(
         () => clinic_details.ToggleFavoriteUseCase(sl()),
   );
-
-
-  // Cubits (Factory - new instance each time)
+// Cubits (Factory - new instance each time)
   sl.registerFactory<ClinicDetailsCubit>(
         () => ClinicDetailsCubit(
       getClinicDetailsUseCase: sl(),
@@ -171,71 +213,5 @@ Future<void> init() async {
     ),
   );
 
-  sl.registerFactory<ClinicUiCubit>(
-        () => ClinicUiCubit(),
-  );
 
-
-// ==========================
-// Feature: Booking
-// ==========================
-
-// Data Sources
-  sl.registerLazySingleton<BookingRemoteDataSource>(
-        () => BookingRemoteDataSourceImpl(apiServices: sl()),
-  );
-
-// Repository
-  sl.registerLazySingleton<BookingRepository>(
-        () => BookingRepositoryImpl(remoteDataSource: sl()),
-  );
-
-// Use Cases
-  sl.registerLazySingleton(
-        () => GetUserBookingsUseCase(sl()),
-  );
-
-  sl.registerLazySingleton(
-        () => MakeAppointmentUseCase(sl()),
-  );
-
-  sl.registerLazySingleton(
-        () => CancelBookingUseCase(sl()),
-  );
-
-// Cubit
-  sl.registerFactory(
-        () => BookingCubit(getUserBookingsUseCase: sl(), makeAppointmentUseCase: sl(), cancelBookingUseCase: sl()),
-  );
-
-  // Data Sources
-  // sl.registerLazySingleton<AuthRemoteDataSource>(
-  //       () => AuthRemoteDataSourceImpl(apiService: sl()),
-  // );
-
-  // Repository
-  sl.registerLazySingleton<AuthRepository>(
-        () => AuthRepositoryImpl(
-      apiServices: sl(),
-    ),
-  );
-
-  // Use Cases
-  sl.registerLazySingleton(() => LoginUseCase(sl()));
-  sl.registerLazySingleton(() => SignupUseCase(sl()));
-  sl.registerLazySingleton(() => LogoutUseCase(sl()));
-  sl.registerLazySingleton(() => UserRepository());
-  sl.registerLazySingleton(() => VerifyOtpUseCase(sl()));
-
-  // Cubit
-  sl.registerFactory(
-        () => AuthCubit(
-      loginUseCase: sl(),
-      signupUseCase: sl(),
-      userRepository: sl(),
-      verifyOtpUseCase: sl(),
-      authRepository: sl(),
-      logoutUseCase: sl(),
-        ),
-  );
 }
