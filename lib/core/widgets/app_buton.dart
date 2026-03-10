@@ -203,7 +203,7 @@ class AppBarButton extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: isTransparent
             ? null
-            : [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+            : [const BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
       ),
       child: IconButton(
         icon: Icon(
