@@ -9,7 +9,6 @@
     "confirmPassword": "Confirm Password",
     "fullName": "Full Name",
     "phone": "Phone Number",
-    "forgotPassword": "Forgot Password?",
     "continueAsGuest": "Continue as Guest",
     "createAccount": "Create Account",
     "welcomeBack": "Welcome Back",
@@ -22,7 +21,25 @@
       "subtitle": "We sent a 6-digit code to\n{email}",
       "verify": "Verify",
       "noCode": "Didn't receive the code?",
-      "resend": "Resend"
+      "resend": "Resend",
+      "resend_success": "The code was successfully resent",
+      "resend_in": "Resend in",
+      "seconds": "seconds"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "headline": "Recover Password",
+      "subtitle": "Enter your email and we'll send you a verification code",
+      "send": "Send Code",
+      "backToLogin": "Back to Login"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "headline": "Set New Password",
+      "subtitle": "Enter the code sent to",
+      "newPassword": "New Password",
+      "submit": "Reset Password",
+      "success": "Password reset successfully"
     }
   },
   "home": {

@@ -4,7 +4,6 @@
 // ============================================
 
 import 'package:flutter/material.dart';
-import '../widget/auth_background.dart';
 import '../widget/auth_logo.dart';
 import '../widget/auth_tab_selector.dart';
 import '../widget/auth_title.dart';
@@ -46,8 +45,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AuthBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -85,7 +83,6 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
             ),
           ),
         ),
-      ),
     );
   }
 }

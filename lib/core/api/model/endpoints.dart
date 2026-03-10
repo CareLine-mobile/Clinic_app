@@ -8,6 +8,9 @@ class Endpoints {
   static const String register = '/auth/register';
   static const String logout = '/auth/logout';
   static const String verifyOTP = '/auth/verify-otp';
+  static const String resendOTP = '/auth/resend-otp';
+  static const String resetPassword = '/auth/resend-otp';
+  static const String sendForgetPassword = '/auth/resend-otp';
 
   // Clinics
   static const String allClinics = '/clinicals';

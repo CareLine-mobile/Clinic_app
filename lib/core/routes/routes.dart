@@ -7,6 +7,8 @@ abstract class Routes {
   // auth
   static const String auth = '/auth';
   static const String verification = '/verification';
+  static const String forgotPassword = '/forgotPassword';
+  static const String resetPassword = '/resetPassword';
   // Patient sub-routes
   static const String patientHome = '/patient-home';
   static const String medicationDetails = '/medication-details';

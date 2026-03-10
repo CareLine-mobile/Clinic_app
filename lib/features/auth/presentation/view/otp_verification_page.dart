@@ -1,5 +1,5 @@
 // lib/features/auth/presentation/pages/otp_verification_page.dart
-// ============================================
+import 'dart:async';
 import 'package:clinic_app/core/widgets/CustomIcon.dart';
 import 'package:clinic_app/core/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +16,6 @@ import '../cubit/auth_state.dart';
 
 class OtpVerificationPage extends StatefulWidget {
   final String email;
-
   const OtpVerificationPage({Key? key, required this.email}) : super(key: key);
 
   @override
@@ -25,23 +24,45 @@ class OtpVerificationPage extends StatefulWidget {
 
 class _OtpVerificationPageState extends State<OtpVerificationPage> {
   static const int _otpLength = 6;
+  static const int _cooldownSeconds = 60;
 
   final List<TextEditingController> _controllers =
   List.generate(_otpLength, (_) => TextEditingController());
-
   final List<FocusNode> _focusNodes =
   List.generate(_otpLength, (_) => FocusNode());
 
+  // ─── Cooldown state ────────────────────────────────────────────────────
+  Timer? _timer;
+  int _secondsLeft = 0;
+  bool get _isCoolingDown => _secondsLeft > 0;
+  // ───────────────────────────────────────────────────────────────────────
+
   @override
   void dispose() {
+    _timer?.cancel();
     for (final c in _controllers) c.dispose();
     for (final f in _focusNodes) f.dispose();
     super.dispose();
   }
 
   String get _otpCode => _controllers.map((c) => c.text).join();
-
   bool get _isOtpComplete => _otpCode.length == _otpLength;
+
+  // ─── Start 60s countdown ──────────────────────────────────────────────
+  void _startCooldown() {
+    _timer?.cancel();
+    setState(() => _secondsLeft = _cooldownSeconds);
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_secondsLeft <= 1) {
+        timer.cancel();
+        setState(() => _secondsLeft = 0);
+      } else {
+        setState(() => _secondsLeft--);
+      }
+    });
+  }
+  // ───────────────────────────────────────────────────────────────────────
 
   void _onDigitEntered(int index, String value) {
     if (value.length == 1 && index < _otpLength - 1) {
@@ -70,7 +91,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   }
 
   void _handleResend() {
-    // TODO: wire up resend OTP use case
+    if (_isCoolingDown) return;
+    context.read<AuthCubit>().resendOtp(email: widget.email);
   }
 
   @override
@@ -78,13 +100,24 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     return BlocConsumer<AuthCubit, AuthState>(
       listenWhen: (_, current) =>
       current is OtpFailure ||
-          current is AuthAuthenticated,
+          current is OtpResendSuccess ||
+          current is AuthAuthenticated ||
+          current is LoginSuccess,
       listener: (context, state) {
         if (state is OtpFailure) {
           CustomSnackBar.show(
             context,
             message: state.message,
             type: SnackBarType.error,
+          );
+        } else if (state is OtpResendSuccess) {
+          for (final c in _controllers) c.clear();
+          _focusNodes.first.requestFocus();
+          _startCooldown(); // ← ابدأ العد التنازلي بعد نجاح الإرسال
+          CustomSnackBar.show(
+            context,
+            message: 'auth.otp.resend_success'.tr(),
+            type: SnackBarType.success,
           );
         } else if (state is AuthAuthenticated || state is LoginSuccess) {
           Navigator.pushNamedAndRemoveUntil(
@@ -95,7 +128,8 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         }
       },
       builder: (context, state) {
-        final isLoading = state is OtpLoading;
+        final isVerifying = state is OtpLoading;
+        final isResending = state is OtpResendLoading;
 
         return Scaffold(
           appBar: CustomAppBar(title: 'auth.otp.title'.tr()),
@@ -116,14 +150,21 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                   const SizedBox(height: 36),
                   AppButton(
                     text: 'auth.otp.verify'.tr(),
-                    onPressed:
-                    (isLoading || !_isOtpComplete) ? null : _handleVerify,
-                    isLoading: isLoading,
+                    onPressed: (isVerifying || isResending || !_isOtpComplete)
+                        ? null
+                        : _handleVerify,
+                    isLoading: isVerifying,
                     horizontalPadding: 0,
                     verticalPadding: 0,
                   ),
                   const SizedBox(height: 20),
-                  _ResendRow(onResend: isLoading ? null : _handleResend),
+                  _ResendRow(
+                    onResend: (isVerifying || isResending || _isCoolingDown)
+                        ? null
+                        : _handleResend,
+                    isResending: isResending,
+                    secondsLeft: _secondsLeft, // ← مرّر العداد
+                  ),
                 ],
               ),
             ),
@@ -138,7 +179,6 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
 class _OtpHeader extends StatelessWidget {
   final String email;
-
   const _OtpHeader({required this.email});
 
   @override
@@ -154,17 +194,15 @@ class _OtpHeader extends StatelessWidget {
         const SizedBox(height: 16),
         Text(
           'auth.otp.headline'.tr(),
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: theme.textTheme.headlineSmall
+              ?.copyWith(fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
         Text(
           'auth.otp.subtitle'.tr(namedArgs: {'email': email}),
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: Colors.grey.shade600,
-          ),
+          style: theme.textTheme.bodyMedium
+              ?.copyWith(color: Colors.grey.shade600),
           textAlign: TextAlign.center,
         ),
       ],
@@ -175,8 +213,8 @@ class _OtpHeader extends StatelessWidget {
 class _OtpInputRow extends StatelessWidget {
   final List<TextEditingController> controllers;
   final List<FocusNode> focusNodes;
-  final void Function(int index, String value) onChanged;
-  final void Function(int index, KeyEvent event) onKeyEvent;
+  final void Function(int, String) onChanged;
+  final void Function(int, KeyEvent) onKeyEvent;
 
   const _OtpInputRow({
     required this.controllers,
@@ -187,7 +225,6 @@ class _OtpInputRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Directionality لضمان إن الخانات دايماً من شمال لين
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Row(
@@ -198,8 +235,8 @@ class _OtpInputRow extends StatelessWidget {
             child: _OtpDigitField(
               controller: controllers[index],
               focusNode: focusNodes[index],
-              onChanged: (value) => onChanged(index, value),
-              onKeyEvent: (event) => onKeyEvent(index, event),
+              onChanged: (v) => onChanged(index, v),
+              onKeyEvent: (e) => onKeyEvent(index, e),
             ),
           );
         }),
@@ -260,29 +297,24 @@ class _OtpDigitFieldState extends State<_OtpDigitField> {
           maxLength: 1,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: widget.onChanged,
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: theme.textTheme.titleLarge
+              ?.copyWith(fontWeight: FontWeight.bold),
           decoration: InputDecoration(
             counterText: '',
             contentPadding: EdgeInsets.zero,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: Colors.grey.shade300,
-                width: 1.5,
-              ),
+              borderSide:
+              BorderSide(color: Colors.grey.shade300, width: 1.5),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: theme.colorScheme.primary,
-                width: 2,
-              ),
+              borderSide:
+              BorderSide(color: theme.colorScheme.primary, width: 2),
             ),
             filled: true,
             fillColor: isFocused
-                ? theme.colorScheme.primary.withOpacity(0.05)
+                ? theme.colorScheme.primary.withValues(alpha:0.05)
                 : Colors.grey.shade50,
           ),
         ),
@@ -291,33 +323,69 @@ class _OtpDigitFieldState extends State<_OtpDigitField> {
   }
 }
 
+// ─── ResendRow — shows timer or button ──────────────────────────────────────
+
 class _ResendRow extends StatelessWidget {
   final VoidCallback? onResend;
+  final bool isResending;
+  final int secondsLeft; // ← العداد
 
-  const _ResendRow({required this.onResend});
+  const _ResendRow({
+    required this.onResend,
+    required this.isResending,
+    required this.secondsLeft,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    final isCoolingDown = secondsLeft > 0;
+
+    return Column(
       children: [
         Text(
           'auth.otp.noCode'.tr(),
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: Colors.grey.shade600,
-          ),
+          style: theme.textTheme.bodyMedium
+              ?.copyWith(color: Colors.grey.shade600),
         ),
-        TextButton(
-          onPressed: onResend,
-          child: Text(
-            'auth.otp.resend'.tr(),
-            style: TextStyle(
-              color: theme.colorScheme.primary,
-              fontWeight: FontWeight.w600,
+        const SizedBox(height: 4),
+
+        // ─── لو في cooldown اعرض العداد بدل الزرار ─────────────────────
+        if (isCoolingDown)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: RichText(
+              text: TextSpan(
+                style: theme.textTheme.bodyMedium,
+                children: [
+                  TextSpan(
+                    text: 'auth.otp.resend_in'.tr(),
+                    style: TextStyle(color: Colors.grey.shade500),
+                  ),
+                  TextSpan(
+                    text: ' $secondsLeft ',
+                    style: TextStyle(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextSpan(
+                    text: 'auth.otp.seconds'.tr(),
+                    style: TextStyle(color: Colors.grey.shade500),
+                  ),
+                ],
+              ),
             ),
+          )
+        // ─── لو مفيش cooldown اعرض الزرار ──────────────────────────────
+        else
+          AppOutlinedButton(
+            text: 'auth.otp.resend'.tr(),
+            isLoading: isResending,
+            active: onResend != null,
+            onPressed: onResend ?? () {},
+            verticalPadding: 4,
           ),
-        ),
       ],
     );
   }

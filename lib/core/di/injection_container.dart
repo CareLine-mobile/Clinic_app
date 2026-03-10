@@ -10,6 +10,8 @@ import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/login_usecase.dart';
 import '../../features/auth/domain/usecases/logout_usecase.dart';
+import '../../features/auth/domain/usecases/reset_password_usecase.dart';
+import '../../features/auth/domain/usecases/send_forgot_password_usecase.dart';
 import '../../features/auth/domain/usecases/signup_usecase.dart';
 import '../../features/auth/domain/usecases/verify_otp_usecase.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
@@ -26,8 +28,6 @@ import '../../features/clinic_details/domain/repositories/clinic_repository.dart
 import '../../features/clinic_details/domain/usecases/get_clinic_details_usecase.dart';
 import '../../features/clinic_details/domain/usecases/toggle_favorite_usecase.dart' as clinic_details;
 import '../../features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
-import '../../features/clinic_details/presentation/cubit/clinic_ui_cubit.dart';
-
 // Features - Home
 import '../../features/home/data/datasources/localdatasource/location_data_source.dart';
 import '../../features/home/data/datasources/localdatasource/location_data_source_impl.dart';
@@ -105,6 +105,8 @@ void setUpAuthModule(){
   sl.registerLazySingleton(() => SignupUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
   sl.registerLazySingleton(() => VerifyOtpUseCase(sl()));
+  sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
+  sl.registerLazySingleton(() => SendForgotPasswordUseCase(sl()));
   // Cubit
   sl.registerLazySingleton(
         () => AuthCubit(
@@ -114,7 +116,9 @@ void setUpAuthModule(){
       verifyOtpUseCase: sl(),
       authRepository: sl(),
       logoutUseCase: sl(),
-    ),
+      sendForgotPasswordUseCase: sl(),
+      resetPasswordUseCase:  sl(),
+  ),
   );
 }
 void setUpHomeModule(){

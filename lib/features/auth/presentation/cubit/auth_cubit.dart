@@ -4,6 +4,8 @@ import '../../../user_data/user_repo.dart';
 import '../../domain/entities/verify_otp_params.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/login_usecase.dart';
+import '../../domain/usecases/reset_password_usecase.dart';
+import '../../domain/usecases/send_forgot_password_usecase.dart';
 import '../../domain/usecases/signup_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/usecases/verify_otp_usecase.dart';
@@ -16,6 +18,8 @@ class AuthCubit extends Cubit<AuthState> {
   final VerifyOtpUseCase verifyOtpUseCase;
   final AuthRepository authRepository;
   final UserRepository userRepository;
+  final SendForgotPasswordUseCase sendForgotPasswordUseCase;
+  final ResetPasswordUseCase resetPasswordUseCase;
 
   AuthCubit({
     required this.loginUseCase,
@@ -24,6 +28,8 @@ class AuthCubit extends Cubit<AuthState> {
     required this.verifyOtpUseCase,
     required this.authRepository,
     required this.userRepository,
+    required this.sendForgotPasswordUseCase,
+    required this.resetPasswordUseCase,
   }) : super(AuthInitial());
 
   Future<void> loadCurrentUser() async {
@@ -94,6 +100,51 @@ class AuthCubit extends Cubit<AuthState> {
         emit(LoginSuccess());
         emit(AuthAuthenticated(user: user));
       },
+    );
+  }
+
+  // ─── Resend OTP ────────────────────────────────────────────────────────
+  Future<void> resendOtp({required String email}) async {
+    if (state is OtpResendLoading) return; // prevent double tap
+    emit(const OtpResendLoading());
+
+    final result = await authRepository.reSendOtp(email: email);
+
+    result.fold(
+          (failure) => emit(OtpFailure(message: failure.message)),
+          (_) => emit(const OtpResendSuccess()),
+    );
+  }
+
+  // ─── Forgot Password ──────────────────────────────────────────────────────
+  Future<void> sendForgotPassword({required String email}) async {
+    emit(ForgotPasswordLoading());
+
+    final result = await sendForgotPasswordUseCase(email: email);
+
+    result.fold(
+          (failure) => emit(ForgotPasswordFailure(failure.message)),
+          (_) => emit(ForgotPasswordSuccess(email)), // بيمرر الـ email للـ next screen
+    );
+  }
+
+  // ─── Reset Password ───────────────────────────────────────────────────────
+  Future<void> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    emit(ResetPasswordLoading());
+
+    final result = await resetPasswordUseCase(
+      email: email,
+      otp: otp,
+      newPassword: newPassword,
+    );
+
+    result.fold(
+          (failure) => emit(ResetPasswordFailure(failure.message)),
+          (_) => emit(ResetPasswordSuccess()),
     );
   }
 

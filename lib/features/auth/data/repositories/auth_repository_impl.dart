@@ -76,6 +76,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+
   @override
   Future<Either<Failure, User>> verifyOtp({
     required String email,
@@ -105,6 +106,64 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, void>> reSendOtp({
+    required String email,
+  }) async {
+    try {
+      await apiServices.request(
+        method: HttpMethod.post,
+        url: Endpoints.resendOTP,
+        body: {'email': email},
+      );
+      return const Right(null);
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
+
+// ─── Forgot Password — بيبعت OTP على الإيميل ────────────────────────────
+  @override
+  Future<Either<Failure, void>> sendForgotPassword({
+    required String email,
+  }) async {
+    try {
+      await apiServices.request(
+        method: HttpMethod.post,
+        url: Endpoints.sendForgetPassword,
+        body: {'email': email},
+      );
+      // response: { status: 200, message: "...", data: null }
+      // مفيش user — مجرد success
+      return const Right(null);
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
+
+// ─── Reset Password — بيستقبل email + otp + password ────────────────────
+  @override
+  Future<Either<Failure, void>> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    try {
+      await apiServices.request(
+        method: HttpMethod.post,
+        url: Endpoints.resetPassword, // تأكد من الـ endpoint
+        body: {
+          'email': email,
+          'otp': otp,
+          'password': newPassword,
+          'password_confirmation': newPassword,
+        },
+      );
+      return const Right(null);
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
   @override
   Future<void> logout() async {
     await apiServices.request(method: HttpMethod.post, url: Endpoints.logout);

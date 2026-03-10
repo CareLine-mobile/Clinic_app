@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +7,7 @@ import 'package:clinic_app/core/widgets/app_buton.dart';
 import 'package:clinic_app/core/widgets/app_text_feild.dart';
 import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/core/utils/validators.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../cubit/auth_cubit.dart';
 import '../../cubit/auth_state.dart';
 
@@ -54,17 +53,17 @@ class _LoginTabState extends State<LoginTab> {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: () {},
+              onPressed: () => Navigator.pushNamed(context, Routes.forgotPassword),
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
               child: Text(
-                'auth.forgotPassword'.tr(),
+                'auth.forgotPassword.title'.tr(),
                 style: TextStyle(
                   color: ColorsManager.primaryColor,
-                  fontSize: 13,
+                  fontSize: 13.sp,
                   fontWeight: FontWeight.w600,
                 ),
               ),

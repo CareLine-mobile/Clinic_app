@@ -32,7 +32,7 @@ class ErrorHandler {
     return key != null ? key.tr() : raw;
   }
 
-  static Failure handleException(Object error, [StackTrace? stackTrace]) {
+  static Failure  handleException(Object error, [StackTrace? stackTrace]) {
     _logError(error, stackTrace);
 
     if (error is ServerException) {

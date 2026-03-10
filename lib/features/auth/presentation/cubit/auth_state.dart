@@ -68,3 +68,45 @@ class AccountNotVerified extends AuthState {
   @override
   List<Object?> get props => [email];
 }
+
+class OtpResendLoading extends AuthState {
+  const OtpResendLoading();
+}
+
+class OtpResendSuccess extends AuthState {
+  const OtpResendSuccess();
+}
+
+// auth_state.dart
+
+// ─── Forgot Password ─────────────────────────────────────────────────────
+class ForgotPasswordLoading extends AuthState {}
+
+class ForgotPasswordSuccess extends AuthState {
+  final String email;
+  const ForgotPasswordSuccess(this.email);
+
+  @override
+  List<Object?> get props => [email];
+}
+
+class ForgotPasswordFailure extends AuthState {
+  final String message;
+  const ForgotPasswordFailure(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+// ─── Reset Password ───────────────────────────────────────────────────────
+class ResetPasswordLoading extends AuthState {}
+
+class ResetPasswordSuccess extends AuthState {}
+
+class ResetPasswordFailure extends AuthState {
+  final String message;
+  const ResetPasswordFailure(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
