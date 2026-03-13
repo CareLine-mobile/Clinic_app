@@ -1,10 +1,9 @@
+import 'package:clinic_app/features/clinic_details/presentation/view/booking/booking_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import '../../../../../core/utils/app_size.dart';
 import '../../../../../core/widgets/confirmation_dialog.dart';
-import '../../../../booking/presentation/pages/booking_screen.dart';
 import '../../../../user_data/auth_guard.dart';
 import '../../../domain/entites/clinic_entities.dart';
 import '../../../domain/entites/doctor_entity.dart';
@@ -26,7 +25,7 @@ class BookButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ClinicDetailsCubit, ClinicDetailsState>(
       builder: (context, state) {
-        final isBooking = state is BookingInProgress;
+        final isBooking = state is BookingLoading;
 
         return ElevatedButton(
           onPressed: isBooking ? null : () => _showBookingDialog(context),
@@ -56,26 +55,25 @@ class BookButton extends StatelessWidget {
     );
   }
 
-
-    void _showBookingDialog(BuildContext context) {
-      if (!AuthGuard.check(context)) return;
-      AppDialog.warning(
-        context: context,
-        message: 'هل تريد حجز موعد مع ${doctor.name}؟',
-        onConfirm: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BookingScreen(
-                clinicalId: int.parse(clinic.id),
-                doctorId: doctor.id,
-                clinicName: clinic.name,
-                doctorName: doctor.name,
-                availableSlots: doctor.availableSlots, // List<TimeSlotEntity>
-              ),
+  void _showBookingDialog(BuildContext context) {
+    if (!AuthGuard.check(context)) return;
+    AppDialog.warning(
+      context: context,
+      message: 'هل تريد حجز موعد مع ${doctor.name}؟',
+      onConfirm: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BookingScreen(
+              clinicalId: int.parse(clinic.id),
+              doctorId: doctor.id,
+              clinicName: clinic.name,
+              doctorName: doctor.name,
+              availableSlots: doctor.availableSlots,
             ),
-          );
-        },
-      );
-    }
+          ),
+        );
+      },
+    );
+  }
 }

@@ -8,6 +8,7 @@ class ReviewEntity extends Equatable {
   final String comment;
   final DateTime date;
   final String doctorName;
+  final int? doctorId; // Optional: to track which doctor was reviewed
 
   const ReviewEntity({
     required this.id,
@@ -17,17 +18,18 @@ class ReviewEntity extends Equatable {
     required this.comment,
     required this.date,
     required this.doctorName,
+    this.doctorId,
   });
-
-  // Business Logic
-  bool get isRecentReview {
-    final daysDifference = DateTime.now().difference(date).inDays;
-    return daysDifference <= 30;
-  }
 
   @override
   List<Object?> get props => [
-    id, patientName, patientImageUrl,
-    rating, comment, date, doctorName,
+    id,
+    patientName,
+    patientImageUrl,
+    rating,
+    comment,
+    date,
+    doctorName,
+    doctorId,
   ];
 }

@@ -1,21 +1,12 @@
 // lib/main.dart
-
-import 'package:clinic_app/features/booking/presentation/cubit/booking_cubit.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'core/di/injection_container.dart' as di;
 import 'core/routes/app_routes.dart';
 import 'core/routes/routes.dart';
 import 'core/service/app_initializer.dart';
 import 'core/theme/app_theme.dart';
-import 'features/auth/presentation/cubit/auth_cubit.dart';
-import 'features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
-import 'features/clinic_details/presentation/cubit/clinic_ui_cubit.dart';
-import 'features/home/presentation/cubit/home_cubit.dart';
-import 'features/home/presentation/cubit/home_ui_cubit.dart';
 import 'features/settings/presentation/cubit/settings_cubit.dart';
 import 'features/user_data/user_cubit.dart';
 import 'features/user_data/user_repo.dart';

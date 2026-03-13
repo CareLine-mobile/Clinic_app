@@ -68,6 +68,16 @@ class UnauthorizedFailure extends Failure {
   String get errorType => 'unauthorized_error'.tr();
 }
 
+class UnexpectedFailure extends Failure {
+  const UnexpectedFailure(super.message);
+
+  @override
+  String get errorKey => 'errors.auth.title'.tr();
+
+  @override
+  String get errorType => 'unauthorized_error'.tr();
+}
+
 class AccountNotVerifiedFailure extends Failure {
   final String email;
 

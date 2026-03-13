@@ -1,11 +1,11 @@
 // lib/features/home/presentation/widgets/last_booking_card.dart
 
+import 'package:clinic_app/features/my_booking/domain/entities/booking_entity.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/colors.dart';
 import '../../../../../core/utils/app_size.dart';
-import '../../../../booking/domain/entities/booking_entity.dart';
 
 
 class LastBookingCard extends StatelessWidget {

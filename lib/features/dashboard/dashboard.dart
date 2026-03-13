@@ -1,11 +1,11 @@
 // lib/features/dashboard/patient_home_screen.dart
 
 import 'dart:ui';
-
 import 'package:clinic_app/core/utils/assets.dart';
 import 'package:clinic_app/core/widgets/CustomIcon.dart';
 import 'package:clinic_app/features/home/presentation/view/home_screen.dart';
 import 'package:clinic_app/features/home/presentation/view/medication_tap_screen.dart';
+import 'package:clinic_app/features/my_booking/presentation/view/booking_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,8 +14,7 @@ import '../../../../core/theme/colors.dart';
 import '../../../../core/utils/app_size.dart';
 import '../auth/presentation/cubit/auth_cubit.dart';
 import '../auth/presentation/cubit/auth_state.dart';
-import '../booking/presentation/pages/booking_list/booking_list_screen.dart';
-import '../booking/presentation/cubit/booking_cubit.dart';
+import '../my_booking/presentation/cubit/booking_cubit.dart';
 import '../settings/presentation/view/settings_screen.dart';
 import '../user_data/user_repo.dart';
 

@@ -1,0 +1,404 @@
+import 'package:clinic_app/features/my_booking/domain/entities/booking_entity.dart';
+import 'package:clinic_app/features/my_booking/presentation/widgets/SectionCard.dart';
+import 'package:clinic_app/features/my_booking/presentation/widgets/booking_detail_row.dart';
+import 'package:clinic_app/features/my_booking/presentation/widgets/booking_status_config.dart';
+import 'package:clinic_app/features/my_booking/presentation/widgets/clinic_avatar.dart';
+import 'package:clinic_app/features/my_booking/presentation/widgets/rating_chip.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
+import '../../../../../../core/utils/app_size.dart';
+import '../../../../../../core/widgets/custom_app_bar.dart';
+import '../cubit/booking_cubit.dart';
+import '../widgets/review_form_widget.dart';
+
+class BookingDetailScreen extends StatelessWidget {
+  final BookingEntity booking;
+
+  const BookingDetailScreen({super.key, required this.booking});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<BookingCubit, BookingState>(
+      listener: (context, state) {
+        if (state is CancelBookingSuccess) {
+          _showSnackBar(
+            context,
+            message: 'bookings.detail.cancel_success'.tr(),
+            isError: false,
+          );
+          context.read<BookingCubit>().loadBookings();
+          Navigator.of(context).pop();
+        } else if (state is CancelBookingError) {
+          _showSnackBar(context, message: state.message, isError: true);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        appBar: CustomAppBar(title: 'bookings.detail.title'.tr()),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(SizeApp.s16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _ClinicCard(booking: booking),
+              SizedBox(height: SizeApp.s16),
+
+              _StatusBanner(status: booking.status),
+              SizedBox(height: SizeApp.s16),
+
+              _AppointmentInfoSection(booking: booking),
+
+              if (booking.patientName != null || booking.patientPhone != null) ...[
+                SizedBox(height: SizeApp.s16),
+                _PatientSection(booking: booking),
+              ],
+
+              if (booking.notes?.isNotEmpty == true) ...[
+                SizedBox(height: SizeApp.s16),
+                _NotesSection(notes: booking.notes!),
+              ],
+
+              // Cancel — only for pending bookings
+              if (booking.canCancel) ...[
+                SizedBox(height: SizeApp.s24),
+                _CancelButton(bookingId: booking.id),
+              ],
+
+              // Review form — only for completed bookings
+              if (booking.canReview) ...[
+                SizedBox(height: SizeApp.s24),
+                ReviewFormWidget(booking: booking),
+              ],
+
+              SizedBox(height: SizeApp.s40),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showSnackBar(
+      BuildContext context, {
+        required String message,
+        required bool isError,
+      }) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor:
+        isError ? const Color(0xFFC62828) : const Color(0xFF2E7D32),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Clinic Card ─────────────────────────────────────────────────────────────
+
+class _ClinicCard extends StatelessWidget {
+  final BookingEntity booking;
+  const _ClinicCard({required this.booking});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final clinical = booking.clinical;
+
+    return Container(
+      padding: EdgeInsets.all(SizeApp.s16),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          ClinicAvatar(thumbnailUrl: clinical.thumbnailUrl, size: 64, radius: 14),
+          SizedBox(width: SizeApp.s12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(clinical.name,
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold)),
+                SizedBox(height: 4.h),
+                Text(clinical.specialty,
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: theme.hintColor)),
+                SizedBox(height: 6.h),
+                Row(
+                  children: [
+                    Icon(Icons.location_on_outlined,
+                        size: 14.sp, color: theme.hintColor),
+                    SizedBox(width: 4.w),
+                    Expanded(
+                      child: Text(
+                        clinical.location,
+                        style: theme.textTheme.bodySmall
+                            ?.copyWith(color: theme.hintColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    RatingChip(rating: clinical.rating),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Status Banner ────────────────────────────────────────────────────────────
+
+class _StatusBanner extends StatelessWidget {
+  final String status;
+  const _StatusBanner({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    final config = BookingStatusConfig.from(status);
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+          horizontal: SizeApp.s16, vertical: SizeApp.s12),
+      decoration: BoxDecoration(
+        color: config.bgColor,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: config.color.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          Icon(config.icon, color: config.color, size: 20.sp),
+          SizedBox(width: SizeApp.s8),
+          Text(
+            config.label,
+            style: TextStyle(
+              color: config.color,
+              fontWeight: FontWeight.bold,
+              fontSize: 15.sp,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Appointment Info ─────────────────────────────────────────────────────────
+
+class _AppointmentInfoSection extends StatelessWidget {
+  final BookingEntity booking;
+  const _AppointmentInfoSection({required this.booking});
+
+  @override
+  Widget build(BuildContext context) {
+    return SectionCard(
+      title: 'bookings.detail.appointment_info'.tr(),
+      children: [
+        BookingDetailRow(
+          icon: Icons.person_outline_rounded,
+          label: 'bookings.doctor'.tr(),
+          value: booking.doctor.name,
+        ),
+        BookingDetailRow(
+          icon: Icons.medical_services_outlined,
+          label: 'bookings.detail.specialty'.tr(),
+          value: booking.doctor.specialty,
+        ),
+        BookingDetailRow(
+          icon: Icons.calendar_today_outlined,
+          label: 'bookings.date'.tr(),
+          value: _formatDate(booking.date),
+        ),
+        BookingDetailRow(
+          icon: Icons.access_time_rounded,
+          label: 'bookings.time'.tr(),
+          value: _formatTime(booking.time),
+        ),
+        if (booking.turnNumber != null)
+          BookingDetailRow(
+            icon: Icons.format_list_numbered_rounded,
+            label: 'bookings.turn_number'.tr(),
+            value: '${booking.turnNumber}',
+            isHighlighted: true,
+          ),
+      ],
+    );
+  }
+
+  String _formatDate(String date) {
+    try {
+      return DateFormat('EEEE، d MMMM yyyy', 'ar').format(DateTime.parse(date));
+    } catch (_) {
+      return date;
+    }
+  }
+
+  String _formatTime(String time) {
+    try {
+      final parts = time.split(':');
+      final hour = int.parse(parts[0]);
+      final minute = parts[1];
+      final suffix = hour >= 12 ? 'م' : 'ص';
+      final hour12 = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+      return '$hour12:$minute $suffix';
+    } catch (_) {
+      return time;
+    }
+  }
+}
+
+// ─── Patient Section ──────────────────────────────────────────────────────────
+
+class _PatientSection extends StatelessWidget {
+  final BookingEntity booking;
+  const _PatientSection({required this.booking});
+
+  @override
+  Widget build(BuildContext context) {
+    return SectionCard(
+      title: 'bookings.detail.patient_info'.tr(),
+      children: [
+        if (booking.patientName != null)
+          BookingDetailRow(
+            icon: Icons.person_rounded,
+            label: 'bookings.detail.patient_name'.tr(),
+            value: booking.patientName!,
+          ),
+        if (booking.patientPhone != null)
+          BookingDetailRow(
+            icon: Icons.phone_outlined,
+            label: 'bookings.detail.patient_phone'.tr(),
+            value: booking.patientPhone!,
+          ),
+      ],
+    );
+  }
+}
+
+// ─── Notes Section ────────────────────────────────────────────────────────────
+
+class _NotesSection extends StatelessWidget {
+  final String notes;
+  const _NotesSection({required this.notes});
+
+  @override
+  Widget build(BuildContext context) {
+    return SectionCard(
+      title: 'bookings.detail.notes'.tr(),
+      children: [
+        Text(
+          notes,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).hintColor,
+            height: 1.6,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Cancel Button ────────────────────────────────────────────────────────────
+
+class _CancelButton extends StatelessWidget {
+  final int bookingId;
+  const _CancelButton({required this.bookingId});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BookingCubit, BookingState>(
+      builder: (context, state) {
+        final isLoading = state is CancelBookingLoading;
+        return SizedBox(
+          width: double.infinity,
+          height: 52.h,
+          child: OutlinedButton(
+            onPressed: isLoading ? null : () => _confirmCancel(context),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: Color(0xFFC62828), width: 1.5),
+              foregroundColor: const Color(0xFFC62828),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+            ),
+            child: isLoading
+                ? SizedBox(
+              width: 22.w,
+              height: 22.w,
+              child: const CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: Color(0xFFC62828),
+              ),
+            )
+                : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.cancel_outlined, size: 20.sp),
+                SizedBox(width: SizeApp.s8),
+                Text(
+                  'bookings.detail.cancel_booking'.tr(),
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _confirmCancel(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        title: Text('bookings.detail.cancel_confirm_title'.tr()),
+        content: Text('bookings.detail.cancel_confirm_body'.tr()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(),
+            child: Text('common.no'.tr()),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogCtx).pop();
+              context.read<BookingCubit>().cancelBooking(bookingId);
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFFC62828),
+            ),
+            child: Text(
+              'bookings.detail.cancel_confirm_yes'.tr(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

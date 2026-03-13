@@ -9,7 +9,7 @@ class AppInitializer {
     WidgetsFlutterBinding.ensureInitialized();
 
     /// Initialize services
-    await Alarm.init();
+    // await Alarm.init(); /// todo:: phase 2
     await _initLanguages();
     /// Initialize dependencies
     await di.init();

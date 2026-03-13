@@ -2,7 +2,7 @@
 
 import 'package:clinic_app/core/utils/app_size.dart';
 import 'package:clinic_app/core/utils/assets.dart';
-import 'package:clinic_app/features/booking/presentation/cubit/booking_cubit.dart';
+import 'package:clinic_app/features/my_booking/presentation/cubit/booking_cubit.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 import 'package:flutter/material.dart';

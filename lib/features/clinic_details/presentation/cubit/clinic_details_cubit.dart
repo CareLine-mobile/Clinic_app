@@ -1,101 +1,214 @@
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
-import '../../../booking/domain/entities/booking_entity.dart';
+import 'package:equatable/equatable.dart';
 import '../../domain/entites/clinic_entities.dart';
 import '../../domain/entites/doctor_entity.dart';
+import '../../domain/entites/time_slot_entity.dart';
+import '../../domain/entites/appointment_request_entity.dart';
 import '../../domain/usecases/get_clinic_details_usecase.dart';
 import '../../domain/usecases/toggle_favorite_usecase.dart';
+import '../../domain/usecases/make_appointment_usecase.dart';
 
 part 'clinic_details_state.dart';
-
-
-
-
 
 class ClinicDetailsCubit extends Cubit<ClinicDetailsState> {
   final GetClinicDetailsUseCase getClinicDetailsUseCase;
   final ToggleFavoriteUseCase toggleFavoriteUseCase;
+  final MakeAppointmentUseCase makeAppointmentUseCase;
 
   ClinicDetailsCubit({
     required this.getClinicDetailsUseCase,
     required this.toggleFavoriteUseCase,
+    required this.makeAppointmentUseCase,
   }) : super(ClinicDetailsInitial());
 
-  ClinicEntity? _currentClinic;
+  // Convenience getter — null-safe access to the loaded state
+  ClinicDetailsLoaded? get _loaded =>
+      state is ClinicDetailsLoaded ? state as ClinicDetailsLoaded : null;
 
-  // ── UI state ──────────────────────────────────────────────
-  DateTime _selectedDate = DateTime.now();
-  DoctorEntity? _selectedDoctor;
-  int _selectedTabIndex = 0;
-  bool _isAppBarTransparent = true;
+  // ── Load ──────────────────────────────────────────────────
 
-  DateTime get selectedDate => _selectedDate;
-  DoctorEntity? get selectedDoctor => _selectedDoctor;
-  int get selectedTabIndex => _selectedTabIndex;
-  bool get isAppBarTransparent => _isAppBarTransparent;
-
-  // ── Data methods ──────────────────────────────────────────
   Future<void> loadClinicDetails(int clinicId) async {
     emit(ClinicDetailsLoading());
     final result = await getClinicDetailsUseCase(clinicId);
     result.fold(
           (failure) => emit(ClinicDetailsError(failure.message)),
-          (clinic) {
-        _currentClinic = clinic;
-        emit(ClinicDetailsLoaded(clinic: clinic));
-      },
+          (clinic) => emit(ClinicDetailsLoaded(
+        clinic: clinic,
+        selectedDate: DateTime.now(),
+      )),
     );
   }
+
+  // ── Favorite ──────────────────────────────────────────────
 
   Future<void> toggleFavorite() async {
-    if (_currentClinic == null) return;
-    final currentState = state;
-    if (currentState is! ClinicDetailsLoaded) return;
+    final s = _loaded;
+    if (s == null) return;
 
-    emit(currentState.copyWith(isFavorite: !currentState.clinic.isOpen));
-    final result = await toggleFavoriteUseCase(_currentClinic!.id);
+    emit(s.copyWith(isFavoriteLoading: true));
+
+    final result = await toggleFavoriteUseCase(s.clinic.id);
     result.fold(
           (failure) {
-        emit(currentState);
+        emit(s.copyWith(isFavoriteLoading: false));
         emit(ClinicDetailsError(failure.message));
       },
-          (_) {},
+          (_) => emit(s.copyWith(isFavoriteLoading: false)),
     );
   }
 
-  void resetBookingState() {
-    if (_currentClinic != null) {
-      emit(ClinicDetailsLoaded(clinic: _currentClinic!));
-    }
-  }
+  // ── Date / Doctor / Slot selection ────────────────────────
 
-  // ── UI methods ────────────────────────────────────────────
+  /// Used from BookingTab — resets doctor + slot because a new date
+  /// means the user should re-pick a doctor for that day.
   void selectDate(DateTime date) {
-    _selectedDate = date;
-    _selectedDoctor = null; // Clear doctor when date changes
-    _emitCurrentLoaded();
+    final s = _loaded;
+    if (s == null) return;
+    emit(s.copyWith(
+      selectedDate: date,
+      selectedDoctor: null,
+      selectedTime: null,
+      selectedTimeFrom: null,
+    ));
   }
 
-  void selectDoctor(DoctorEntity? doctor) {
-    _selectedDoctor = doctor;
-    _emitCurrentLoaded();
+  /// Used from BookingDateTimePage — date changes but doctor is already
+  /// locked in, so we only reset the time slot.
+  void selectDateInBookingFlow(DateTime date) {
+    final s = _loaded;
+    if (s == null) return;
+    emit(s.copyWith(
+      selectedDate: date,
+      selectedTime: null,
+      selectedTimeFrom: null,
+    ));
   }
+
+  void selectDoctor(DoctorEntity doctor) {
+    final s = _loaded;
+    if (s == null) return;
+    // Reset slot when doctor changes
+    emit(s.copyWith(
+      selectedDoctor: doctor,
+      selectedTime: null,
+      selectedTimeFrom: null,
+      bookingStep: 0,
+    ));
+  }
+
+  void selectTimeSlot(TimeSlotEntity slot) {
+    final s = _loaded;
+    if (s == null) return;
+    emit(s.copyWith(
+      selectedTime: slot.timeSlot,
+      selectedTimeFrom: slot.timeFrom,
+    ));
+  }
+
+  // ── Tab / AppBar ──────────────────────────────────────────
 
   void changeTab(int index) {
-    _selectedTabIndex = index;
-    _emitCurrentLoaded();
+    final s = _loaded;
+    if (s == null) return;
+    emit(s.copyWith(selectedTabIndex: index));
   }
 
   void updateAppBarTransparency(bool isTransparent) {
-    if (_isAppBarTransparent != isTransparent) {
-      _isAppBarTransparent = isTransparent;
-      _emitCurrentLoaded();
-    }
+    final s = _loaded;
+    if (s == null || s.isAppBarTransparent == isTransparent) return;
+    emit(s.copyWith(isAppBarTransparent: isTransparent));
   }
 
-  void _emitCurrentLoaded() {
-    if (state is ClinicDetailsLoaded) {
-      emit((state as ClinicDetailsLoaded).copyWith());
-    }
+  // ── Booking flow ──────────────────────────────────────────
+
+  void nextBookingStep() {
+    final s = _loaded;
+    if (s == null) return;
+    if (s.bookingStep == 0 && !s.canProceedStep1) return;
+    if (s.bookingStep == 1 && !s.canProceedStep2) return;
+    if (s.bookingStep >= 2) return;
+    emit(s.copyWith(bookingStep: s.bookingStep + 1));
   }
+
+  void previousBookingStep() {
+    final s = _loaded;
+    if (s == null || s.bookingStep <= 0) return;
+    emit(s.copyWith(bookingStep: s.bookingStep - 1));
+  }
+
+  void resetBookingFlow() {
+    final s = _loaded;
+    if (s == null) return;
+    emit(s.copyWith(
+      bookingStep: 0,
+      selectedDoctor: null,
+      selectedTime: null,
+      selectedTimeFrom: null,
+      patientName: null,
+      patientPhone: null,
+      bookingNotes: null,
+    ));
+  }
+
+  void updatePatientName(String name) {
+    final s = _loaded;
+    if (s == null) return;
+    emit(s.copyWith(patientName: name));
+  }
+
+  void updatePatientPhone(String phone) {
+    final s = _loaded;
+    if (s == null) return;
+    emit(s.copyWith(patientPhone: phone));
+  }
+
+  void updateBookingNotes(String notes) {
+    final s = _loaded;
+    if (s == null) return;
+    emit(s.copyWith(bookingNotes: notes));
+  }
+
+  Future<void> confirmBooking() async {
+    final s = _loaded;
+    if (s == null) return;
+
+    if (s.selectedTimeFrom == null ||
+        s.selectedDoctor == null ||
+        s.clinic.id.isEmpty) {
+      emit(BookingError('Missing required booking information'));
+      return;
+    }
+
+    emit(BookingLoading());
+
+    final result = await makeAppointmentUseCase(
+      AppointmentRequestEntity(
+        clinicalId: s.clinic.id,
+        doctorId: s.selectedDoctor!.id,
+        date: _formatDate(s.selectedDate),
+        time: s.selectedTimeFrom!,
+        notes: s.bookingNotes,
+      ),
+    );
+
+    result.fold(
+          (failure) => emit(BookingError(failure.message)),
+          (_) {
+        // Go back to loaded state with flow reset
+        emit(s.copyWith(
+          bookingStep: 0,
+          selectedDoctor: null,
+          selectedTime: null,
+          selectedTimeFrom: null,
+          patientName: null,
+          patientPhone: null,
+          bookingNotes: null,
+        ));
+        emit(BookingSuccess('Appointment booked successfully'));
+      },
+    );
+  }
+
+  String _formatDate(DateTime date) =>
+      '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 }

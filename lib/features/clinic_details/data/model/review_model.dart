@@ -1,3 +1,4 @@
+
 import '../../domain/entites/review_entity.dart';
 
 class ReviewModel extends ReviewEntity {
@@ -12,14 +13,35 @@ class ReviewModel extends ReviewEntity {
   });
 
   factory ReviewModel.fromJson(Map<String, dynamic> json) {
+    // Extract doctor info from nested object
+    final doctorData = json['doctor'] as Map<String, dynamic>?;
+    final doctorName = doctorData != null
+        ? doctorData['name'] as String? ?? ''
+        : json['doctor_name'] as String? ?? '';
+    final doctorId = doctorData != null
+        ? doctorData['id'] as int?
+        : json['doctor_id'] as int?;
+
+    // Parse date safely
+    DateTime parsedDate;
+    try {
+      final dateString = json['date'] as String?;
+      parsedDate = dateString != null
+          ? DateTime.parse(dateString)
+          : DateTime.now();
+    } catch (e) {
+      parsedDate = DateTime.now();
+    }
+
     return ReviewModel(
       id: json['id']?.toString() ?? '',
-      patientName: json['patient_name'] ?? '',
-      patientImageUrl: json['patient_image_url'] ?? '',
-      rating: (json['rating'] ?? 0).toDouble(),
-      comment: json['comment'] ?? '',
-      date: DateTime.parse(json['date'] ?? DateTime.now().toIso8601String()),
-      doctorName: json['doctor_name'] ?? '',
+      patientName: json['patient_name'] as String? ?? '',
+      patientImageUrl: json['patient_image_url'] as String? ?? '',
+      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+      comment: json['comment'] as String? ?? '',
+      date: parsedDate,
+      doctorName: doctorName,
+
     );
   }
 
@@ -46,4 +68,7 @@ class ReviewModel extends ReviewEntity {
       doctorName: entity.doctorName,
     );
   }
+
+  // Helper to convert to entity
+  ReviewEntity toEntity() => this;
 }

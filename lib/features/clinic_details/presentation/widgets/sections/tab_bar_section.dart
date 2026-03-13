@@ -3,7 +3,6 @@ import 'package:clinic_app/features/clinic_details/presentation/cubit/clinic_det
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entites/clinic_entities.dart';
-import '../../cubit/clinic_ui_cubit.dart';
 import '../tab_bar_delegate.dart';
 
 

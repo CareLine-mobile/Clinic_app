@@ -8,9 +8,7 @@ import '../../../../core/widgets/custom_snack_bar.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../domain/entites/clinic_entities.dart';
 import '../cubit/clinic_details_cubit.dart';
-import '../cubit/clinic_ui_cubit.dart';
 import 'content_view.dart';
-
 
 class ClinicDetailsScreen extends StatefulWidget {
   final int clinicId;
@@ -32,7 +30,6 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
   static const int _tabCount = 4;
   static const double _appBarTransitionOffset = 180.0;
 
-  // Keep track of the last loaded clinic
   ClinicEntity? _lastLoadedClinic;
 
   @override
@@ -93,11 +90,11 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
           },
           actionLabel: 'اضغط للمحاولة مرة أخرى',
           subtitle: '',
-
         ),
       ),
       ClinicDetailsLoaded() => _buildLoadedContent(state.clinic),
-      BookingInProgress() => _buildLoadedContent(_lastLoadedClinic!),
+    // Booking states: show cached clinic content with overlay handling in listener
+      BookingLoading() => _buildLoadedContent(_lastLoadedClinic!),
       BookingSuccess() => _buildLoadedContent(_lastLoadedClinic!),
       BookingError() => _buildLoadedContent(_lastLoadedClinic!),
       _ => const Scaffold(
@@ -108,8 +105,13 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
     };
   }
 
-  Widget _buildLoadedContent(ClinicEntity clinic) {
-    // Cache the last loaded clinic
+  Widget _buildLoadedContent(ClinicEntity? clinic) {
+    if (clinic == null) {
+      return const Scaffold(
+        body: Center(child: LoadingSpinner()),
+      );
+    }
+
     _lastLoadedClinic = clinic;
 
     return ContentView(
@@ -140,7 +142,6 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
           type: SnackBarType.error,
         );
       case ClinicDetailsLoaded():
-      // Update cached clinic when loaded
         _lastLoadedClinic = state.clinic;
       default:
         break;

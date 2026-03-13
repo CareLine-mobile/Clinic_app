@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/app_size.dart';
 import '../../../../core/theme/colors.dart';
 import '../../../../core/widgets/error_state_widget.dart';
-import '../../../booking/presentation/cubit/booking_cubit.dart';
+import '../../../my_booking/presentation/cubit/booking_cubit.dart';
 import '../../../clinic_details/presentation/view/clinic_details_screen.dart';
 import '../../../user_data/user_repo.dart';
 import '../../domain/entities/clinic_summary.dart';
