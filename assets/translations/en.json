@@ -1,5 +1,7 @@
-{
 
+
+
+{
   "auth": {
     "user": "User",
     "login": "Login",
@@ -67,6 +69,7 @@
     "date": "Date",
     "time": "Time",
     "turn_number": "Turn Number",
+    "reviewed": "Reviewed",
     "detail": {
       "title": "Booking Details",
       "appointment_info": "Appointment Info",
@@ -84,7 +87,74 @@
     "status": {
       "confirmed": "Confirmed",
       "cancelled": "Cancelled",
-      "pending": "Pending"
+      "pending": "Pending",
+      "completed": "Completed"
+    }
+  },
+  "reviews": {
+    "form": {
+      "title": "Add Your Review",
+      "ratingLabel": "Your Rating",
+      "commentLabel": "Your Comment",
+      "commentHint": "Share your experience with this clinic...",
+      "submit": "Submit Review",
+      "success": "Your review was submitted successfully, thank you!"
+    }
+  },
+  "booking": {
+    "choose_date": "Choose Date",
+    "choose_time": "Choose Time",
+    "no_slots": "No available slots for this day",
+    "continue": "Continue",
+    "confirm_title": "Confirm Your Booking",
+    "confirm_subtitle": "Please review your booking details before confirming",
+    "confirm_button": "Confirm Booking",
+    "confirmed_title": "Booking Confirmed!",
+    "confirmed_body": "Your appointment has been booked successfully",
+    "confirmed_done": "Done",
+    "payment_note": "The clinic will contact you for payment instructions once approved",
+    "your_info": "Your Information",
+    "full_name": "Full Name",
+    "full_name_hint": "Enter your full name",
+    "phone": "Phone Number",
+    "phone_hint": "Enter your phone number",
+    "notes_optional": "Notes (Optional)",
+    "notes_hint": "Any symptoms or notes for the doctor...",
+    "summary": {
+      "clinic": "Clinic",
+      "doctor": "Doctor",
+      "patient": "Patient",
+      "phone": "Phone",
+      "date": "Date",
+      "time": "Time",
+      "notes": "Notes"
+    },
+    "bottom_bar": {
+      "fee_label": "Consultation Fee",
+      "book_now": "Book Now"
+    },
+    "stepper": {
+      "date_time": "Date & Time",
+      "your_info": "Your Info",
+      "confirm": "Confirm"
+    },
+    "missing_info": "Missing required booking information"
+  },
+  "clinic": {
+    "choose_date": "Choose Date",
+    "available_doctors": "Available Doctors ({count})",
+    "no_doctors": "No doctors available on this date",
+    "no_slots_today": "No available slots today",
+    "choose_time": "Choose Time",
+    "remaining": "{count} remaining",
+    "selected_summary_clear": "Clear selection",
+    "book_now": "Book Now",
+    "currency": "EGP",
+    "years_exp": "{count} years exp.",
+    "tabs": {
+      "overview": "Overview",
+      "booking": "Booking",
+      "reviews": "Reviews"
     }
   },
   "validation": {

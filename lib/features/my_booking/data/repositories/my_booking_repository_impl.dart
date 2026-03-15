@@ -36,11 +36,11 @@ class MyBookingRepositoryImpl implements MyBookingRepository {
       ResultHandler.handleVoid(
             () => _remoteDataSource.createReview(
           clinicId: clinicId,
-          request: ReviewRequestModel(
-            rating: rating,
-            comment: comment,
-            doctorId: doctorId,
-          ),
+              request: ReviewRequestModel.fromParams(
+                rating: rating,
+                comment: comment,
+                doctorId: doctorId,
+              ),
         ),
       );
 }

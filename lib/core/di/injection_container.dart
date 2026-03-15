@@ -1,5 +1,7 @@
 import 'package:clinic_app/core/api/base_api_services.dart';
 import 'package:clinic_app/core/api/dio_client.dart';
+import 'package:clinic_app/features/my_booking/data/data_sources/review_local_data_source.dart';
+import 'package:clinic_app/features/my_booking/domain/usecase/review_local_data_source.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -100,7 +102,7 @@ void setUpAuthModule() {
   sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
   sl.registerLazySingleton(() => SendForgotPasswordUseCase(sl()));
 
-  sl.registerLazySingleton(
+  sl.registerFactory(
         () => AuthCubit(
       loginUseCase: sl(),
       signupUseCase: sl(),
@@ -142,27 +144,35 @@ void setUpHomeModule() {
 }
 
 void setUpMyBookingModule() {
-  // Data source
+  // ─── Data sources ───────────────────────────────────────
   sl.registerLazySingleton<MyBookingRemoteDataSource>(
         () => MyBookingRemoteDataSourceImpl(apiServices: sl()),
   );
 
-  // Repository
+  sl.registerLazySingleton<ReviewLocalDataSource>(
+        () => ReviewLocalDataSourceImpl(),
+  );
+
+  // ─── Repository ─────────────────────────────────────────
   sl.registerLazySingleton<MyBookingRepository>(
         () => MyBookingRepositoryImpl(remoteDataSource: sl()),
   );
 
-  // Use cases
+  // ─── Use cases ──────────────────────────────────────────
   sl.registerLazySingleton(() => GetUserBookingsUseCase(sl()));
   sl.registerLazySingleton(() => CancelBookingUseCase(sl()));
   sl.registerLazySingleton(() => CreateReviewUseCase(sl()));
+  sl.registerLazySingleton(() => IsClinicReviewedUseCase(sl()));
+  sl.registerLazySingleton(() => MarkClinicReviewedUseCase(sl()));
 
-  // Cubit — Factory so each screen gets a fresh instance
+  // ─── Cubit ──────────────────────────────────────────────
   sl.registerFactory(
         () => BookingCubit(
       getUserBookings: sl(),
       cancelBooking: sl(),
       createReview: sl(),
+      isClinicReviewed: sl(),
+      markClinicReviewed: sl(),
     ),
   );
 }

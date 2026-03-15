@@ -1,6 +1,9 @@
 import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:clinic_app/features/home/presentation/cubit/home_cubit.dart';
+import 'package:clinic_app/features/my_booking/domain/entities/booking_entity.dart';
+import 'package:clinic_app/features/my_booking/presentation/cubit/booking_cubit.dart';
+import 'package:clinic_app/features/my_booking/presentation/view/booking_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/auth/presentation/view/auth_screen.dart';
@@ -14,44 +17,78 @@ import '../di/injection_container.dart' as di;
 
 class AppRouter {
   static final GlobalKey<NavigatorState> navigatorKey =
-      GlobalKey<NavigatorState>();
+  GlobalKey<NavigatorState>();
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
+
+    // ── Auth ────────────────────────────────────────────────────────────
+    // Each route gets its OWN fresh AuthCubit (Factory).
+    // BlocProvider owns the lifecycle → closes it when the route pops.
       case Routes.auth:
         return MaterialPageRoute(
           builder: (_) => BlocProvider<AuthCubit>(
-            create: (context) => di.sl<AuthCubit>(),
+            create: (_) => di.sl<AuthCubit>(),
             child: const AuthScreen(),
           ),
         );
-
-      case Routes.forgotPassword:
+      case Routes.bookingDetails:
+        final args = settings.arguments as Map<String, dynamic>;
+        final booking = args['booking'] as BookingEntity;
+        final cubit   = args['cubit']   as BookingCubit;
         return MaterialPageRoute(
           builder: (_) => BlocProvider.value(
-            value: di.sl<AuthCubit>(),
+            value: cubit,
+            child: BookingDetailScreen(booking: booking),
+          ),
+        );
+    // ForgotPassword needs to share the cubit created in Routes.auth
+    // so we pass it via arguments instead of creating a new one.
+      case Routes.forgotPassword:
+        final cubit = settings.arguments as AuthCubit?;
+        return MaterialPageRoute(
+          builder: (_) => cubit != null
+              ? BlocProvider.value(
+            value: cubit,
+            child: const ForgotPasswordScreen(),
+          )
+          // fallback: create a fresh one if navigated to directly
+              : BlocProvider<AuthCubit>(
+            create: (_) => di.sl<AuthCubit>(),
             child: const ForgotPasswordScreen(),
           ),
         );
 
       case Routes.resetPassword:
-        final email = settings.arguments as String;
+        final args = settings.arguments as Map<String, dynamic>;
+        final email = args['email'] as String;
+        final cubit = args['cubit'] as AuthCubit?;
         return MaterialPageRoute(
-          builder: (_) => BlocProvider.value(
-            value: di.sl<AuthCubit>(),
+          builder: (_) => cubit != null
+              ? BlocProvider.value(
+            value: cubit,
+            child: ResetPasswordScreen(email: email),
+          )
+              : BlocProvider<AuthCubit>(
+            create: (_) => di.sl<AuthCubit>(),
             child: ResetPasswordScreen(email: email),
           ),
         );
 
+    // OTP — always shares the same cubit that started the signup/login flow.
+    // Pass the cubit via arguments from AuthScreen.
       case Routes.verification:
-        final email = settings.arguments as String;
+        final args = settings.arguments as Map<String, dynamic>;
+        final email = args['email'] as String;
+        final cubit = args['cubit'] as AuthCubit;
         return MaterialPageRoute(
-          builder: (_) => BlocProvider<AuthCubit>(
-            create: (_) => di.sl<AuthCubit>(),
+          builder: (_) => BlocProvider.value(
+            value: cubit,
             child: OtpVerificationPage(email: email),
           ),
         );
 
+    // ── Dashboard ───────────────────────────────────────────────────────
       case Routes.dashBoard:
         return MaterialPageRoute(
           builder: (_) => MultiBlocProvider(
@@ -66,14 +103,14 @@ class AppRouter {
             child: const PatientHomeScreen(),
           ),
         );
+
+    // ── Clinic Details ──────────────────────────────────────────────────
       case Routes.clinicDetails:
         final clinicId = settings.arguments as int?;
-        if (clinicId == null) {
-          return _errorRoute();
-        }
+        if (clinicId == null) return _errorRoute();
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (context) => di.sl<ClinicDetailsCubit>(),
+            create: (_) => di.sl<ClinicDetailsCubit>(),
             child: ClinicDetailsScreen(clinicId: clinicId),
           ),
         );

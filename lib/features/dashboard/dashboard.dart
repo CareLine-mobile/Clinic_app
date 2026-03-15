@@ -34,8 +34,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
   final List<String> _icons = [
     Assets.homeIcon,
-    Assets.pillsIcon,
-    Assets.chatsIcon,
+    Assets.searchIcon,
+    Assets.myBookingIcon,
     Assets.settingIcon,
   ];
 

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:clinic_app/features/my_booking/data/model/booking_model.dart';
 import 'package:clinic_app/features/my_booking/data/model/review_request_model.dart';
 import '../../../../../../core/api/base_api_services.dart';
@@ -44,10 +46,11 @@ class MyBookingRemoteDataSourceImpl implements MyBookingRemoteDataSource {
     required int clinicId,
     required ReviewRequestModel request,
   }) async {
+    log('asdasd ${request.toJson()}');
     // Fire-and-forget: server returns 200 + message on success
     await _apiServices.request(
       method: HttpMethod.post,
-      url: '/clinics/$clinicId/reviews',
+      url: Endpoints.createReview(clinicId),
       body: request.toJson(),
     );
   }

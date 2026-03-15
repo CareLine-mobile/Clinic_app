@@ -25,6 +25,12 @@ class SharedPrefHelper {
   // SECURE — JSON (user data, tokens)
   // ══════════════════════════════════════════════════════════
 
+
+
+  // ══════════════════════════════════════════════════════════
+  // SECURE — JSON (user data, tokens)
+  // ══════════════════════════════════════════════════════════
+
   static Future<bool> saveJson({
     required String key,
     required Map<String, dynamic> value,

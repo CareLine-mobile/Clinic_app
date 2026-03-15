@@ -1,7 +1,4 @@
-
-
 import 'package:clinic_app/features/my_booking/domain/entities/booking_entity.dart';
-import 'package:clinic_app/features/my_booking/presentation/view/booking_list_screen.dart';
 import 'package:clinic_app/features/my_booking/presentation/widgets/booking_detail_row.dart';
 import 'package:clinic_app/features/my_booking/presentation/widgets/booking_status_config.dart';
 import 'package:clinic_app/features/my_booking/presentation/widgets/clinic_avatar.dart';
@@ -10,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-
 import '../../../../../../core/routes/routes.dart';
 import '../../../../../../core/theme/colors.dart';
 import '../../../../../../core/utils/app_size.dart';
@@ -181,13 +177,13 @@ class _BookingCard extends StatelessWidget {
 
     return InkWell(
       borderRadius: BorderRadius.circular(16.r),
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => BlocProvider.value(
-            value: context.read<BookingCubit>(),
-            child: BookingDetailScreen(booking: booking),
-          ),
-        ),
+      onTap: () => Navigator.pushNamed(
+        context,
+        Routes.bookingDetails,
+        arguments: {
+          'booking': booking,
+          'cubit': context.read<BookingCubit>(),
+        },
       ),
       child: Container(
         margin: EdgeInsets.only(bottom: SizeApp.s12),
@@ -220,25 +216,46 @@ class _BookingCard extends StatelessWidget {
 
 // ─── Card Header ──────────────────────────────────────────────────────────────
 
-class _CardHeader extends StatelessWidget {
+class _CardHeader extends StatefulWidget {
   final BookingEntity booking;
   const _CardHeader({required this.booking});
 
   @override
+  State<_CardHeader> createState() => _CardHeaderState();
+}
+
+class _CardHeaderState extends State<_CardHeader> {
+  bool _isReviewed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkReviewStatus();
+  }
+
+  Future<void> _checkReviewStatus() async {
+    final reviewed = await context
+        .read<BookingCubit>()
+        .isClinicReviewed(widget.booking.clinical.id);
+    if (mounted) setState(() => _isReviewed = reviewed);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Padding(
       padding: EdgeInsets.all(SizeApp.s16),
       child: Row(
         children: [
-          ClinicAvatar(thumbnailUrl: booking.clinical.thumbnailUrl),
+          ClinicAvatar(thumbnailUrl: widget.booking.clinical.thumbnailUrl),
           SizedBox(width: SizeApp.s12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  booking.clinical.name,
+                  widget.booking.clinical.name,
                   style: theme.textTheme.titleSmall
                       ?.copyWith(fontWeight: FontWeight.bold),
                   maxLines: 1,
@@ -246,37 +263,28 @@ class _CardHeader extends StatelessWidget {
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  booking.clinical.specialty,
+                  widget.booking.clinical.specialty,
                   style: theme.textTheme.bodySmall
                       ?.copyWith(color: theme.hintColor),
                 ),
               ],
             ),
           ),
-          // Show review badge for completed bookings
-          if (booking.isCompleted)
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1565C0).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.rate_review_outlined,
-                      size: 12.sp, color: const Color(0xFF1565C0)),
-                  SizedBox(width: 3.w),
-                  Text(
-                    'reviews.form.title'.tr(),
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                      color: const Color(0xFF1565C0),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
+
+          // ─── Review badge ──────────────────────────────
+          if (widget.booking.isCompleted)
+            _isReviewed
+                ? _ReviewBadge(
+              label: 'bookings.reviewed'.tr(),
+              icon: Icons.check_circle_outline_rounded,
+              color: const Color(0xFF2E7D32),
+              bgColor: const Color(0xFFE8F5E9),
+            )
+                : _ReviewBadge(
+              label: 'reviews.form.title'.tr(),
+              icon: Icons.rate_review_outlined,
+              color: const Color(0xFF1565C0),
+              bgColor: const Color(0xFF1565C0).withOpacity(0.1),
             ),
         ],
       ),
@@ -284,6 +292,47 @@ class _CardHeader extends StatelessWidget {
   }
 }
 
+// ─── Badge widget ─────────────────────────────────────────────────────────────
+
+class _ReviewBadge extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final Color bgColor;
+
+  const _ReviewBadge({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.bgColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12.sp, color: color),
+          SizedBox(width: 3.w),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10.sp,
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 // ─── Card Details ─────────────────────────────────────────────────────────────
 
 class _CardDetails extends StatelessWidget {

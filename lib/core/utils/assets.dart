@@ -9,6 +9,7 @@ class Assets {
   static const String favIcon = 'assets/icons/heart_Pop.json';
   // NavBar Icon
   static const String settingIcon = 'assets/icons/settings_icon.svg';
+  static const String searchIcon = 'assets/icons/search-normal.svg';
   // auth
   static const String verifiedIcon = 'assets/icons/verified.svg';
 
@@ -16,4 +17,5 @@ class Assets {
   static const String hospitalIcon = 'assets/images/hospital.png';
   static const String pillsIcon = 'assets/icons/pills_icon.svg';
   static const String chatsIcon = 'assets/icons/chats_icon.svg';
+  static const String myBookingIcon = 'assets/icons/clinical-booking.svg';
 }

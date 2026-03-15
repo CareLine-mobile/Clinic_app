@@ -66,6 +66,7 @@
     "date": "التاريخ",
     "time": "الوقت",
     "turn_number": "رقم الدور",
+    "reviewed": "تم التقييم",
     "detail": {
       "title": "تفاصيل الحجز",
       "appointment_info": "معلومات الموعد",
@@ -83,7 +84,75 @@
     "status": {
       "confirmed": "مؤكد",
       "cancelled": "ملغي",
-      "pending": "قيد الانتظار"
+      "pending": "قيد الانتظار",
+      "completed": "مكتمل"
+    }
+  },
+  "reviews": {
+    "form": {
+      "title": "أضف تقييمك",
+      "ratingLabel": "تقييمك",
+      "commentLabel": "تعليقك",
+      "commentHint": "شارك تجربتك مع هذه العيادة...",
+      "submit": "إرسال التقييم",
+      "success": "تم إرسال تقييمك بنجاح، شكراً لك!"
+    }
+  },
+  "booking": {
+    "choose_date": "اختر التاريخ",
+    "choose_time": "اختر الوقت",
+    "no_slots": "لا تتوفر مواعيد لهذا اليوم",
+    "continue": "متابعة",
+    "confirm_title": "تأكيد الحجز",
+    "confirm_subtitle": "يرجى مراجعة تفاصيل موعدك قبل التأكيد",
+    "confirm_button": "تأكيد الحجز",
+    "confirmed_title": "تم تأكيد الحجز!",
+    "confirmed_body": "تم حجز موعدك بنجاح",
+    "confirmed_done": "تم",
+    "payment_note": "ستتواصل معك العيادة بخصوص تعليمات الدفع بعد الموافقة",
+    "your_info": "معلوماتك",
+    "full_name": "الاسم الكامل",
+    "full_name_hint": "أدخل اسمك الكامل",
+    "phone": "رقم الهاتف",
+    "phone_hint": "أدخل رقم هاتفك",
+    "notes_optional": "ملاحظات (اختياري)",
+    "notes_hint": "أي أعراض أو ملاحظات للطبيب...",
+    "reviewed": "Reviewed",
+    "summary": {
+      "clinic": "العيادة",
+      "doctor": "الطبيب",
+      "patient": "المريض",
+      "phone": "الهاتف",
+      "date": "التاريخ",
+      "time": "الوقت",
+      "notes": "الملاحظات"
+    },
+    "bottom_bar": {
+      "fee_label": "رسوم الاستشارة",
+      "book_now": "احجز الآن"
+    },
+    "stepper": {
+      "date_time": "الموعد",
+      "your_info": "بياناتك",
+      "confirm": "التأكيد"
+    },
+    "missing_info": "معلومات الحجز غير مكتملة"
+  },
+  "clinic": {
+    "choose_date": "اختر التاريخ",
+    "available_doctors": "الأطباء المتاحون ({count})",
+    "no_doctors": "لا يوجد أطباء متاحون في هذا التاريخ",
+    "no_slots_today": "لا توجد مواعيد متاحة اليوم",
+    "choose_time": "اختر الوقت",
+    "remaining": "متبقي {count}",
+    "selected_summary_clear": "إلغاء الاختيار",
+    "book_now": "احجز الآن",
+    "currency": "ج.م",
+    "years_exp": "{count} سنة خبرة",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "booking": "الحجز",
+      "reviews": "التقييمات"
     }
   },
   "validation": {
