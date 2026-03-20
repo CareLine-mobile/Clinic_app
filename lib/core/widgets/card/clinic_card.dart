@@ -5,12 +5,10 @@ import 'package:clinic_app/core/utils/assets.dart';
 import 'package:clinic_app/core/utils/enums.dart';
 import 'package:clinic_app/core/widgets/CustomIcon.dart';
 import 'package:clinic_app/core/widgets/custom_network_image.dart';
+import 'package:clinic_app/features/home/domain/entities/clinic_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/widgets/animated_lottie_icon.dart';
-import '../../../data/model/clinic_model.dart' show ClinicsHomeModel;
-import '../../../domain/entities/clinic_summary.dart';
-
 
 class ClinicCard extends StatefulWidget {
   final ClinicSummary clinic;

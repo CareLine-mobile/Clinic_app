@@ -2,6 +2,11 @@ import 'package:clinic_app/core/api/base_api_services.dart';
 import 'package:clinic_app/core/api/dio_client.dart';
 import 'package:clinic_app/features/my_booking/data/data_sources/review_local_data_source.dart';
 import 'package:clinic_app/features/my_booking/domain/usecase/review_local_data_source.dart';
+import 'package:clinic_app/features/search/data/datasources/search_remote_data_source.dart';
+import 'package:clinic_app/features/search/data/repositories/search_repository_impl.dart';
+import 'package:clinic_app/features/search/domain/repositories/search_repository.dart';
+import 'package:clinic_app/features/search/domain/usecases/search_clinics_usecase.dart';
+import 'package:clinic_app/features/search/presentation/cubit/search_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -61,8 +66,9 @@ Future<void> init() async {
   setUpLocalDb();
   setUpAuthModule();
   setUpHomeModule();
-  setUpMyBookingModule(); // ← replaces old setUpBookingModule
+  setUpMyBookingModule();
   setUpClinicModule();
+  setUpSearchModule();
 
   sl.registerLazySingleton(() => UserRepository());
 }
@@ -205,5 +211,24 @@ void setUpClinicModule() {
       toggleFavoriteUseCase: sl(),
       makeAppointmentUseCase: sl(),
     ),
+  );
+}
+
+void setUpSearchModule() {
+// Search feature
+// 1. Cubit
+  sl.registerFactory(() => SearchCubit(searchClinicsUseCase: sl()));
+
+  // 2. UseCase
+  sl.registerLazySingleton(() => SearchClinicsUseCase( sl()));
+
+  // 3. Repository
+  sl.registerLazySingleton<SearchRepository>(
+        () => SearchRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // 4. Data Source
+  sl.registerLazySingleton<SearchRemoteDataSource>(
+        () => SearchRemoteDataSourceImpl(apiServices: sl(),),
   );
 }

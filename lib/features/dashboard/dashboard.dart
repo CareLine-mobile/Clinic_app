@@ -1,11 +1,14 @@
 // lib/features/dashboard/patient_home_screen.dart
 
 import 'dart:ui';
+import 'package:clinic_app/core/di/injection_container.dart';
 import 'package:clinic_app/core/utils/assets.dart';
 import 'package:clinic_app/core/widgets/CustomIcon.dart';
 import 'package:clinic_app/features/home/presentation/view/home_screen.dart';
 import 'package:clinic_app/features/home/presentation/view/medication_tap_screen.dart';
 import 'package:clinic_app/features/my_booking/presentation/view/booking_list_screen.dart';
+import 'package:clinic_app/features/search/presentation/cubit/search_cubit.dart';
+import 'package:clinic_app/features/search/presentation/view/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -48,7 +51,11 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
           setState(() => _currentIndex = index);
         },
       ),
-      const MedicationsTabScreen(),
+      BlocProvider<SearchCubit>(
+        create: (_) => sl<SearchCubit>(),
+        child: const SearchScreen(),
+      ),
+
       const BookingListScreen(),
       const SettingsTabScreen(),
     ];
@@ -95,7 +102,12 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
           icons: _icons,
           isNavBarVisible: _isNavBarVisible,
           onScroll: _onScroll,
-          onTabTap: (index) => setState(() => _currentIndex = index),
+          onTabTap: (index) {
+            // Unfocus any open keyboard when switching tabs
+            FocusManager.instance.primaryFocus?.unfocus();
+
+            setState(() => _currentIndex = index);
+          },
         ),
       ),
     );
@@ -124,6 +136,7 @@ class _PatientHomeBody extends StatelessWidget {
   });
 
   @override
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -132,13 +145,15 @@ class _PatientHomeBody extends StatelessWidget {
     const Color activeColor = ColorsManager.primaryColor;
     final Color inactiveColor = theme.colorScheme.onSurfaceVariant;
     final Color glassColor = isDark
-        ? Colors.black.withOpacity(0.3)
-        : Colors.white.withOpacity(0.3);
+        ? Colors.black.withValues(alpha: 0.3)
+        : Colors.white.withValues(alpha: 0.3);
     final Color borderColor = isDark
-        ? Colors.white.withOpacity(0.15)
-        : Colors.black.withOpacity(0.1);
+        ? Colors.white.withValues(alpha: 0.15)
+        : Colors.black.withValues(alpha: 0.1);
 
     final displayIcons = isRTL ? icons.reversed.toList() : icons;
+
+    final double bottomSafeArea = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -158,7 +173,9 @@ class _PatientHomeBody extends StatelessWidget {
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            bottom: isNavBarVisible ? SizeApp.s16 : -100.h,
+            bottom: isNavBarVisible
+                ? (SizeApp.s16 + bottomSafeArea)
+                : -(100.h + bottomSafeArea),
             left: SizeApp.s12,
             right: SizeApp.s12,
             child: _FloatingNavBar(

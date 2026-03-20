@@ -1,10 +1,9 @@
 // lib/features/clinics/presentation/widgets/clinics_carousel.dart
 
 import 'package:clinic_app/core/utils/enums.dart';
+import 'package:clinic_app/features/home/domain/entities/clinic_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../data/model/clinic_model.dart';
-import '../../../domain/entities/clinic_summary.dart';
 import 'clinic_card.dart';
 
 // ==================== Featured Section (Parallax Carousel) ====================

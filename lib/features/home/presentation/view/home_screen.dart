@@ -1,7 +1,8 @@
 // lib/features/home/presentation/screens/home_screen.dart
-
 import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/core/utils/enums.dart';
+import 'package:clinic_app/core/widgets/card/clinic_card.dart';
+import 'package:clinic_app/core/widgets/card/clinic_list.dart';
 import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,13 +10,9 @@ import '../../../../core/utils/app_size.dart';
 import '../../../../core/theme/colors.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../my_booking/presentation/cubit/booking_cubit.dart';
-import '../../../clinic_details/presentation/view/clinic_details_screen.dart';
 import '../../../user_data/user_repo.dart';
 import '../../domain/entities/clinic_summary.dart';
 import '../cubit/home_cubit.dart';
-import '../cubit/home_ui_cubit.dart';
-import '../widget/card/clinic_card.dart';
-import '../widget/card/clinic_list.dart';
 import '../widget/clinical_refresh_indicator.dart';
 import '../widget/home_app_bar_widget.dart';
 import '../widget/home_shimmer_loading.dart';

@@ -2,6 +2,7 @@
 
 import 'package:clinic_app/core/utils/app_size.dart';
 import 'package:clinic_app/core/utils/assets.dart';
+import 'package:clinic_app/core/widgets/card/last_booking_card.dart';
 import 'package:clinic_app/features/my_booking/presentation/cubit/booking_cubit.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -10,7 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../../core/theme/colors.dart';
-import 'card/last_booking_card.dart';
+
 
 class HomeHeaderWidget extends StatelessWidget {
   final String? userName;

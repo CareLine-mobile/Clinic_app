@@ -133,8 +133,6 @@ class AppSizeHorizontal extends AppSizeBase {
   double get s18 => throw UnimplementedError();
 }
 
-
-
 class TextSizeApp extends AppSizeBase {
   TextSizeApp._(); // private constructor
   static final TextSizeApp instance = TextSizeApp._();

@@ -4,7 +4,8 @@ class Assets {
   // details icons
   static const String doctorIcon = 'assets/icons/doctor_icon.svg';
   static const locationIcon = 'assets/icons/location.svg';
-
+  // icon
+  static const String searchBarIcon = 'assets/icons/search-icon.svg';
   // lotti icon
   static const String favIcon = 'assets/icons/heart_Pop.json';
   // NavBar Icon

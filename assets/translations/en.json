@@ -157,6 +157,13 @@
       "reviews": "Reviews"
     }
   },
+  "search": {
+    "hint": "Search for a clinic or doctor...",
+    "initial_title": "Search Clinics",
+    "initial_hint": "Start typing to find a clinic or doctor",
+    "empty_title": "No Results",
+    "no_results": "We couldn't find any clinic matching your search"
+  },
   "validation": {
     "emailRequired": "Email is required",
     "emailInvalid": "Invalid email format",

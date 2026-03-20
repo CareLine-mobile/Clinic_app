@@ -47,45 +47,47 @@ class EmptyStateWidget extends StatelessWidget {
           ),
         )
             : null,
-        body: Container(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: iconSize,
-                color: Colors.grey[300],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[600],
+        body: Center(
+          child: Container(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: iconSize,
+                  color: Colors.grey[300],
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[500],
+                const SizedBox(height: 16),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              if (onActionPressed != null && actionLabel != null) ...[
-                const SizedBox(height: 24),
-                AppButton(
-                  text: actionLabel!,
-                  onPressed: onActionPressed,
-                  horizontalPadding: 40,
-                  verticalPadding: 0,
+                const SizedBox(height: 8),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[500],
+                  ),
+                  textAlign: TextAlign.center,
                 ),
+                if (onActionPressed != null && actionLabel != null) ...[
+                  const SizedBox(height: 24),
+                  AppButton(
+                    text: actionLabel!,
+                    onPressed: onActionPressed,
+                    horizontalPadding: 40,
+                    verticalPadding: 0,
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

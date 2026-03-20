@@ -1,9 +1,12 @@
+import 'package:clinic_app/core/di/injection_container.dart';
 import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:clinic_app/features/home/presentation/cubit/home_cubit.dart';
 import 'package:clinic_app/features/my_booking/domain/entities/booking_entity.dart';
 import 'package:clinic_app/features/my_booking/presentation/cubit/booking_cubit.dart';
 import 'package:clinic_app/features/my_booking/presentation/view/booking_detail_screen.dart';
+import 'package:clinic_app/features/search/presentation/cubit/search_cubit.dart';
+import 'package:clinic_app/features/search/presentation/view/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/auth/presentation/view/auth_screen.dart';
@@ -101,6 +104,14 @@ class AppRouter {
               ),
             ],
             child: const PatientHomeScreen(),
+          ),
+        );
+
+      case Routes.search:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<SearchCubit>(),
+            child: const SearchScreen(),
           ),
         );
 
