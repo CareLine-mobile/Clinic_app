@@ -1,6 +1,5 @@
 // lib/features/clinic_details/presentation/widgets/components/clinic_name_header.dart
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/utils/app_size.dart';
@@ -30,18 +29,18 @@ class ClinicNameHeader extends StatelessWidget {
           children: [
 
             // ─── Specialty chip ───────────────────────────────────────
-            if (clinic.specialty != null && clinic.specialty!.isNotEmpty) ...[
+            if (clinic.specialty.isNotEmpty) ...[
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: _h.s10,
                   vertical: _v.s4,
                 ),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Text(
-                  clinic.specialty!,
+                  clinic.specialty,
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.w700,
@@ -61,7 +60,7 @@ class ClinicNameHeader extends StatelessWidget {
             ),
 
             // ─── Location ─────────────────────────────────────────────
-            if (clinic.location != null && clinic.location!.isNotEmpty) ...[
+            if (clinic.location.isNotEmpty) ...[
               SizedBox(height: _v.s10),
               Row(
                 children: [
@@ -73,7 +72,7 @@ class ClinicNameHeader extends StatelessWidget {
                   SizedBox(width: _h.s6),
                   Expanded(
                     child: Text(
-                      clinic.location!,
+                      clinic.location,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.hintColor,
                       ),
@@ -86,7 +85,7 @@ class ClinicNameHeader extends StatelessWidget {
             ],
 
             SizedBox(height: _v.s16),
-            Divider(height: 1, color: theme.dividerColor.withOpacity(0.4)),
+            Divider(height: 1, color: theme.dividerColor.withValues(alpha:0.4)),
           ],
         ),
       ),
