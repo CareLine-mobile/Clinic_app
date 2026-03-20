@@ -1,9 +1,13 @@
+// lib/features/clinic_details/presentation/pages/content_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../domain/entites/clinic_entities.dart';
 import '../cubit/clinic_details_cubit.dart';
 import '../widgets/components/booking_bottom_bar.dart';
 import '../widgets/components/clinic_app_bar.dart';
+import '../widgets/sections/clinic_name_header.dart' show ClinicNameHeader;
 import '../widgets/sections/image_gallery_section.dart';
 import '../widgets/sections/statistics_section.dart';
 import '../widgets/sections/tab_bar_section.dart';
@@ -25,7 +29,6 @@ class ContentView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ClinicDetailsCubit, ClinicDetailsState>(
       builder: (context, state) {
-        // Read everything from state, not cubit getters
         final loaded = state is ClinicDetailsLoaded ? state : null;
 
         return Scaffold(
@@ -40,8 +43,16 @@ class ContentView extends StatelessWidget {
           body: NestedScrollView(
             controller: scrollController,
             headerSliverBuilder: (context, innerBoxIsScrolled) => [
+              // 1 — Image gallery (full bleed, behind appbar)
               ImageGallerySection(clinic: clinic),
+
+              // 2 — Clinic name header ← new
+              ClinicNameHeader(clinic: clinic),
+
+              // 3 — Statistics row
               StatisticsSection(clinic: clinic),
+
+              // 4 — Tab bar
               TabBarSection(clinic: clinic, tabController: tabController),
             ],
             body: TabBarViewSection(
@@ -49,7 +60,6 @@ class ContentView extends StatelessWidget {
               tabController: tabController,
             ),
           ),
-          // Only show bottom bar when doctor AND time are both selected
           bottomNavigationBar: loaded?.selectedDoctor != null
               ? BookingBottomBar(
             clinic: clinic,

@@ -140,6 +140,10 @@
   },
   "clinic": {
     "choose_date": "اختر التاريخ",
+    "status": {
+      "open": "متاح",
+      "closed": "مغلق"
+    },
     "available_doctors": "الأطباء المتاحون ({count})",
     "no_doctors": "لا يوجد أطباء متاحون في هذا التاريخ",
     "no_slots_today": "لا توجد مواعيد متاحة اليوم",

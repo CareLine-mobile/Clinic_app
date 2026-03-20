@@ -6,7 +6,9 @@ import 'package:clinic_app/core/utils/enums.dart';
 import 'package:clinic_app/core/widgets/CustomIcon.dart';
 import 'package:clinic_app/core/widgets/custom_network_image.dart';
 import 'package:clinic_app/features/home/domain/entities/clinic_summary.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/widgets/animated_lottie_icon.dart';
 
@@ -87,7 +89,7 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     // Force LTR direction for the entire card
     return Directionality(
-      textDirection: TextDirection.ltr,
+      textDirection: ui.TextDirection.ltr,
       child: _buildLayoutSwitch(),
     );
   }
@@ -623,7 +625,9 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
               borderRadius: BorderRadius.circular(_hSize.s20),
             ),
             child: Text(
-              widget.clinic.isOpen ? 'متاح' : 'مغلق',
+              widget.clinic.isOpen
+                ? 'clinic.status.open'.tr()
+                  : 'clinic.status.closed'.tr(),
               style: TextStyle(
                 color: Colors.white,
                 fontSize: _tSize.s10,

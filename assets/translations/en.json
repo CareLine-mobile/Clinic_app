@@ -142,6 +142,10 @@
   },
   "clinic": {
     "choose_date": "Choose Date",
+    "status": {
+      "open": "Open",
+      "closed": "Closed"
+    },
     "available_doctors": "Available Doctors ({count})",
     "no_doctors": "No doctors available on this date",
     "no_slots_today": "No available slots today",
