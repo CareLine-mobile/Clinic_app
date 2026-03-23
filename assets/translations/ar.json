@@ -171,6 +171,32 @@
       "overview": "نظرة عامة",
       "booking": "الحجز",
       "reviews": "التقييمات"
+    },
+    "info": {
+      "about": "عن العيادة",
+      "opening_hours": "ساعات العمل",
+      "location": "الموقع",
+      "contact": "التواصل",
+      "call": "اتصال",
+      "whatsapp": "واتساب",
+      "open_maps": "فتح الخريطة",
+      "show_more": "عرض المزيد",
+      "show_less": "عرض أقل"
+    },
+    "services": {
+      "title": "الخدمات",
+      "services": "الخدمات المتاحة",
+      "facilities": "المرافق",
+      "insurance": "التأمينات المقبولة",
+      "empty_title": "لا توجد خدمات",
+      "empty_subtitle": "لم يتم إضافة معلومات الخدمات بعد"
+    },
+    "reviews": {
+      "title": "التقييمات والآراء",
+      "patients_reviews": "آراء المرضى",
+      "empty": "لا توجد تقييمات بعد",
+      "with_doctor": "مع: {name}",
+      "total": "{count} تقييم"
     }
   },
   "search": {

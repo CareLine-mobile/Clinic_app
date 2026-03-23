@@ -1,12 +1,11 @@
-// lib/features/clinics/presentation/widgets/reviews_section_widget.dart
-
+import 'package:clinic_app/core/theme/colors.dart';
 import 'package:clinic_app/features/clinic_details/domain/entites/review_entity.dart';
-import 'package:clinic_app/features/clinic_details/presentation/widgets/review_card.dart' show ReviewCard;
+import 'package:clinic_app/features/clinic_details/presentation/widgets/components/section_header.dart';
+import 'package:clinic_app/features/clinic_details/presentation/widgets/review_card.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 import '../../../../core/utils/app_size.dart';
-import '../../domain/entites/clinic_entities.dart';
 
 class ReviewsSectionWidget extends StatelessWidget {
   final List<ReviewEntity> reviews;
@@ -24,95 +23,102 @@ class ReviewsSectionWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final vSize = AppSizeVertical.instance;
     final hSize = AppSizeHorizontal.instance;
+    final theme = Theme.of(context);
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(hSize.s20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'التقييمات والآراء',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          SectionHeader(title: 'clinic.reviews.title'.tr()),
           SizedBox(height: vSize.s20),
 
           // Overall Rating Card
           Container(
             padding: EdgeInsets.all(hSize.s20),
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(hSize.s16),
-              border: Border.all(color: Theme.of(context).dividerColor),
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(16.r),
+              border: Border.all(color: theme.dividerColor.withOpacity(0.08)),
             ),
             child: Row(
               children: [
-                // Rating Number
+                // ── Big number ──────────────────────────────────
                 Column(
                   children: [
                     Text(
                       averageRating.toStringAsFixed(1),
-                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                        fontSize: 48.sp,
+                      style: theme.textTheme.displayLarge?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: theme.primaryColor,
                       ),
                     ),
                     Row(
                       children: List.generate(
                         5,
-                            (index) => Icon(
-                          index < averageRating.floor()
-                              ? Icons.star
-                              : Icons.star_border,
-                          color: Colors.amber,
-                          size: 20.r,
+                            (i) => Icon(
+                          i < averageRating.floor()
+                              ? Icons.star_rounded
+                              : Icons.star_outline_rounded,
+                          color: ColorsManager.warningFill,
+                          size: 16.r,
                         ),
                       ),
                     ),
                     SizedBox(height: vSize.s4),
                     Text(
-                      '$totalReviews تقييم',
-                      style: Theme.of(context).textTheme.bodySmall,
+                      'clinic.reviews.total'
+                          .tr(namedArgs: {'count': '$totalReviews'}),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.hintColor,
+                      ),
                     ),
                   ],
                 ),
-                SizedBox(width: hSize.s32),
 
-                // Rating Distribution
+                SizedBox(width: hSize.s24),
+
+                // ── Distribution bars ────────────────────────────
                 Expanded(
                   child: Column(
-                    children: List.generate(5, (index) {
-                      final stars = 5 - index;
+                    children: List.generate(5, (i) {
+                      final stars = 5 - i;
                       final count = reviews
                           .where((r) => r.rating.floor() == stars)
                           .length;
-                      final percentage = totalReviews > 0
-                          ? (count / totalReviews * 100)
-                          : 0.0;
+                      final pct =
+                      totalReviews > 0 ? count / totalReviews : 0.0;
 
                       return Padding(
-                        padding: EdgeInsets.only(bottom: vSize.s8),
+                        padding: EdgeInsets.only(bottom: vSize.s6),
                         child: Row(
                           children: [
-                            Text(
-                              '$stars',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            SizedBox(width: hSize.s4),
-                            Icon(Icons.star, size: 14.r, color: Colors.amber),
-                            SizedBox(width: hSize.s8),
+                            Text('$stars', style: theme.textTheme.labelSmall),
+                            SizedBox(width: 4.w),
+                            Icon(Icons.star_rounded,
+                                size: 11.sp,
+                                color: ColorsManager.warningFill),
+                            SizedBox(width: 6.w),
                             Expanded(
-                              child: LinearProgressIndicator(
-                                value: percentage / 100,
-                                backgroundColor: Colors.grey[200],
-                                color: Colors.amber,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(4.r),
+                                child: LinearProgressIndicator(
+                                  value: pct,
+                                  minHeight: 5.h,
+                                  backgroundColor:
+                                  theme.dividerColor.withOpacity(0.15),
+                                  color: ColorsManager.warningFill,
+                                ),
                               ),
                             ),
-                            SizedBox(width: hSize.s8),
-                            Text(
-                              '${percentage.toInt()}%',
-                              style: Theme.of(context).textTheme.bodySmall,
+                            SizedBox(width: 6.w),
+                            SizedBox(
+                              width: 28.w,
+                              child: Text(
+                                '${(pct * 100).toInt()}%',
+                                style: theme.textTheme.labelSmall,
+                                textAlign: TextAlign.end,
+                              ),
                             ),
                           ],
                         ),
@@ -124,16 +130,10 @@ class ReviewsSectionWidget extends StatelessWidget {
             ),
           ),
 
-          SizedBox(height: vSize.s24),
+          SizedBox(height: vSize.s20),
 
-          // Reviews List
-          Text(
-            'آراء المرضى',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: vSize.s16),
+          SectionHeader(title: 'clinic.reviews.patients_reviews'.tr()),
+          SizedBox(height: vSize.s12),
 
           if (reviews.isEmpty)
             Center(
@@ -144,13 +144,13 @@ class ReviewsSectionWidget extends StatelessWidget {
                     Icon(
                       Icons.rate_review_outlined,
                       size: 64.r,
-                      color: Theme.of(context).hintColor,
+                      color: theme.hintColor,
                     ),
                     SizedBox(height: vSize.s16),
                     Text(
-                      'لا توجد تقييمات بعد',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).hintColor,
+                      'clinic.reviews.empty'.tr(),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.hintColor,
                       ),
                     ),
                   ],
@@ -162,14 +162,10 @@ class ReviewsSectionWidget extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: reviews.length,
-              itemBuilder: (context, index) {
-                final review = reviews[index];
-                return ReviewCard(review: review);
-              },
+              itemBuilder: (_, index) => ReviewCard(review: reviews[index]),
             ),
         ],
       ),
     );
   }
 }
-

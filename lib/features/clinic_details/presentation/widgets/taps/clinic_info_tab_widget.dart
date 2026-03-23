@@ -1,4 +1,5 @@
 // ==================== clinic_info_tab_widget.dart ====================
+import 'package:clinic_app/features/clinic_details/presentation/widgets/components/section_header.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -47,7 +48,7 @@ class ClinicInfoTabWidget extends StatelessWidget {
         children: [
 
           // ─── 1. Description ───────────────────────────────────────
-          _SectionHeader(
+          SectionHeader(
             title: 'clinic.info.about'.tr(),
             accentColor: accentColor,
           ),
@@ -60,7 +61,7 @@ class ClinicInfoTabWidget extends StatelessWidget {
           _Divider(theme: theme),
 
           // ─── 2. Opening hours ─────────────────────────────────────
-          _SectionHeader(
+          SectionHeader(
             title: 'clinic.info.opening_hours'.tr(),
             accentColor: accentColor,
           ),
@@ -75,7 +76,7 @@ class ClinicInfoTabWidget extends StatelessWidget {
           _Divider(theme: theme),
 
           // ─── 3. Location ──────────────────────────────────────────
-          _SectionHeader(
+          SectionHeader(
             title: 'clinic.info.location'.tr(),
             accentColor: accentColor,
           ),
@@ -92,7 +93,7 @@ class ClinicInfoTabWidget extends StatelessWidget {
           _Divider(theme: theme),
 
           // ─── 4. Contact ───────────────────────────────────────────
-          _SectionHeader(
+          SectionHeader(
             title: 'clinic.info.contact'.tr(),
             accentColor: accentColor,
           ),
@@ -136,40 +137,6 @@ class ClinicInfoTabWidget extends StatelessWidget {
   }
 }
 
-// ─── Section Header ───────────────────────────────────────────────────────────
-
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final Color accentColor;
-
-  const _SectionHeader({required this.title, required this.accentColor});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      children: [
-        Container(
-          width: 3.w,
-          height: 18.h,
-          decoration: BoxDecoration(
-            color: accentColor,
-            borderRadius: BorderRadius.circular(2.r),
-          ),
-        ),
-        SizedBox(width: 8.w),
-        Text(
-          title,
-          // titleSmall → 13sp, w500 ✓
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            fontSize: TextSizeApp.instance.s16,
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 // ─── Divider ──────────────────────────────────────────────────────────────────
 

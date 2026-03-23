@@ -1,5 +1,6 @@
-// lib/features/clinics/presentation/widgets/clinic_services_widget.dart
-
+import 'package:clinic_app/core/theme/colors.dart';
+import 'package:clinic_app/features/clinic_details/presentation/widgets/components/section_header.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/utils/app_size.dart';
@@ -22,12 +23,12 @@ class ClinicServicesWidget extends StatelessWidget {
     final vSize = AppSizeVertical.instance;
     final hSize = AppSizeHorizontal.instance;
 
-    // Check if all lists are empty
     if (services.isEmpty && facilities.isEmpty && insuranceAccepted.isEmpty) {
-      return const EmptyStateWidget(
+      return EmptyStateWidget(
         icon: Icons.medical_services_outlined,
-        title: 'لا توجد خدمات متاحة',
-        subtitle: 'لم يتم إضافة معلومات الخدمات بعد',
+        title: 'clinic.services.empty_title'.tr(),
+        subtitle: 'clinic.services.empty_subtitle'.tr(),
+        enableBackButton: false,
       );
     }
 
@@ -36,35 +37,30 @@ class ClinicServicesWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Services Section
           if (services.isNotEmpty) ...[
             _ServiceSection(
-              title: 'الخدمات المتاحة',
-              icon: Icons.medical_services,
+              title: 'clinic.services.services'.tr(),
+              icon: Icons.medical_services_outlined,
               items: services,
-              color: Colors.blue,
+              color: ColorsManager.infoFill,
             ),
             SizedBox(height: vSize.s16),
           ],
-
-          // Facilities Section
           if (facilities.isNotEmpty) ...[
             _ServiceSection(
-              title: 'المرافق',
-              icon: Icons.business,
+              title: 'clinic.services.facilities'.tr(),
+              icon: Icons.business_outlined,
               items: facilities,
-              color: Colors.green,
+              color: ColorsManager.successFill,
             ),
             SizedBox(height: vSize.s16),
           ],
-
-          // Insurance Section
           if (insuranceAccepted.isNotEmpty)
             _ServiceSection(
-              title: 'التأمينات المقبولة',
-              icon: Icons.verified_user,
+              title: 'clinic.services.insurance'.tr(),
+              icon: Icons.verified_user_outlined,
               items: insuranceAccepted,
-              color: Colors.orange,
+              color: ColorsManager.warningFill,
             ),
         ],
       ),
@@ -109,30 +105,20 @@ class _ServiceSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           _ServiceHeader(
             icon: icon,
             title: title,
             color: color,
             itemCount: items.length,
           ),
-
           SizedBox(height: vSize.s16),
-
-          // Items List
           ...items.asMap().entries.map((entry) {
-            final index = entry.key;
-            final item = entry.value;
-            final isLast = index == items.length - 1;
-
+            final isLast = entry.key == items.length - 1;
             return Padding(
               padding: EdgeInsets.only(bottom: isLast ? 0 : vSize.s12),
-              child: _ServiceItem(
-                text: item,
-                color: color,
-              ),
+              child: _ServiceItem(text: entry.value, color: color),
             );
-          }).toList(),
+          }),
         ],
       ),
     );
@@ -166,34 +152,21 @@ class _ServiceHeader extends StatelessWidget {
             color: color.withOpacity(0.1),
             borderRadius: BorderRadius.circular(hSize.s10),
           ),
-          child: Icon(
-            icon,
-            size: 24.r,
-            color: color,
-          ),
+          child: Icon(icon, size: 24.r, color: color),
         ),
         SizedBox(width: hSize.s12),
         Expanded(
-          child: Text(
-            title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          child: SectionHeader(title: title, accentColor: color),
         ),
         Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: hSize.s10,
-            vertical: 4.h,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: hSize.s10, vertical: 4.h),
           decoration: BoxDecoration(
             color: color.withOpacity(0.1),
             borderRadius: BorderRadius.circular(hSize.s12),
           ),
           child: Text(
             '$itemCount',
-            style: TextStyle(
-              fontSize: 12.sp,
+            style: theme.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -209,10 +182,7 @@ class _ServiceItem extends StatelessWidget {
   final String text;
   final Color color;
 
-  const _ServiceItem({
-    required this.text,
-    required this.color,
-  });
+  const _ServiceItem({required this.text, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -224,19 +194,13 @@ class _ServiceItem extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.only(top: 2.h),
-          child: Icon(
-            Icons.check_circle,
-            size: 20.r,
-            color: color,
-          ),
+          child: Icon(Icons.check_circle, size: 20.r, color: color),
         ),
         SizedBox(width: hSize.s12),
         Expanded(
           child: Text(
             text,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              height: 1.5,
-            ),
+            style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
           ),
         ),
       ],

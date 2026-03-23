@@ -170,6 +170,32 @@
       "overview": "Overview",
       "booking": "Booking",
       "reviews": "Reviews"
+    },
+    "info": {
+      "about": "About",
+      "opening_hours": "Opening Hours",
+      "location": "Location",
+      "contact": "Contact",
+      "call": "Call",
+      "whatsapp": "WhatsApp",
+      "open_maps": "Open Maps",
+      "show_more": "Show more",
+      "show_less": "Show less"
+    },
+    "services": {
+      "title": "Services",
+      "services": "Available Services",
+      "facilities": "Facilities",
+      "insurance": "Accepted Insurance",
+      "empty_title": "No Services",
+      "empty_subtitle": "No service information has been added yet"
+    },
+    "reviews": {
+      "title": "Reviews",
+      "patients_reviews": "Patient Reviews",
+      "empty": "No reviews yet",
+      "with_doctor": "With: {name}",
+      "total": "{count} reviews"
     }
   },
   "search": {
