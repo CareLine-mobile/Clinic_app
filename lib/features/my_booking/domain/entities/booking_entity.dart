@@ -7,6 +7,7 @@ class BookingEntity extends Equatable {
   final String date;
   final String time;
   final int? turnNumber;
+  final int? waitTurns;
   final String status; // 'pending' | 'confirmed' | 'cancelled' | 'completed'
   final String? notes;
   final ClinicalEntity clinical;
@@ -19,27 +20,27 @@ class BookingEntity extends Equatable {
     required this.date,
     required this.time,
     this.turnNumber,
+    this.waitTurns,
     required this.status,
     this.notes,
     required this.clinical,
     required this.doctor,
   });
 
-  bool get isPending => status == 'pending';
+  bool get isPending   => status == 'pending';
   bool get isConfirmed => status == 'confirmed';
   bool get isCancelled => status == 'cancelled';
   bool get isCompleted => status == 'completed';
 
-  /// Only completed bookings can be reviewed
-  bool get canReview => isCompleted;
+  bool get canReview   => isCompleted;
+  bool get canCancel   => isPending;
+  bool get hasQueue => waitTurns != null && waitTurns! > 0;
 
-  /// Only pending bookings can be cancelled
-  bool get canCancel => isPending;
 
   @override
   List<Object?> get props => [
     id, patientName, patientPhone, date, time,
-    turnNumber, status, notes, clinical, doctor,
+    turnNumber, status, notes, clinical, doctor, waitTurns
   ];
 }
 

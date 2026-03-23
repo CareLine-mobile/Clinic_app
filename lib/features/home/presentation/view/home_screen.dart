@@ -1,4 +1,6 @@
 // lib/features/home/presentation/screens/home_screen.dart
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/core/utils/enums.dart';
 import 'package:clinic_app/core/widgets/card/clinic_card.dart';
@@ -7,7 +9,6 @@ import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/app_size.dart';
-import '../../../../core/theme/colors.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../my_booking/presentation/cubit/booking_cubit.dart';
 import '../../../user_data/user_repo.dart';
@@ -35,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _scrollController = ScrollController()..addListener(_onScroll);
     context.read<HomeCubit>().initHome();
 
-    // Load bookings only if user is logged in
     if (UserRepository().isLoggedIn) {
       context.read<BookingCubit>().loadBookings();
     }
@@ -59,12 +59,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: BlocConsumer<HomeCubit, HomeState>(
         listener: _handleStateChanges,
+        // ─── Don't rebuild for same state type ───────────────────
+        buildWhen: (prev, curr) => curr.runtimeType != prev.runtimeType ||
+            curr is HomeLoaded,
         builder: (context, state) {
           if (state is HomeLoaded) {
             return ClinicRefreshIndicator(
@@ -74,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 physics: const BouncingScrollPhysics(),
                 slivers: [
                   _buildHeader(),
-                  ..._buildLoadedBody(state, textTheme),
+                  ..._buildLoadedBody(state),
                 ],
               ),
             );
@@ -105,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           }
 
+          // HomeInitial or fallback
           return CustomScrollView(
             slivers: [
               _buildHeader(),
@@ -118,16 +120,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ── Header — reads user from singleton, booking from BookingCubit ─────────
+  // ── Header ────────────────────────────────────────────────────────────────
 
   Widget _buildHeader() {
     return HomeHeaderWidget(
       userName: UserRepository().currentUser?.name,
       userPhotoUrl: UserRepository().currentUser?.avatar,
       onNotificationTap: _handleNotificationTap,
-      onBookingCardTap: () {
-        // BookingCubit state is accessible here if needed for navigation
-      },
+      onBookingCardTap: () {},
       onSearchTap: () => widget.onNavigateToSearch?.call(1),
     );
   }
@@ -146,10 +146,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ── Loaded body ───────────────────────────────────────────────────────────
 
-  List<Widget> _buildLoadedBody(HomeLoaded state, TextTheme textTheme) {
-    return [
-      SliverToBoxAdapter(child: SizedBox(height: SizeApp.s50)),
+  List<Widget> _buildLoadedBody(HomeLoaded state) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final v = AppSizeVertical.instance;
+    final h = AppSizeHorizontal.instance;
 
+    return [
+      SliverToBoxAdapter(child: SizedBox(height: v.s50)),
+
+      // ─── Featured ──────────────────────────────────────────────
       if (state.featuredClinics.isNotEmpty)
         SliverToBoxAdapter(
           child: FeaturedClinicsSection(
@@ -160,93 +166,103 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
+      // ─── Nearby ────────────────────────────────────────────────
       if (state.nearbyClinics.isNotEmpty)
         SliverToBoxAdapter(
           child: HorizontalClinicsCarousel(
             clinics: state.nearbyClinics,
-            title: 'العيادات القريبة',
+            title: 'home.sections.nearby'.tr(),
             onTap: _navigateToClinicDetails,
             onFavorite: _toggleFavorite,
             onBook: _bookAppointment,
           ),
         ),
 
+      // ─── All clinics title ─────────────────────────────────────
       SliverToBoxAdapter(
         child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: SizeApp.s20,
-            vertical: SizeApp.s8,
-          ),
+          padding: EdgeInsets.fromLTRB(h.s20, v.s16, h.s20, v.s8),
           child: Text(
-            'جميع العيادات',
-            style: textTheme.headlineLarge?.copyWith(
-              fontSize: SizeApp.s24,
+            'home.sections.all_clinics'.tr(),
+            style: textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
-              color: ColorsManager.defaultText,
             ),
           ),
         ),
       ),
 
+      // ─── Clinics list ──────────────────────────────────────────
       _buildClinicsList(state.allClinics),
 
+      // ─── Load more indicator ───────────────────────────────────
       if (state.isLoadingMore)
         SliverToBoxAdapter(
           child: Padding(
-            padding: EdgeInsets.all(SizeApp.s16),
-            child: const Center(child: CircularProgressIndicator()),
-          ),
-        ),
-
-      if (!state.hasMorePages && state.allClinics.isNotEmpty)
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.all(SizeApp.s16),
+            padding: EdgeInsets.all(v.s16),
             child: Center(
-              child: Text(
-                'لا توجد المزيد من العيادات',
-                style: textTheme.bodySmall?.copyWith(color: Colors.grey),
+              child: CircularProgressIndicator(
+                color: theme.colorScheme.primary,
+                strokeWidth: 2.5,
               ),
             ),
           ),
         ),
 
-      if (state.allClinics.isEmpty &&
-          state.featuredClinics.isEmpty &&
-          state.nearbyClinics.isEmpty)
-        SliverFillRemaining(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+      // ─── End of list ───────────────────────────────────────────
+      if (!state.hasMorePages && state.allClinics.isNotEmpty)
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: v.s20),
+            child: Row(
               children: [
-                Icon(Icons.local_hospital_outlined,
-                    size: 80, color: Colors.grey[400]),
-                SizedBox(height: SizeApp.s16),
-                Text(
-                  'لا توجد عيادات متاحة',
-                  style: textTheme.bodyLarge?.copyWith(color: Colors.grey),
+                Expanded(
+                  child: Divider(color: theme.dividerColor.withOpacity(0.3)),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: h.s12),
+                  child: Text(
+                    'home.sections.no_more'.tr(),
+                    style: textTheme.bodySmall?.copyWith(
+                      color: theme.hintColor,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Divider(color: theme.dividerColor.withOpacity(0.3)),
                 ),
               ],
             ),
           ),
         ),
 
-      SliverToBoxAdapter(child: SizedBox(height: SizeApp.s40)),
+      // ─── Completely empty state ────────────────────────────────
+      if (state.allClinics.isEmpty &&
+          state.featuredClinics.isEmpty &&
+          state.nearbyClinics.isEmpty)
+        SliverFillRemaining(
+          child: _EmptyHomeView(),
+        ),
+
+      SliverToBoxAdapter(child: SizedBox(height: v.s40)),
     ];
   }
 
   // ── Clinics list ──────────────────────────────────────────────────────────
 
   Widget _buildClinicsList(List<ClinicSummary> clinics) {
+    final h = AppSizeHorizontal.instance;
+    final v = AppSizeVertical.instance;
+
     return SliverPadding(
-      padding: EdgeInsets.symmetric(horizontal: SizeApp.s20),
+      padding: EdgeInsets.symmetric(horizontal: h.s16),
       sliver: SliverList.builder(
         itemCount: clinics.length,
         itemBuilder: (context, index) {
           final clinic = clinics[index];
           return Padding(
-            padding: EdgeInsets.only(bottom: SizeApp.s12),
+            padding: EdgeInsets.only(bottom: v.s12),
             child: ClinicCard(
+              key: ValueKey(clinic.id),
               clinic: clinic,
               layout: ClinicCardLayout.list,
               onTap: () => _navigateToClinicDetails(clinic),
@@ -261,29 +277,58 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ── Event handlers ────────────────────────────────────────────────────────
 
-  void _navigateToClinicDetails(ClinicSummary clinic) {
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (_) => ClinicDetailsScreen(clinicId: clinic.id),
-    //   ),
-    // );
-    Navigator.pushNamed(context, Routes.clinicDetails, arguments: clinic.id);
-  }
+  void _navigateToClinicDetails(ClinicSummary clinic) =>
+      Navigator.pushNamed(context, Routes.clinicDetails, arguments: clinic.id);
 
-  void _toggleFavorite(ClinicSummary clinic) {
-    context.read<HomeCubit>().toggleFavorite(clinic.id);
-  }
+  void _toggleFavorite(ClinicSummary clinic) =>
+      context.read<HomeCubit>().toggleFavorite(clinic.id);
 
-  void _bookAppointment(ClinicSummary clinic) {
-    _navigateToClinicDetails(clinic);
-  }
+  void _bookAppointment(ClinicSummary clinic) =>
+      _navigateToClinicDetails(clinic);
 
   void _handleNotificationTap() {
     CustomSnackBar.show(
       context,
-      message: 'لا توجد إشعارات جديدة',
+      message: 'home.no_notifications'.tr(),
       type: SnackBarType.info,
+    );
+  }
+}
+
+// ─── Empty home view ──────────────────────────────────────────────────────────
+
+class _EmptyHomeView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final v = AppSizeVertical.instance;
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.local_hospital_outlined,
+            size: 72,
+            color: theme.hintColor.withOpacity(0.3),
+          ),
+          SizedBox(height: v.s16),
+          Text(
+            'home.sections.empty_title'.tr(),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: v.s8),
+          Text(
+            'home.sections.empty_subtitle'.tr(),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.hintColor,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }

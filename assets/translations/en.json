@@ -1,6 +1,3 @@
-
-
-
 {
   "auth": {
     "user": "User",
@@ -46,15 +43,24 @@
   },
   "home": {
     "header": {
-      "title": "Quick clinic bookings",
-      "subtitle": "Follow your turn without waiting"
+      "title": "Book at your clinic easily",
+      "subtitle": "Track your turn without waiting"
+    },
+    "no_notifications": "No new notifications",
+    "sections": {
+      "nearby": "Nearby clinics",
+      "all_clinics": "All clinics",
+      "no_more": "No more available",
+      "empty_title": "No clinics",
+      "empty_subtitle": "No clinics are currently available, please try again later"
     },
     "last_booking": {
-      "badge": "Last Booking",
-      "queue_position": "Your Turn",
-      "people_ahead": "{count} ahead",
-      "no_bookings_title": "No Bookings",
-      "no_bookings_subtitle": "You have no confirmed bookings at the moment"
+      "badge": "Last booking",
+      "queue_position": "Your turn",
+      "your_turn": "Your turn now",
+      "people_ahead": "{count} people ahead of you",
+      "no_bookings_title": "No bookings",
+      "no_bookings_subtitle": "You currently have no confirmed bookings"
     }
   },
   "bookings": {
@@ -70,6 +76,11 @@
     "time": "Time",
     "turn_number": "Turn Number",
     "reviewed": "Reviewed",
+    "wait_turns": {
+      "label": "Queue",
+      "your_turn": "Your turn now",
+      "count": "{} ahead of you"
+    },
     "detail": {
       "title": "Booking Details",
       "appointment_info": "Appointment Info",

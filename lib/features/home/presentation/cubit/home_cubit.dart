@@ -1,7 +1,7 @@
 // lib/features/home/presentation/cubit/home_cubit.dart
-// ============================================
 
 import 'package:bloc/bloc.dart';
+import 'package:clinic_app/core/service/notification_permission_service.dart';
 import 'package:clinic_app/features/home/domain/usecases/get_latest_clinics_usecase.dart';
 import 'package:clinic_app/features/home/domain/usecases/get_nearby_clinics_usecase.dart';
 import 'package:meta/meta.dart';
@@ -25,7 +25,6 @@ class HomeCubit extends Cubit<HomeState> {
     required this.toggleFavoriteUseCase,
   }) : super(HomeInitial());
 
-  // Private state
   List<ClinicSummary> _allClinics = [];
   List<ClinicSummary> _featuredClinics = [];
   List<ClinicSummary> _nearbyClinics = [];
@@ -33,195 +32,86 @@ class HomeCubit extends Cubit<HomeState> {
   bool _hasMorePages = true;
   bool _isLoadingMore = false;
 
-  // ============================================
-  // INIT HOME - Load All Data at Once
-  // ============================================
+  // ════════════════════════════════════════════════════════════════
+  // INIT — permissions first, then data
+  // ════════════════════════════════════════════════════════════════
 
-  /// Initialize home screen by loading all data concurrently
   Future<void> initHome() async {
     emit(HomeLoading());
 
+    // ─── Ask permissions on every launch (non-blocking) ──────────
+    await _requestPermissions();
+
+    // ─── Load all data concurrently ──────────────────────────────
     try {
-      // Load all data concurrently
       final results = await Future.wait([
         getLatestClinicsUseCase.call(),
-        getNearByClinicsUseCase.call(),
+        getNearByClinicsUseCase.call(), // returns [] if location denied
         getClinicsUseCase.call(page: 1),
       ]);
 
-      // Extract results
-      final featuredResult = results[0];
-      final nearbyResult = results[1];
-      final allClinicsResult = results[2];
-
-      // Check for any failures
       Failure? failure;
 
-      featuredResult.fold(
+      results[0].fold((f) => failure ??= f, (c) => _featuredClinics = c as List<ClinicSummary>);
+      // ─── Nearby: empty list is fine — not a failure ───────────
+      results[1].fold((_) {}, (c) => _nearbyClinics = c as List<ClinicSummary>);
+      results[2].fold(
             (f) => failure ??= f,
-            (clinics) => _featuredClinics = clinics,
-      );
-
-      nearbyResult.fold(
-            (f) => failure ??= f,
-            (clinics) => _nearbyClinics = clinics,
-      );
-
-      allClinicsResult.fold(
-            (f) => failure ??= f,
-            (clinics) {
-          _allClinics = clinics;
+            (c) {
+          _allClinics = c as List<ClinicSummary>;
           _currentPage = 1;
-          _hasMorePages = clinics.isNotEmpty;
+          _hasMorePages = (c).isNotEmpty;
         },
       );
 
-      // Emit state based on results
-      if (failure != null) {
+      // Only show error if the critical data (all clinics) failed
+      if (failure != null && _allClinics.isEmpty) {
         emit(HomeError(failure: failure!));
       } else {
         _emitLoadedState();
       }
     } catch (e) {
-      emit(HomeError(
-        failure: ServerFailure('حدث خطأ غير متوقع: ${e.toString()}'),
-      ));
+      emit(HomeError(failure: ServerFailure(e.toString())));
     }
   }
 
-  // ============================================
-  // LOAD CLINICS - With Refresh Support
-  // ============================================
-
-  /// Load all clinics (page 1)
-  /// [isRefresh] - if true, keeps old data visible during loading
-  Future<void> loadClinics({bool isRefresh = false}) async {
-    if (!isRefresh) {
-      emit(HomeLoading());
-    }
-
-    final result = await getClinicsUseCase.call(page: 1);
-
-    result.fold(
-          (failure) {
-        if (!isRefresh) {
-          emit(HomeError(failure: failure));
-        }
-        // If refresh, keep current state
-      },
-          (clinics) {
-        _allClinics = clinics;
-        _currentPage = 1;
-        _hasMorePages = clinics.isNotEmpty;
-        _emitLoadedState();
-      },
-    );
+  /// Ask notification + location permissions silently on every launch
+  Future<void> _requestPermissions() async {
+    // Fire and forget — don't await result, don't block UI
+    NotificationPermissionService.requestPermission().ignore();
+    // Location permission is handled inside GetNearByClinicsUseCase
   }
 
-  /// Load latest/featured clinics
-  /// [isRefresh] - if true, keeps old data visible during loading
-  Future<void> loadLatestClinics({bool isRefresh = false}) async {
-    if (!isRefresh) {
-      emit(HomeLoading());
-    }
+  // ════════════════════════════════════════════════════════════════
+  // REFRESH
+  // ════════════════════════════════════════════════════════════════
 
-    final result = await getLatestClinicsUseCase.call();
-
-    result.fold(
-          (failure) {
-        if (!isRefresh) {
-          emit(HomeError(failure: failure));
-        }
-      },
-          (clinics) {
-        _featuredClinics = clinics;
-        _emitLoadedState();
-      },
-    );
-  }
-
-  /// Load nearby clinics
-  /// [isRefresh] - if true, keeps old data visible during loading
-  Future<void> loadNearByClinics({bool isRefresh = false}) async {
-    if (!isRefresh) {
-      emit(HomeLoading());
-    }
-
-    final result = await getNearByClinicsUseCase.call();
-
-    result.fold(
-          (failure) {
-        if (!isRefresh) {
-          emit(HomeError(failure: failure));
-        }
-      },
-          (clinics) {
-        _nearbyClinics = clinics;
-        _emitLoadedState();
-      },
-    );
-  }
-
-  // ============================================
-  // REFRESH - Reload All Data
-  // ============================================
-
-  /// Refresh all data (for pull-to-refresh)
-  /// Keeps old data visible while loading new data
   Future<void> refresh() async {
     try {
-      // Load all data concurrently with isRefresh = true
       final results = await Future.wait([
         getLatestClinicsUseCase.call(),
-        getNearByClinicsUseCase.call(),
+        getNearByClinicsUseCase.call(), // graceful — returns [] if denied
         getClinicsUseCase.call(page: 1),
       ]);
 
-      // Extract results
-      final featuredResult = results[0];
-      final nearbyResult = results[1];
-      final allClinicsResult = results[2];
+      results[0].fold((_) {}, (c) => _featuredClinics = c as List<ClinicSummary>);
+      results[1].fold((_) {}, (c) => _nearbyClinics  = c as List<ClinicSummary>);
+      results[2].fold((_) {}, (c) {
+        _allClinics  = c as List<ClinicSummary>;
+        _currentPage = 1;
+        _hasMorePages = (c).isNotEmpty;
+      });
 
-      // Update data without showing loading state
-      featuredResult.fold(
-            (failure) {
-          // Log error but don't show error state
-          print('Failed to refresh featured clinics: ${failure.message}');
-        },
-            (clinics) => _featuredClinics = clinics,
-      );
-
-      nearbyResult.fold(
-            (failure) {
-          print('Failed to refresh nearby clinics: ${failure.message}');
-        },
-            (clinics) => _nearbyClinics = clinics,
-      );
-
-      allClinicsResult.fold(
-            (failure) {
-          print('Failed to refresh all clinics: ${failure.message}');
-        },
-            (clinics) {
-          _allClinics = clinics;
-          _currentPage = 1;
-          _hasMorePages = clinics.isNotEmpty;
-        },
-      );
-
-      // Emit updated state (instant swap)
       _emitLoadedState();
-    } catch (e) {
-      print('Refresh error: $e');
-      // Keep current state on error
+    } catch (_) {
+      // Keep current state on refresh error
     }
   }
 
-  // ============================================
-  // LOAD MORE CLINICS - Pagination
-  // ============================================
+  // ════════════════════════════════════════════════════════════════
+  // LOAD MORE
+  // ════════════════════════════════════════════════════════════════
 
-  /// Load more clinics (pagination)
   Future<void> loadMoreClinics() async {
     final currentState = state;
     if (currentState is! HomeLoaded) return;
@@ -262,23 +152,21 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
-  // ============================================
+  // ════════════════════════════════════════════════════════════════
   // TOGGLE FAVORITE
-  // ============================================
+  // ════════════════════════════════════════════════════════════════
 
-  /// Toggle favorite for a clinic (optimistic update)
   Future<void> toggleFavorite(int clinicId) async {
     final currentState = state;
     if (currentState is! HomeLoaded) return;
 
-    // Optimistic update
     final updatedFeatured = _updateClinicFavorite(_featuredClinics, clinicId);
-    final updatedNearby = _updateClinicFavorite(_nearbyClinics, clinicId);
-    final updatedAll = _updateClinicFavorite(_allClinics, clinicId);
+    final updatedNearby   = _updateClinicFavorite(_nearbyClinics, clinicId);
+    final updatedAll      = _updateClinicFavorite(_allClinics, clinicId);
 
     _featuredClinics = updatedFeatured;
-    _nearbyClinics = updatedNearby;
-    _allClinics = updatedAll;
+    _nearbyClinics   = updatedNearby;
+    _allClinics      = updatedAll;
 
     emit(currentState.copyWith(
       featuredClinics: updatedFeatured,
@@ -286,65 +174,53 @@ class HomeCubit extends Cubit<HomeState> {
       allClinics: updatedAll,
     ));
 
-    // Call API
     final result = await toggleFavoriteUseCase(clinicId.toString());
 
     result.fold(
-          (failure) {
-        // Rollback on failure
-        final revertedFeatured = _updateClinicFavorite(updatedFeatured, clinicId);
-        final revertedNearby = _updateClinicFavorite(updatedNearby, clinicId);
-        final revertedAll = _updateClinicFavorite(updatedAll, clinicId);
-
-        _featuredClinics = revertedFeatured;
-        _nearbyClinics = revertedNearby;
-        _allClinics = revertedAll;
-
+          (_) {
+        // Rollback
+        _featuredClinics = _updateClinicFavorite(updatedFeatured, clinicId);
+        _nearbyClinics   = _updateClinicFavorite(updatedNearby, clinicId);
+        _allClinics      = _updateClinicFavorite(updatedAll, clinicId);
         emit(currentState.copyWith(
-          featuredClinics: revertedFeatured,
-          nearbyClinics: revertedNearby,
-          allClinics: revertedAll,
+          featuredClinics: _featuredClinics,
+          nearbyClinics: _nearbyClinics,
+          allClinics: _allClinics,
         ));
       },
           (_) => null,
     );
   }
 
-  // ============================================
-  // HELPER METHODS
-  // ============================================
+  // ════════════════════════════════════════════════════════════════
+  // HELPERS
+  // ════════════════════════════════════════════════════════════════
 
-  /// Helper method to update clinic favorite status
   List<ClinicSummary> _updateClinicFavorite(
       List<ClinicSummary> clinics,
       int clinicId,
       ) {
-    return clinics.map((clinic) {
-      if (clinic.id == clinicId) {
-        return clinic.copyWith(isFavorite: !clinic.isFavorite);
-      }
-      return clinic;
+    return clinics.map((c) {
+      return c.id == clinicId ? c.copyWith(isFavorite: !c.isFavorite) : c;
     }).toList();
   }
 
-  /// Helper method to emit loaded state
   void _emitLoadedState() {
     emit(HomeLoaded(
       featuredClinics: List.from(_featuredClinics),
-      nearbyClinics: List.from(_nearbyClinics),
-      allClinics: List.from(_allClinics),
-      currentPage: _currentPage,
-      hasMorePages: _hasMorePages,
-      isLoadingMore: false,
+      nearbyClinics:   List.from(_nearbyClinics),
+      allClinics:      List.from(_allClinics),
+      currentPage:     _currentPage,
+      hasMorePages:    _hasMorePages,
+      isLoadingMore:   false,
     ));
   }
 
-  /// Reset state
   void reset() {
     _allClinics.clear();
     _featuredClinics.clear();
     _nearbyClinics.clear();
-    _currentPage = 1;
+    _currentPage  = 1;
     _hasMorePages = true;
     _isLoadingMore = false;
     emit(HomeInitial());

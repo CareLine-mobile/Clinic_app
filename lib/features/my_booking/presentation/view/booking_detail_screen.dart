@@ -4,6 +4,7 @@ import 'package:clinic_app/features/my_booking/presentation/widgets/booking_deta
 import 'package:clinic_app/features/my_booking/presentation/widgets/booking_status_config.dart';
 import 'package:clinic_app/features/my_booking/presentation/widgets/clinic_avatar.dart';
 import 'package:clinic_app/features/my_booking/presentation/widgets/rating_chip.dart';
+import 'package:clinic_app/features/my_booking/presentation/widgets/wait_turns_chip.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -233,13 +234,25 @@ class _AppointmentInfoSection extends StatelessWidget {
           label: 'bookings.time'.tr(),
           value: _formatTime(booking.time),
         ),
-        if (booking.turnNumber != null)
-          BookingDetailRow(
-            icon: Icons.format_list_numbered_rounded,
-            label: 'bookings.turn_number'.tr(),
-            value: '${booking.turnNumber}',
-            isHighlighted: true,
+        if (booking.isPending && booking.waitTurns != null) ...[
+          SizedBox(height: SizeApp.s4),
+          Row(
+            children: [
+              Icon(Icons.hourglass_top_rounded,
+                  size: 16.sp, color: Theme.of(context).primaryColor),
+              SizedBox(width: SizeApp.s8),
+              Text(
+                '${'bookings.wait_turns.label'.tr()}:',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).hintColor,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const Spacer(),
+              WaitTurnsChip(waitTurns: booking.waitTurns!),
+            ],
           ),
+        ],
       ],
     );
   }

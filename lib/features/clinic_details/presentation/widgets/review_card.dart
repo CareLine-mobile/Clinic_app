@@ -9,11 +9,10 @@ import '../../../../../core/utils/app_size.dart';
 class ReviewCard extends StatelessWidget {
   final ReviewEntity review;
 
-  const ReviewCard({Key? key, required this.review}) : super(key: key);
+  const ReviewCard({required this.review});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final vSize = AppSizeVertical.instance;
     final hSize = AppSizeHorizontal.instance;
 
@@ -21,9 +20,9 @@ class ReviewCard extends StatelessWidget {
       margin: EdgeInsets.only(bottom: vSize.s16),
       padding: EdgeInsets.all(hSize.s16),
       decoration: BoxDecoration(
-        color: theme.cardColor,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(hSize.s12),
-        border: Border.all(color: theme.dividerColor),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,15 +30,23 @@ class ReviewCard extends StatelessWidget {
           Row(
             children: [
               CircleAvatar(
-                radius: 20.r,
+                radius: 24.r,
+                backgroundImage: NetworkImage(review.patientImageUrl),
+                onBackgroundImageError: (exception, stackTrace) {},
                 child: ClipOval(
                   child: Image.network(
                     review.patientImageUrl,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: Colors.grey[300],
-                      child: Icon(Icons.person, size: 20.r, color: Colors.grey[600]),
-                    ),
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[300],
+                        child: Icon(
+                          Icons.person,
+                          size: 24.r,
+                          color: Colors.grey[600],
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -50,36 +57,66 @@ class ReviewCard extends StatelessWidget {
                   children: [
                     Text(
                       review.patientName,
-                      style: theme.textTheme.titleSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                    SizedBox(height: vSize.s2),
                     Text(
                       DateFormat('dd/MM/yyyy', 'ar').format(review.date),
-                      style: theme.textTheme.bodySmall,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).hintColor,
+                      ),
                     ),
                   ],
                 ),
               ),
-              Row(
-                children: List.generate(
-                  5,
-                      (index) => Icon(
-                    index < review.rating.floor() ? Icons.star : Icons.star_border,
-                    color: Colors.amber,
-                    size: 16.r,
-                  ),
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: hSize.s8,
+                  vertical: vSize.s4,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(hSize.s8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.star, size: 16.r, color: Colors.amber),
+                    SizedBox(width: hSize.s4),
+                    Text(
+                      review.rating.toStringAsFixed(1),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.amber[700],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
           SizedBox(height: vSize.s12),
-          Text(review.comment, style: theme.textTheme.bodyMedium),
-          SizedBox(height: vSize.s8),
           Text(
-            'مع: ${review.doctorName}',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.hintColor,
-              fontStyle: FontStyle.italic,
+            review.comment,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          SizedBox(height: vSize.s8),
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: hSize.s8,
+              vertical: vSize.s4,
+            ),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(hSize.s6),
+            ),
+            child: Text(
+              'مع: ${review.doctorName}',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],

@@ -28,9 +28,7 @@ class MyBookingRemoteDataSourceImpl implements MyBookingRemoteDataSource {
       url: Endpoints.getListBooking,
       queryParams: {'page': page},
     );
-    // API wraps paginator under response['data']
-    final paginator = response['data'] as Map<String, dynamic>;
-    return BookingListModel.fromJson(paginator);
+    return BookingListModel.fromJson(response);
   }
 
   @override

@@ -3,6 +3,7 @@
 import 'package:clinic_app/features/my_booking/domain/entities/booking_entity.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/theme/colors.dart';
 import '../../../../../core/utils/app_size.dart';
@@ -43,7 +44,10 @@ class LastBookingCard extends StatelessWidget {
             _ClinicImage(imageUrl: booking.clinical.thumbnailUrl ?? ''),
             SizedBox(width: hSize.s12),
             Expanded(child: _ClinicInfo(booking: booking)),
-            _QueueBadge(turnNumber: booking.turnNumber ?? 0),
+            _QueueBadge(
+              turnNumber: booking.turnNumber ?? 0,
+              waitTurns: booking.waitTurns,
+            ),
           ],
         ),
       ),
@@ -211,42 +215,79 @@ class _LocationRow extends StatelessWidget {
 // ─────────────────────────────────────────────
 
 class _QueueBadge extends StatelessWidget {
-  final int turnNumber;
+  final int? turnNumber;
+  final int? waitTurns;
 
-  const _QueueBadge({required this.turnNumber});
+  const _QueueBadge({
+    required this.turnNumber,
+    this.waitTurns,
+  });
 
+  /// Returns (bgColor, fgColor, labelColor) based on wait position
+  (Color, Color, Color) _resolveColors() => switch (waitTurns) {
+    0    => (ColorsManager.successSurface, ColorsManager.successFill,  ColorsManager.successText),
+    null => (ColorsManager.infoSurface,   ColorsManager.infoFill,      ColorsManager.infoText),
+    <= 3 => (ColorsManager.warningSurface, ColorsManager.warningFill,  ColorsManager.warningText),
+    _    => (ColorsManager.errorSurface,  ColorsManager.errorFill,     ColorsManager.errorText),
+  };
   @override
   Widget build(BuildContext context) {
     final hSize = AppSizeHorizontal.instance;
     final vSize = AppSizeVertical.instance;
     final theme = Theme.of(context);
 
+    final (bg, accent, labelColor) = _resolveColors();
+
     return Container(
+      constraints: BoxConstraints(minWidth: hSize.s60),
       padding: EdgeInsets.symmetric(
         horizontal: hSize.s12,
-        vertical: vSize.s8,
+        vertical: vSize.s10,
       ),
       decoration: BoxDecoration(
-        color: theme.primaryColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(hSize.s12),
+        color: bg,
+        borderRadius: BorderRadius.circular(hSize.s14),
+        border: Border.all(color: accent.withOpacity(0.25), width: 1),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            '$turnNumber',
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.primaryColor,
+
+          // ── turn number ──────────────────────────────
+          if (turnNumber != null && waitTurns != 0) ...[
+              Text(
+              '$turnNumber',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: accent,
+                height: 1.1,
+              ),
             ),
-          ),
-          Text(
-            'home.last_booking.queue_position'.tr(),
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.hintColor,
-              fontWeight: FontWeight.w600,
+            SizedBox(height: vSize.s2),
+            Text(
+              'home.last_booking.queue_position'.tr(),
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: accent.withOpacity(0.7),
+                letterSpacing: 0.3,
+              ),
             ),
-          ),
+          ],
+
+          // ── wait turns pill ──────────────────────────
+          if (waitTurns != null)
+            Flexible(
+              child: Text(
+                waitTurns == 0
+                    ? 'home.last_booking.your_turn'.tr()
+                    : 'home.last_booking.people_ahead'.tr(args: ['$waitTurns']),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: accent,
+                ),
+                maxLines: 2,
+                textAlign: TextAlign.center,
+              ),
+            ),
         ],
       ),
     );

@@ -46,12 +46,21 @@
       "title": "احجز في عيادتك بسهولة",
       "subtitle": "تابع دورك دون انتظار"
     },
+    "no_notifications": "لا توجد إشعارات جديدة",
+    "sections": {
+      "nearby":        "العيادات القريبة",
+      "all_clinics":   "جميع العيادات",
+      "no_more":       "لا توجد المزيد",
+      "empty_title":   "لا توجد عيادات",
+      "empty_subtitle":"لا توجد عيادات متاحة حالياً، حاول لاحقاً"
+    },
     "last_booking": {
-      "badge": "آخر حجز",
-      "queue_position": "دورك",
-      "people_ahead": "{count} قدامك",
-      "no_bookings_title": "لا توجد حجوزات",
-      "no_bookings_subtitle": "ليس لديك أي حجوزات مؤكدة حالياً"
+      "badge":              "آخر حجز",
+      "queue_position":     "دورك",
+      "people_ahead":       "{count} قدامك",
+      "no_bookings_title":  "لا توجد حجوزات",
+      "your_turn": "دورك الآن",
+      "no_bookings_subtitle":"ليس لديك أي حجوزات مؤكدة حالياً"
     }
   },
   "bookings": {
@@ -67,6 +76,11 @@
     "time": "الوقت",
     "turn_number": "رقم الدور",
     "reviewed": "تم التقييم",
+    "wait_turns": {
+      "label": "الانتظار",
+      "your_turn": "دورك الآن",
+      "count": "{} شخص قبلك"
+    },
     "detail": {
       "title": "تفاصيل الحجز",
       "appointment_info": "معلومات الموعد",
