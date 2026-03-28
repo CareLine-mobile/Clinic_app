@@ -6,15 +6,27 @@ import 'failures.dart';
 
 class ErrorHandler {
 
+// lib/core/errors/error_handler.dart
+
   static const Map<String, String> _serverMessageMap = {
+    // ─── مع dot ومن غيره ────────────────────────────────────────────
     'please verify your email first.':      'errors.server.accountNotVerified',
     'please verify your email first':       'errors.server.accountNotVerified',
+    'please verify your email.':            'errors.server.accountNotVerified',
+    'please verify your email':             'errors.server.accountNotVerified',
+
     'invalid credentials.':                 'errors.server.invalidCredentials',
+    'invalid credentials':                  'errors.server.invalidCredentials',
+    'unauthenticated.':                     'errors.server.unauthorized',
     'unauthenticated':                      'errors.server.unauthorized',
     'unauthorized':                         'errors.server.unauthorized',
     'email already taken':                  'errors.server.emailTaken',
     'email has already been taken':         'errors.server.emailTaken',
     'the email has already been taken':     'errors.server.emailTaken',
+    'this email is already registered.':    'errors.server.emailTaken',
+    'this email is already registered':     'errors.server.emailTaken',
+    'this phone number is already registered.': 'errors.server.phoneTaken',
+    'this phone number is already registered':  'errors.server.phoneTaken',
     'user not found':                       'errors.server.userNotFound',
     'wrong password':                       'errors.server.invalidCredentials',
     'token expired':                        'errors.server.tokenExpired',
@@ -78,38 +90,51 @@ class ErrorHandler {
 
     final statusCode = response.statusCode ?? 0;
     final rawMessage = _extractErrorMessage(response.data);
-    final message = _translateMessage(rawMessage);
+    final message    = _translateMessage(rawMessage);
 
     switch (statusCode) {
       case 400:
+      // ─── Special case: email not verified ──────────────────────
+        final isNotVerified = rawMessage.toLowerCase().contains('verify your email');
+        if (isNotVerified) {
+          // Extract email from request if available
+          final email = _extractEmailFromResponse(response.data);
+          return AccountNotVerifiedFailure(email);
+        }
         return ServerFailure(
           message.isNotEmpty ? message : 'errors.server.badRequest'.tr(),
           ErrorMessages.badRequest,
         );
+
       case 401:
         return UnauthorizedFailure(
           message.isNotEmpty ? message : 'errors.server.unauthorized'.tr(),
           ErrorMessages.unauthorized,
         );
+
       case 403:
         return ServerFailure(
           message.isNotEmpty ? message : 'errors.server.forbidden'.tr(),
           ErrorMessages.forbidden,
         );
+
       case 404:
         return ServerFailure(
           message.isNotEmpty ? message : 'errors.server.notFound'.tr(),
           ErrorMessages.notFound,
         );
+
       case 422:
         return ValidationFailure(
           message.isNotEmpty ? message : 'errors.server.invalidData'.tr(),
           ErrorMessages.unexpectedError,
         );
+
       case 500:
       case 502:
       case 503:
         return ServerFailure('errors.server.internal'.tr(), ErrorMessages.serverError);
+
       default:
         return ServerFailure(
           message.isNotEmpty ? message : 'errors.server.unexpected'.tr(),
@@ -118,20 +143,41 @@ class ErrorHandler {
     }
   }
 
+  static String _extractEmailFromResponse(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      if (data.containsKey('data') && data['data'] is Map) {
+        return (data['data'] as Map)['email']?.toString() ?? '';
+      }
+    }
+    return '';
+  }
   static String _extractErrorMessage(dynamic data) {
     if (data == null) return '';
 
     if (data is Map<String, dynamic>) {
+
+      // ─── message field ────────────────────────────────────────────
       if (data.containsKey('message')) {
-        return data['message'].toString();
-      }
-      if (data.containsKey('error')) {
-        final error = data['error'];
-        if (error is String) return error;
-        if (error is Map && error.containsKey('message')) {
-          return error['message'].toString();
+        final msg = data['message'];
+
+        // Normal string message
+        if (msg is String) return msg;
+
+        // 422 case: message is a Map { "email": [...], "phone": [...] }
+        if (msg is Map) {
+          final parts = <String>[];
+          msg.forEach((key, value) {
+            if (value is List && value.isNotEmpty) {
+              parts.add(value.first.toString());
+            } else {
+              parts.add(value.toString());
+            }
+          });
+          return parts.join(' • ');
         }
       }
+
+      // ─── errors field ─────────────────────────────────────────────
       if (data.containsKey('errors')) {
         final errors = data['errors'];
         if (errors is Map && errors.isNotEmpty) {
@@ -143,6 +189,15 @@ class ErrorHandler {
         }
         if (errors is List && errors.isNotEmpty) {
           return errors.first.toString();
+        }
+      }
+
+      // ─── error field ──────────────────────────────────────────────
+      if (data.containsKey('error')) {
+        final error = data['error'];
+        if (error is String) return error;
+        if (error is Map && error.containsKey('message')) {
+          return error['message'].toString();
         }
       }
     }

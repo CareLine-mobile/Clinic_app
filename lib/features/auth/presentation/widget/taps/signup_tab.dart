@@ -46,7 +46,14 @@ class _SignupTabState extends State<SignupTab> {
           _showErrorSnackBar(state.message);
         } else if (state is SignupSuccess) {
           CustomSnackBar.show(context, message: 'errors.server.accountNotVerified'.tr() ,type: SnackBarType.success);
-          Navigator.pushNamed(context, Routes.verification,arguments: state.email,);
+          Navigator.pushNamed(
+            context,
+            Routes.verification,
+            arguments: {
+              'email': state.email,
+              'cubit': context.read<AuthCubit>(),
+            },
+          );
         } else if (state is AuthAuthenticated) {
           Navigator.pushNamedAndRemoveUntil(context, Routes.dashBoard, (_) => false);
         }

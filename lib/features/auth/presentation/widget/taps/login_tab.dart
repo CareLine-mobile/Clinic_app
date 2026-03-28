@@ -96,7 +96,10 @@ class _LoginTabState extends State<LoginTab> {
           Navigator.pushNamed(
             context,
             Routes.verification,
-            arguments: state.email,
+            arguments: {
+              'email': state.email,
+              'cubit': context.read<AuthCubit>(),
+            },
           );
         }
       },

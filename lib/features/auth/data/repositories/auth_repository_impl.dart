@@ -37,7 +37,13 @@ class AuthRepositoryImpl implements AuthRepository {
         'LOGIN_FAILED',
       );
     } catch (e) {
-      return Left(ErrorHandler.handleException(e));
+      final failure = ErrorHandler.handleException(e);
+
+      if (failure is AccountNotVerifiedFailure) {
+        return Left(AccountNotVerifiedFailure(email));
+      }
+
+      return Left(failure);
     }
   }
 
