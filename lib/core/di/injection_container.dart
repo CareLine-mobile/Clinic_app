@@ -23,6 +23,13 @@ import '../../features/auth/domain/usecases/verify_otp_usecase.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 
 // Features - My Booking
+import '../../features/favourite/data/datasources/favourite_remote_data_source.dart';
+import '../../features/favourite/data/datasources/favourite_remote_data_source_impl.dart';
+import '../../features/favourite/data/repositories/favourite_repository_impl.dart';
+import '../../features/favourite/domain/repositories/favourite_repository.dart';
+import '../../features/favourite/domain/usecases/get_favourites_usecase.dart';
+import '../../features/favourite/domain/usecases/toggle_favourite_usecase.dart';
+import '../../features/favourite/presentation/cubit/favourite_cubit.dart';
 import '../../features/my_booking/presentation/cubit/booking_cubit.dart';
 import 'package:clinic_app/features/home/domain/usecases/get_nearby_clinics_usecase.dart';
 import 'package:clinic_app/features/my_booking/data/data_sources/my_booking_remote_data_source.dart';
@@ -38,7 +45,8 @@ import '../../features/clinic_details/data/repositories/clinic_repository_impl.d
 import '../../features/clinic_details/domain/repositories/clinic_repository.dart';
 import '../../features/clinic_details/domain/usecases/get_clinic_details_usecase.dart';
 import '../../features/clinic_details/domain/usecases/make_appointment_usecase.dart';
-import '../../features/clinic_details/domain/usecases/toggle_favorite_usecase.dart' as clinic_details;
+import '../../features/clinic_details/domain/usecases/toggle_favorite_usecase.dart'
+    as clinic_details;
 import '../../features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
 
 // Features - Home
@@ -69,6 +77,7 @@ Future<void> init() async {
   setUpMyBookingModule();
   setUpClinicModule();
   setUpSearchModule();
+  setUpFavouriteModule();
 
   sl.registerLazySingleton(() => UserRepository());
 }
@@ -82,23 +91,23 @@ void setUpDio() {
   sl.registerLazySingleton(() => dio);
 
   sl.registerLazySingleton<BaseApiServices>(
-        () => DioApiService(sl()),
+    () => DioApiService(sl()),
   );
 }
 
 void setUpLocalDb() {
   sl.registerLazySingleton<LocationDataSource>(
-        () => LocationDataSourceImpl(),
+    () => LocationDataSourceImpl(),
   );
 
   sl.registerLazySingleton<LocationRepository>(
-        () => LocationRepositoryImpl(dataSource: sl()),
+    () => LocationRepositoryImpl(dataSource: sl()),
   );
 }
 
 void setUpAuthModule() {
   sl.registerLazySingleton<AuthRepository>(
-        () => AuthRepositoryImpl(apiServices: sl()),
+    () => AuthRepositoryImpl(apiServices: sl()),
   );
 
   sl.registerLazySingleton(() => LoginUseCase(sl()));
@@ -109,7 +118,7 @@ void setUpAuthModule() {
   sl.registerLazySingleton(() => SendForgotPasswordUseCase(sl()));
 
   sl.registerFactory(
-        () => AuthCubit(
+    () => AuthCubit(
       loginUseCase: sl(),
       signupUseCase: sl(),
       userRepository: sl(),
@@ -124,25 +133,27 @@ void setUpAuthModule() {
 
 void setUpHomeModule() {
   sl.registerLazySingleton<HomeRepository>(
-        () => HomeRepositoryImpl(apiServices: sl()),
+    () => HomeRepositoryImpl(apiServices: sl()),
   );
 
   sl.registerLazySingleton(() => GetCurrentLocationUseCase(sl()));
   sl.registerLazySingleton<GetClinicsUseCase>(() => GetClinicsUseCase(sl()));
-  sl.registerLazySingleton<GetLatestClinicsUseCase>(() => GetLatestClinicsUseCase(sl()));
+  sl.registerLazySingleton<GetLatestClinicsUseCase>(
+      () => GetLatestClinicsUseCase(sl()));
   sl.registerLazySingleton<GetNearByClinicsUseCase>(
-        () => GetNearByClinicsUseCase(
+    () => GetNearByClinicsUseCase(
       getCurrentLocationUseCase: sl(),
       repository: sl(),
     ),
   );
 
   sl.registerFactory<HomeCubit>(
-        () => HomeCubit(
+    () => HomeCubit(
       getLatestClinicsUseCase: sl(),
       getClinicsUseCase: sl(),
       getNearByClinicsUseCase: sl(),
-      toggleFavoriteUseCase: sl(),
+      toggleFavouriteUseCase: sl(),
+      favouriteRepository: sl(),
     ),
   );
 
@@ -152,16 +163,16 @@ void setUpHomeModule() {
 void setUpMyBookingModule() {
   // ─── Data sources ───────────────────────────────────────
   sl.registerLazySingleton<MyBookingRemoteDataSource>(
-        () => MyBookingRemoteDataSourceImpl(apiServices: sl()),
+    () => MyBookingRemoteDataSourceImpl(apiServices: sl()),
   );
 
   sl.registerLazySingleton<ReviewLocalDataSource>(
-        () => ReviewLocalDataSourceImpl(),
+    () => ReviewLocalDataSourceImpl(),
   );
 
   // ─── Repository ─────────────────────────────────────────
   sl.registerLazySingleton<MyBookingRepository>(
-        () => MyBookingRepositoryImpl(remoteDataSource: sl()),
+    () => MyBookingRepositoryImpl(remoteDataSource: sl()),
   );
 
   // ─── Use cases ──────────────────────────────────────────
@@ -173,7 +184,7 @@ void setUpMyBookingModule() {
 
   // ─── Cubit ──────────────────────────────────────────────
   sl.registerFactory(
-        () => BookingCubit(
+    () => BookingCubit(
       getUserBookings: sl(),
       cancelBooking: sl(),
       createReview: sl(),
@@ -185,28 +196,28 @@ void setUpMyBookingModule() {
 
 void setUpClinicModule() {
   sl.registerLazySingleton<ClinicLocalDataSource>(
-        () => ClinicLocalDataSourceImpl(sharedPreferences: sl()),
+    () => ClinicLocalDataSourceImpl(sharedPreferences: sl()),
   );
 
   sl.registerLazySingleton<ClinicRepository>(
-        () => ClinicRepositoryImpl(
+    () => ClinicRepositoryImpl(
       apiServices: sl(),
       localDataSource: sl(),
     ),
   );
 
   sl.registerLazySingleton<GetClinicDetailsUseCase>(
-        () => GetClinicDetailsUseCase(sl()),
+    () => GetClinicDetailsUseCase(sl()),
   );
   sl.registerLazySingleton<MakeAppointmentUseCase>(
-        () => MakeAppointmentUseCase(sl()),
+    () => MakeAppointmentUseCase(sl()),
   );
   sl.registerLazySingleton<clinic_details.ToggleFavoriteUseCase>(
-        () => clinic_details.ToggleFavoriteUseCase(sl()),
+    () => clinic_details.ToggleFavoriteUseCase(sl()),
   );
 
   sl.registerFactory<ClinicDetailsCubit>(
-        () => ClinicDetailsCubit(
+    () => ClinicDetailsCubit(
       getClinicDetailsUseCase: sl(),
       toggleFavoriteUseCase: sl(),
       makeAppointmentUseCase: sl(),
@@ -220,15 +231,98 @@ void setUpSearchModule() {
   sl.registerFactory(() => SearchCubit(searchClinicsUseCase: sl()));
 
   // 2. UseCase
-  sl.registerLazySingleton(() => SearchClinicsUseCase( sl()));
+  sl.registerLazySingleton(() => SearchClinicsUseCase(sl()));
 
   // 3. Repository
   sl.registerLazySingleton<SearchRepository>(
-        () => SearchRepositoryImpl(remoteDataSource: sl()),
+    () => SearchRepositoryImpl(remoteDataSource: sl()),
   );
 
   // 4. Data Source
   sl.registerLazySingleton<SearchRemoteDataSource>(
-        () => SearchRemoteDataSourceImpl(apiServices: sl(),),
+    () => SearchRemoteDataSourceImpl(
+      apiServices: sl(),
+    ),
   );
 }
+
+void setUpFavouriteModule() {
+  // ── Favourite feature ──────────────────────────────────────────
+
+// Data Sources
+  sl.registerLazySingleton<FavouriteRemoteDataSource>(
+    () => FavouriteRemoteDataSourceImpl(sl()),
+  );
+
+// Repository — SINGLETON so the broadcast stream is shared app-wide
+  sl.registerLazySingleton<FavouriteRepository>(
+    () => FavouriteRepositoryImpl(sl()),
+  );
+
+// Use Cases
+  sl.registerLazySingleton(() => GetFavouritesUseCase(sl()));
+
+// This unified ToggleFavouriteUseCase replaces the old clinic_details one
+  sl.registerLazySingleton(() => ToggleFavouriteUseCase(sl()));
+
+// Cubit — factory so each tab gets a fresh instance
+  sl.registerFactory(
+    () => FavouriteCubit(
+      getFavouritesUseCase: sl(),
+      toggleFavouriteUseCase: sl(),
+      favouriteRepository: sl(),
+      userRepository: sl(),
+    ),
+  );
+}
+/*
+╔╣ Request ║ POST
+I/flutter (32075): ║  https://clinical.khorogat.com/api/auth/register
+I/flutter (32075): ╚══════════════════════════════════════════════════════════════════════════════════════════╝
+I/flutter (32075): ╔ Headers
+I/flutter (32075): ╟ content-type: application/json
+I/flutter (32075): ╟ contentType: application/json
+I/flutter (32075): ╟ responseType: ResponseType.json
+I/flutter (32075): ╟ followRedirects: true
+I/flutter (32075): ╟ connectTimeout: 0:00:30.000000
+I/flutter (32075): ╟ receiveTimeout: 0:00:30.000000
+I/flutter (32075): ╚══════════════════════════════════════════════════════════════════════════════════════════╝
+I/flutter (32075): ╔ Body
+I/flutter (32075): ╟ name: زياد محمد
+I/flutter (32075): ╟ email: zyadmuhammed05@gmail.com
+I/flutter (32075): ╟ phone: 01142214358
+I/flutter (32075): ╟ password: zyadmohamed
+I/flutter (32075): ╟ password_confirmation: zyadmohamed
+I/flutter (32075): ╚══════════════════════════════════════════════════════════════════════════════════════════╝
+I/flutter (32075): ║ {name: زياد محمد, email: zyadmuhammed05@gmail.com, phone: 01142214358, password: zyadmoham
+I/flutter (32075): ║ ed, password_confirmation: zyadmohamed}
+I/flutter (32075):
+I/flutter (32075): ╔╣ Response ║ POST ║ Status: 200 OK  ║ Time: 1218 ms
+I/flutter (32075): ║  https://clinical.khorogat.com/api/auth/register
+I/flutter (32075): ╚══════════════════════════════════════════════════════════════════════════════════════════╝
+I/flutter (32075): ╔ Body
+I/flutter (32075): ║
+I/flutter (32075): ║    {
+I/flutter (32075): ║         "message": "Registration successful Check OTP",
+I/flutter (32075): ║         "status": 200,
+I/flutter (32075): ║         "data": {email: zyadmuhammed05@gmail.com}
+I/flutter (32075): ║    }
+I/flutter (32075): ║
+I/flutter (32075): ╚══════════════════════════════════════════════════════════════════════════════════════════╝
+I/flutter (32075): fjdofjdofdof {"message":"Registration successful Check OTP","status":200,"data":{"email":"zyadmuhammed05@gmail.com"}}
+E/flutter (32075): [ERROR:flutter/runtime/dart_vm_initializer.cc(40)] Unhandled Exception: type 'String' is not a subtype of type 'Map<String, dynamic>' in type cast
+E/flutter (32075): #0      AppRouter.onGenerateRoute (package:clinic_app/core/routes/app_routes.dart:84:41)
+E/flutter (32075): #1      _WidgetsAppState._onGenerateRoute (package:flutter/src/widgets/app.dart:1553:37)
+E/flutter (32075): #2      NavigatorState._routeNamed (package:flutter/src/widgets/navigator.dart:4661:47)
+E/flutter (32075): #3      NavigatorState.pushNamed (package:flutter/src/widgets/navigator.dart:4729:21)
+E/flutter (32075): #4      Navigator.pushNamed (package:flutter/src/widgets/navigator.dart:1896:34)
+E/flutter (32075): #5      _SignupTabState.build.<anonymous closure> (package:clinic_app/features/auth/presentation/widget/taps/signup_tab.dart:49:21)
+E/flutter (32075): #6      _BlocConsumerState.build.<anonymous closure> (package:flutter_bloc/src/bloc_consumer.dart:160:26)
+E/flutter (32075): #7      _BlocListenerBaseState._subscribe.<anonymous closure> (package:flutter_bloc/src/bloc_listener.dart:215:30)
+E/flutter (32075): #8      _RootZone.runUnaryGuarded (dart:async/zone.dart:1778:10)
+E/flutter (32075): #9      _BufferingStreamSubscription._sendData (dart:async/stream_impl.dart:381:11)
+E/flutter (32075): #10     _DelayedData.perform (dart:async/stream_impl.dart:573:14)
+E/flutter (32075): #11     _PendingEvents.handleNext (dart:async/stream_impl.dart:678:11)
+E/flutter (32075): #12     _PendingEvents.schedule.<anonymous closure> (dart:async/stream_impl.dart:649:7)
+E/flutter (32075): #13     _microtaskLoop (dart:async/schedule_microtask.dart:40:21)
+ */

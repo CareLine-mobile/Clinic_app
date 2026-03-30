@@ -20,9 +20,8 @@ class Endpoints {
   static const String clinicDetails = '/clinicals'; // + /{id}
 
   // Favorites
-  static const String toggleFavorite = '/favorites/toggle';
-  static const String getFavorites = '/favorites';
-
+  static String toggleFavorite(int id) => '/clinicals/$id/favourite';
+  static const String getFavorites = '/clinicals/favourites';
   // Bookings
   static const String bookAppointment = '/auth/bookings'; // POST Method
   static const String getListBooking = '/auth/bookings'; // GET Method

@@ -1,11 +1,15 @@
 // lib/features/home/presentation/cubit/home_cubit.dart
 
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:clinic_app/core/service/notification_permission_service.dart';
 import 'package:clinic_app/features/home/domain/usecases/get_latest_clinics_usecase.dart';
 import 'package:clinic_app/features/home/domain/usecases/get_nearby_clinics_usecase.dart';
 import 'package:meta/meta.dart';
 import '../../../../core/errors/failures.dart';
+import '../../../favourite/domain/repositories/favourite_repository.dart';
+import '../../../favourite/domain/usecases/toggle_favourite_usecase.dart';
 import '../../domain/entities/clinic_summary.dart';
 import '../../domain/usecases/get_clinics_usecase.dart';
 import '../../../clinic_details/domain/usecases/toggle_favorite_usecase.dart';
@@ -16,14 +20,26 @@ class HomeCubit extends Cubit<HomeState> {
   final GetClinicsUseCase getClinicsUseCase;
   final GetLatestClinicsUseCase getLatestClinicsUseCase;
   final GetNearByClinicsUseCase getNearByClinicsUseCase;
-  final ToggleFavoriteUseCase toggleFavoriteUseCase;
+
+  // ── CHANGED: now uses the unified ToggleFavouriteUseCase ──────
+  final ToggleFavouriteUseCase toggleFavouriteUseCase;
+
+  // ── NEW: reactive singleton repo ─────────────────────────────
+  final FavouriteRepository _favouriteRepository;
+  StreamSubscription<Set<int>>? _favStreamSub;
 
   HomeCubit({
     required this.getClinicsUseCase,
     required this.getLatestClinicsUseCase,
     required this.getNearByClinicsUseCase,
-    required this.toggleFavoriteUseCase,
-  }) : super(HomeInitial());
+    required this.toggleFavouriteUseCase,
+    required FavouriteRepository favouriteRepository, // NEW param
+  })  : _favouriteRepository = favouriteRepository,
+        super(HomeInitial()) {
+    // ── NEW: subscribe once — handles all cross-screen sync ───
+    _favStreamSub = _favouriteRepository.favouriteIdsStream
+        .listen(_onFavouriteIdsUpdated);
+  }
 
   List<ClinicSummary> _allClinics = [];
   List<ClinicSummary> _featuredClinics = [];
@@ -32,85 +48,121 @@ class HomeCubit extends Cubit<HomeState> {
   bool _hasMorePages = true;
   bool _isLoadingMore = false;
 
-  // ════════════════════════════════════════════════════════════════
-  // INIT — permissions first, then data
-  // ════════════════════════════════════════════════════════════════
+  // ════════════════════════════════════════════════════════════
+  // NEW: stream listener — fired by ANY screen's toggle
+  // ════════════════════════════════════════════════════════════
+
+  void _onFavouriteIdsUpdated(Set<int> ids) {
+    final current = state;
+    if (current is! HomeLoaded) return;
+
+    // Rebuild all three lists in one pass — one emit
+    _featuredClinics = _applyFavIds(_featuredClinics, ids);
+    _nearbyClinics   = _applyFavIds(_nearbyClinics, ids);
+    _allClinics      = _applyFavIds(_allClinics, ids);
+
+    emit(current.copyWith(
+      featuredClinics: _featuredClinics,
+      nearbyClinics:   _nearbyClinics,
+      allClinics:      _allClinics,
+    ));
+  }
+
+  List<ClinicSummary> _applyFavIds(List<ClinicSummary> list, Set<int> ids) {
+    return list
+        .map((c) => c.copyWith(isFavorite: ids.contains(c.id)))
+        .toList();
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // INIT — same as before + seed repo after load
+  // ════════════════════════════════════════════════════════════
 
   Future<void> initHome() async {
     emit(HomeLoading());
-
-    // ─── Ask permissions on every launch (non-blocking) ──────────
     await _requestPermissions();
 
-    // ─── Load all data concurrently ──────────────────────────────
     try {
       final results = await Future.wait([
         getLatestClinicsUseCase.call(),
-        getNearByClinicsUseCase.call(), // returns [] if location denied
+        getNearByClinicsUseCase.call(),
         getClinicsUseCase.call(page: 1),
       ]);
 
       Failure? failure;
 
-      results[0].fold((f) => failure ??= f, (c) => _featuredClinics = c as List<ClinicSummary>);
-      // ─── Nearby: empty list is fine — not a failure ───────────
-      results[1].fold((_) {}, (c) => _nearbyClinics = c as List<ClinicSummary>);
+      results[0].fold(
+            (f) => failure ??= f,
+            (c) => _featuredClinics = c as List<ClinicSummary>,
+      );
+      results[1].fold(
+            (_) {},
+            (c) => _nearbyClinics = c as List<ClinicSummary>,
+      );
       results[2].fold(
             (f) => failure ??= f,
             (c) {
-          _allClinics = c as List<ClinicSummary>;
-          _currentPage = 1;
-          _hasMorePages = (c).isNotEmpty;
+          _allClinics   = c as List<ClinicSummary>;
+          _currentPage  = 1;
+          _hasMorePages = (c as List).isNotEmpty;
         },
       );
 
-      // Only show error if the critical data (all clinics) failed
       if (failure != null && _allClinics.isEmpty) {
         emit(HomeError(failure: failure!));
-      } else {
-        _emitLoadedState();
+        return;
       }
+
+      // ── NEW: seed the reactive repo so FavouriteCubit starts ─
+      // synced without an extra /favorites network call.
+      _seedRepo();
+
+      _emitLoadedState();
     } catch (e) {
       emit(HomeError(failure: ServerFailure(e.toString())));
     }
   }
 
-  /// Ask notification + location permissions silently on every launch
-  Future<void> _requestPermissions() async {
-    // Fire and forget — don't await result, don't block UI
-    NotificationPermissionService.requestPermission().ignore();
-    // Location permission is handled inside GetNearByClinicsUseCase
+  // ── NEW: collect isFavorite=true IDs and hand to repo ────────
+  void _seedRepo() {
+    final ids = {
+      ..._featuredClinics.where((c) => c.isFavorite).map((c) => c.id),
+      ..._nearbyClinics.where((c) => c.isFavorite).map((c) => c.id),
+      ..._allClinics.where((c) => c.isFavorite).map((c) => c.id),
+    };
+    _favouriteRepository.seedFavouriteIds(ids);
   }
 
-  // ════════════════════════════════════════════════════════════════
-  // REFRESH
-  // ════════════════════════════════════════════════════════════════
+  // ════════════════════════════════════════════════════════════
+  // REFRESH — same logic as before + re-seed
+  // ════════════════════════════════════════════════════════════
 
   Future<void> refresh() async {
     try {
       final results = await Future.wait([
         getLatestClinicsUseCase.call(),
-        getNearByClinicsUseCase.call(), // graceful — returns [] if denied
+        getNearByClinicsUseCase.call(),
         getClinicsUseCase.call(page: 1),
       ]);
 
       results[0].fold((_) {}, (c) => _featuredClinics = c as List<ClinicSummary>);
-      results[1].fold((_) {}, (c) => _nearbyClinics  = c as List<ClinicSummary>);
+      results[1].fold((_) {}, (c) => _nearbyClinics   = c as List<ClinicSummary>);
       results[2].fold((_) {}, (c) {
-        _allClinics  = c as List<ClinicSummary>;
-        _currentPage = 1;
-        _hasMorePages = (c).isNotEmpty;
+        _allClinics   = c as List<ClinicSummary>;
+        _currentPage  = 1;
+        _hasMorePages = (c as List).isNotEmpty;
       });
 
+      _seedRepo(); // ← re-seed on pull-to-refresh too
       _emitLoadedState();
     } catch (_) {
       // Keep current state on refresh error
     }
   }
 
-  // ════════════════════════════════════════════════════════════════
-  // LOAD MORE
-  // ════════════════════════════════════════════════════════════════
+  // ════════════════════════════════════════════════════════════
+  // LOAD MORE — unchanged
+  // ════════════════════════════════════════════════════════════
 
   Future<void> loadMoreClinics() async {
     final currentState = state;
@@ -134,12 +186,14 @@ class HomeCubit extends Cubit<HomeState> {
           if (newClinics.isEmpty) {
             _hasMorePages = false;
           } else {
-            _allClinics.addAll(newClinics);
+            // ── Apply current fav state to newly loaded clinics ──
+            final ids = _favouriteRepository.currentFavouriteIds;
+            _allClinics.addAll(_applyFavIds(newClinics, ids));
           }
           _isLoadingMore = false;
           emit(currentState.copyWith(
-            allClinics: List.from(_allClinics),
-            currentPage: _currentPage,
+            allClinics:   List.from(_allClinics),
+            currentPage:  _currentPage,
             hasMorePages: _hasMorePages,
             isLoadingMore: false,
           ));
@@ -152,57 +206,30 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
-  // ════════════════════════════════════════════════════════════════
-  // TOGGLE FAVORITE
-  // ════════════════════════════════════════════════════════════════
+  // ════════════════════════════════════════════════════════════
+  // TOGGLE FAVOURITE — SIMPLIFIED
+  // ════════════════════════════════════════════════════════════
+
+  // ── BEFORE: manual optimistic update + rollback in this cubit ──
+  //
+  // ── AFTER: one line. The repository handles:
+  //    • guard (no double-tap)
+  //    • optimistic update
+  //    • API call
+  //    • rollback on failure
+  //    • stream broadcast → _onFavouriteIdsUpdated() above updates the UI
 
   Future<void> toggleFavorite(int clinicId) async {
-    final currentState = state;
-    if (currentState is! HomeLoaded) return;
-
-    final updatedFeatured = _updateClinicFavorite(_featuredClinics, clinicId);
-    final updatedNearby   = _updateClinicFavorite(_nearbyClinics, clinicId);
-    final updatedAll      = _updateClinicFavorite(_allClinics, clinicId);
-
-    _featuredClinics = updatedFeatured;
-    _nearbyClinics   = updatedNearby;
-    _allClinics      = updatedAll;
-
-    emit(currentState.copyWith(
-      featuredClinics: updatedFeatured,
-      nearbyClinics: updatedNearby,
-      allClinics: updatedAll,
-    ));
-
-    final result = await toggleFavoriteUseCase(clinicId.toString());
-
-    result.fold(
-          (_) {
-        // Rollback
-        _featuredClinics = _updateClinicFavorite(updatedFeatured, clinicId);
-        _nearbyClinics   = _updateClinicFavorite(updatedNearby, clinicId);
-        _allClinics      = _updateClinicFavorite(updatedAll, clinicId);
-        emit(currentState.copyWith(
-          featuredClinics: _featuredClinics,
-          nearbyClinics: _nearbyClinics,
-          allClinics: _allClinics,
-        ));
-      },
-          (_) => null,
-    );
+    await toggleFavouriteUseCase(clinicId);
+    // That's it. No manual state patching needed here.
   }
 
-  // ════════════════════════════════════════════════════════════════
+  // ════════════════════════════════════════════════════════════
   // HELPERS
-  // ════════════════════════════════════════════════════════════════
+  // ════════════════════════════════════════════════════════════
 
-  List<ClinicSummary> _updateClinicFavorite(
-      List<ClinicSummary> clinics,
-      int clinicId,
-      ) {
-    return clinics.map((c) {
-      return c.id == clinicId ? c.copyWith(isFavorite: !c.isFavorite) : c;
-    }).toList();
+  Future<void> _requestPermissions() async {
+    NotificationPermissionService.requestPermission().ignore();
   }
 
   void _emitLoadedState() {
@@ -220,9 +247,16 @@ class HomeCubit extends Cubit<HomeState> {
     _allClinics.clear();
     _featuredClinics.clear();
     _nearbyClinics.clear();
-    _currentPage  = 1;
-    _hasMorePages = true;
+    _currentPage   = 1;
+    _hasMorePages  = true;
     _isLoadingMore = false;
     emit(HomeInitial());
+  }
+
+  // ── NEW: cancel subscription — prevents memory leak ──────────
+  @override
+  Future<void> close() {
+    _favStreamSub?.cancel();
+    return super.close();
   }
 }
