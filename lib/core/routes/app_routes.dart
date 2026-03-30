@@ -81,12 +81,30 @@ class AppRouter {
     // OTP — always shares the same cubit that started the signup/login flow.
     // Pass the cubit via arguments from AuthScreen.
       case Routes.verification:
-        final args = settings.arguments as Map<String, dynamic>;
-        final email = args['email'] as String;
-        final cubit = args['cubit'] as AuthCubit;
+      // ─── Handle both String and Map arguments ────────────────────
+        final args = settings.arguments;
+        String email;
+        AuthCubit? cubit;
+
+        if (args is Map<String, dynamic>) {
+          email = args['email'] as String;
+          cubit = args['cubit'] as AuthCubit?;
+        } else if (args is String) {
+          // Fallback for backward compatibility: if a plain email string is passed, use it and create a new cubit.
+          email = args;
+          cubit = null;
+        } else {
+          return _errorRoute();
+        }
+
         return MaterialPageRoute(
-          builder: (_) => BlocProvider.value(
+          builder: (_) => cubit != null
+              ? BlocProvider.value(
             value: cubit,
+            child: OtpVerificationPage(email: email),
+          )
+              : BlocProvider<AuthCubit>(
+            create: (_) => di.sl<AuthCubit>(),
             child: OtpVerificationPage(email: email),
           ),
         );

@@ -3,7 +3,6 @@ import 'package:clinic_app/features/clinic_details/presentation/cubit/clinic_det
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../../core/utils/app_size.dart';
 import '../../domain/entites/doctor_entity.dart';
 
 class DoctorCard extends StatelessWidget {
@@ -130,25 +129,8 @@ class DoctorCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Column(
-                  children: [
-                    Text(
-                      '${doctor.consultationFee.toInt()}',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w800,
-                        color: accentColor,
-                      ),
-                    ),
-                    Text('ج.م',
-                        style: TextStyle(
-                            fontSize: 11.sp,
-                            color: Colors.grey.shade500)),
-                  ],
-                ),
               ],
             ),
-
             SizedBox(height: 16.h),
             Divider(height: 1, color: Colors.grey.shade100),
             SizedBox(height: 12.h),

@@ -238,15 +238,17 @@ class HomeHeaderWidget extends StatelessWidget {
               }
 
               if (state is BookingLoaded) {
-                final booking = state.bookings.first;
-                if (booking != null) {
-                  return LastBookingCard(
-                    booking: booking,
-                    onTap: onBookingCardTap,
-                  );
+                // If there are no bookings, show empty state card
+                if (state.bookings.isEmpty) {
+                  return _buildEmptyStateCard(context);
                 }
-              }
 
+                final booking = state.bookings.first;
+                return LastBookingCard(
+                  booking: booking,
+                  onTap: onBookingCardTap,
+                );
+              }
               // No booking or error → empty state card
               return _buildEmptyStateCard(context);
             },

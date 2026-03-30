@@ -244,6 +244,7 @@
       "userNotFound": "User not found",
       "accountNotVerified": "Account not verified, check your email",
       "tokenExpired": "Session expired, please log in again",
+      "phoneTaken": "Phone number is already in use",
       "tooManyRequests": "Too many attempts, please wait and try again"
     },
     "auth": {
