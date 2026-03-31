@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import '../../../favourite/domain/repositories/favourite_repository.dart';
+import '../../../favourite/domain/usecases/toggle_favourite_usecase.dart';
 import '../../domain/entites/clinic_entities.dart';
 import '../../domain/entites/doctor_entity.dart';
 import '../../domain/entites/time_slot_entity.dart';
@@ -12,15 +16,37 @@ part 'clinic_details_state.dart';
 
 class ClinicDetailsCubit extends Cubit<ClinicDetailsState> {
   final GetClinicDetailsUseCase getClinicDetailsUseCase;
-  final ToggleFavoriteUseCase toggleFavoriteUseCase;
+  final ToggleFavouriteUseCase toggleFavoriteUseCase;
   final MakeAppointmentUseCase makeAppointmentUseCase;
-
+  final FavouriteRepository _favouriteRepository;
+  StreamSubscription<Set<int>>? _favStreamSub;
   ClinicDetailsCubit({
     required this.getClinicDetailsUseCase,
     required this.toggleFavoriteUseCase,
     required this.makeAppointmentUseCase,
-  }) : super(ClinicDetailsInitial());
+    required FavouriteRepository favouriteRepository,
+  }) :  _favouriteRepository = favouriteRepository ,super(ClinicDetailsInitial()){
+    _favStreamSub = _favouriteRepository.favouriteIdsStream.listen(_onFavouriteIdsUpdated);
 
+  }
+    void _onFavouriteIdsUpdated(Set<int> ids) {
+
+      final s = _loaded;
+      if (s == null) return;
+
+      final clinicId = int.tryParse(s.clinic.id);
+      if (clinicId == null) return;
+
+      final isFav = ids.contains(clinicId);
+
+      // Only emit if the value actually changed (avoids unnecessary rebuilds)
+      if (s.clinic.isFavorite == isFav) return;
+
+      emit(s.copyWith(
+        clinic: s.clinic.copyWith(isFavorite: isFav),
+      ));
+
+    }
   // Convenience getter — null-safe access to the loaded state
   ClinicDetailsLoaded? get _loaded =>
       state is ClinicDetailsLoaded ? state as ClinicDetailsLoaded : null;
@@ -47,7 +73,7 @@ class ClinicDetailsCubit extends Cubit<ClinicDetailsState> {
 
     emit(s.copyWith(isFavoriteLoading: true));
 
-    final result = await toggleFavoriteUseCase(s.clinic.id);
+    final result = await toggleFavoriteUseCase  (int.parse(s.clinic.id));
     result.fold(
           (failure) {
         emit(s.copyWith(isFavoriteLoading: false));

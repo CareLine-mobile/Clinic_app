@@ -15,6 +15,9 @@ class GetLatestClinicsUseCase {
   Future<Either<Failure, List<ClinicSummary>>> call() async {
     try {
       final clinics = await repository.latestClinics();
+      // clinics.forEach((element) {
+      //     print('GetLatestClinicsUseCase : ${element.toString()}');
+      // });
       return Right(clinics);
     } catch (e, stackTrace) {
       return Left(ErrorHandler.handleException(e, stackTrace));

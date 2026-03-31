@@ -5,6 +5,7 @@ import 'package:clinic_app/core/api/base_api_services.dart';
 import 'package:clinic_app/core/api/model/http_method.dart';
 import 'package:clinic_app/features/user_data/user_repo.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 class DioApiService extends BaseApiServices {
@@ -23,17 +24,18 @@ class DioApiService extends BaseApiServices {
       ),
     );
     // Add pretty logger to debug responses
-    _dio.interceptors.add(
-      PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-        responseBody: true,
-        responseHeader: false,
-        error: true,
-        compact: true,
-        maxWidth: 90,
-      ),
-    );
+    // _dio.interceptors.add(
+    //   PrettyDioLogger(
+    //     requestHeader: true,
+    //     requestBody: true,
+    //   //  responseBody: true,
+    //   //  responseHeader: false,
+    //     error: true,
+    //     compact: true,
+    //     maxWidth: 90,
+    //   ),
+    // );
+    _dio.interceptors.add(CustomLoggerInterceptor());
   }
 
   @override
@@ -57,15 +59,27 @@ class DioApiService extends BaseApiServices {
         queryParameters: queryParams,
         options: options,
       );
-      print('fjdofjdofdof $response');
+  //    print('fjdofjdofdof $response');
       return response.data;
 
     } catch (e, stackTrace) {
-      print('zyad');
+    //  print('zyad');
       // Convert exception to custom exception and throw
       rethrow;
     }
   }
 
 
+}
+class CustomLoggerInterceptor extends Interceptor {
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    // 🎯 فلترة على endpoint معين
+    if (response.requestOptions.path.contains('/clinicals')) {
+      debugPrint('✅ RESPONSE [${response.requestOptions.path}]');
+      debugPrint('DATA: ${response.data}');
+    }
+
+    handler.next(response);
+  }
 }

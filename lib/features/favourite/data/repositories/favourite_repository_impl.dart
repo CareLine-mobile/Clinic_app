@@ -123,6 +123,8 @@ class FavouriteRepositoryImpl implements FavouriteRepository {
   // ── Private helpers ──────────────────────────────────────────
 
   void _emit() {
+    print('📡 Repo emitting: $_favouriteIds');
+    print(StackTrace.current); // ← This will show EXACTLY what called _emit()
     if (!_controller.isClosed) {
       _controller.add(Set.unmodifiable(_favouriteIds));
     }

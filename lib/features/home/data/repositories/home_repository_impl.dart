@@ -21,6 +21,7 @@ class HomeRepositoryImpl implements HomeRepository {
     );
 
     final clinicsResponse = ClinicsResponse.fromJson(response);
+    print('zyad : ${clinicsResponse.clinics}');
     return clinicsResponse.clinics.map((model) => model.toEntity()).toList();
   }
 

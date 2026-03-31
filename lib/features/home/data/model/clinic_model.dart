@@ -31,7 +31,8 @@ class ClinicsHomeModel extends ClinicSummary {
       rating: json['rating']?.toString() ?? '0',
       isOpen: json['is_open'] as bool? ?? true,
       doctorsCount: json['doctors_count'] as String? ?? '0',
-      isFavorite: json['is_favorite'] as bool? ?? false,
+      isFavorite: json['is_favourite'] as bool? ?? false,
+      //is_favourite
     );
   }
 

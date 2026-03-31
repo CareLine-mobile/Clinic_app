@@ -27,6 +27,7 @@ class ContentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('clicnc sdsd ${clinic.isFavorite}');
     return BlocBuilder<ClinicDetailsCubit, ClinicDetailsState>(
       builder: (context, state) {
         final loaded = state is ClinicDetailsLoaded ? state : null;
@@ -36,7 +37,7 @@ class ContentView extends StatelessWidget {
           appBar: ClinicAppBar(
             clinic: clinic,
             isTransparent: loaded?.isAppBarTransparent ?? true,
-            isFavorite: clinic.isOpen,
+            isFavorite: clinic.isFavorite,
             onFavoriteToggle: () =>
                 context.read<ClinicDetailsCubit>().toggleFavorite(),
           ),

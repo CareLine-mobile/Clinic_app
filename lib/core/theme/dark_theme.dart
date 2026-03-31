@@ -81,11 +81,11 @@ class DarkTheme {
     ),
 
     // Bottom App Bar Theme
-    bottomAppBarTheme: BottomAppBarTheme(
-      elevation: 0,
-      color: ColorsManager.secondaryDarkColor,
-      surfaceTintColor: ColorsManager.secondaryDarkColor,
-    ),
+    // bottomAppBarTheme: BottomAppBarTheme(
+    //   elevation: 0,
+    //   color: ColorsManager.secondaryDarkColor,
+    //   surfaceTintColor: ColorsManager.secondaryDarkColor,
+    // ),
 
     // Card Theme
     cardTheme: CardThemeData(

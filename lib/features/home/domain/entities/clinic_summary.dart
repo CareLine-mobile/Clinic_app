@@ -78,5 +78,10 @@ class ClinicSummary extends Equatable {
   ];
 
   @override
+  String toString() {
+    return 'ClinicSummary{id: $id, name: $name, isFavorite: $isFavorite}';
+  }
+
+  @override
   bool get stringify => true;
 }

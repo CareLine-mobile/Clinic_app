@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:clinic_app/core/di/injection_container.dart';
 import 'package:clinic_app/core/utils/assets.dart';
 import 'package:clinic_app/core/widgets/CustomIcon.dart';
+import 'package:clinic_app/features/favourite/presentation/view/favourites_screen.dart';
 import 'package:clinic_app/features/home/presentation/view/home_screen.dart';
 import 'package:clinic_app/features/home/presentation/view/medication_tap_screen.dart';
 import 'package:clinic_app/features/my_booking/presentation/view/booking_list_screen.dart';
@@ -40,6 +41,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     Assets.searchIcon,
     Assets.myBookingIcon,
     Assets.settingIcon,
+    'assets/icons/favourite-heart2.svg'
   ];
 
   @override
@@ -58,6 +60,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
       const BookingListScreen(),
       const SettingsTabScreen(),
+      const FavouritesScreen()
     ];
   }
 

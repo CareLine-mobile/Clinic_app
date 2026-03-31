@@ -29,6 +29,9 @@ class GetNearByClinicsUseCase {
               latitude: location.latitude,
               longitude: location.longitude,
             );
+            clinics.forEach((element) {
+              print('GetNearByClinicsUseCase : ${element.toString()}');
+            });
             return Right(clinics);
           } catch (e, stackTrace) {
             // ─── Nearby API failed → empty list, NOT a failure ────────

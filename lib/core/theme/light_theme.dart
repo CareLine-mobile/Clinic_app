@@ -80,11 +80,11 @@ class LightTheme {
     ),
 
     // Bottom App Bar Theme
-    bottomAppBarTheme: const BottomAppBarTheme(
-      elevation: 0,
-      color: Colors.transparent,
-      surfaceTintColor: Colors.transparent,
-    ),
+    // bottomAppBarTheme: const BottomAppBarTheme(
+    //   elevation: 0,
+    //   color: Colors.transparent,
+    //   surfaceTintColor: Colors.transparent,
+    // ),
 
     // Card Theme
     cardTheme: CardThemeData(

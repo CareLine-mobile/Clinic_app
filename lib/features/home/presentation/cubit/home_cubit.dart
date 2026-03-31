@@ -53,6 +53,8 @@ class HomeCubit extends Cubit<HomeState> {
   // ════════════════════════════════════════════════════════════
 
   void _onFavouriteIdsUpdated(Set<int> ids) {
+    print('🔴 HomeCubit stream fired with ids: $ids');
+    print('🔴 Current state: $state');
     final current = state;
     if (current is! HomeLoaded) return;
 
@@ -115,6 +117,10 @@ class HomeCubit extends Cubit<HomeState> {
 
       // ── NEW: seed the reactive repo so FavouriteCubit starts ─
       // synced without an extra /favorites network call.
+    //  print('featured fav: ${_featuredClinics.where((c) => c.isFavorite).length}');
+   //   print('nearby fav: ${_nearbyClinics.where((c) => c.isFavorite).length}');
+
+     // print('all fav: ${_allClinics[0].toString()}');
       _seedRepo();
 
       _emitLoadedState();
@@ -125,6 +131,7 @@ class HomeCubit extends Cubit<HomeState> {
 
   // ── NEW: collect isFavorite=true IDs and hand to repo ────────
   void _seedRepo() {
+
     final ids = {
       ..._featuredClinics.where((c) => c.isFavorite).map((c) => c.id),
       ..._nearbyClinics.where((c) => c.isFavorite).map((c) => c.id),
