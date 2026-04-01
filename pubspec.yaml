@@ -82,7 +82,7 @@ dependencies:
 
   # Maps
   google_maps_flutter:
-  geolocator: ^12.0.0
+  geolocator: ^14.0.2
 
   # Image Picker
   image_picker: ^1.0.7
