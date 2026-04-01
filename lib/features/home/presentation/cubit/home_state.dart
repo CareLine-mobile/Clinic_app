@@ -48,3 +48,9 @@ class HomeError extends HomeState {
 
   HomeError({required this.failure});
 }
+
+class LocationError extends HomeState {
+  final Failure failure;
+
+  LocationError({required this.failure});
+}

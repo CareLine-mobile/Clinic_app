@@ -96,9 +96,9 @@ void setUpDio() {
 }
 
 void setUpLocalDb() {
-  sl.registerLazySingleton<LocationDataSource>(
-    () => LocationDataSourceImpl(),
-  );
+  // sl.registerLazySingleton<LocationDataSource>(
+  //   () => LocationDataSourceUtilits(),
+  // );
 
   sl.registerLazySingleton<LocationRepository>(
     () => LocationRepositoryImpl(dataSource: sl()),
@@ -142,7 +142,7 @@ void setUpHomeModule() {
       () => GetLatestClinicsUseCase(sl()));
   sl.registerLazySingleton<GetNearByClinicsUseCase>(
     () => GetNearByClinicsUseCase(
-      getCurrentLocationUseCase: sl(),
+    //  getCurrentLocationUseCase: sl(),
       repository: sl(),
     ),
   );

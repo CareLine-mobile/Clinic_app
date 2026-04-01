@@ -98,7 +98,12 @@ class HomeCubit extends Cubit<HomeState> {
             (c) => _featuredClinics = c as List<ClinicSummary>,
       );
       results[1].fold(
-            (_) {},
+            (f) => {
+              if (f is LocationFailure){
+                emit(LocationError(failure: f)),
+              }
+
+            },
             (c) => _nearbyClinics = c as List<ClinicSummary>,
       );
       results[2].fold(
@@ -111,6 +116,7 @@ class HomeCubit extends Cubit<HomeState> {
       );
 
       if (failure != null && _allClinics.isEmpty) {
+
         emit(HomeError(failure: failure!));
         return;
       }

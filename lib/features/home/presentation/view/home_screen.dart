@@ -1,5 +1,7 @@
 // lib/features/home/presentation/screens/home_screen.dart
 
+import 'package:clinic_app/core/errors/failures.dart';
+import 'package:clinic_app/core/utils/location/location_error_handler.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/core/utils/enums.dart';
@@ -9,6 +11,7 @@ import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/app_size.dart';
+import '../../../../core/utils/location/location_utils.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../my_booking/presentation/cubit/booking_cubit.dart';
 import '../../../user_data/user_repo.dart';
@@ -141,7 +144,18 @@ class _HomeScreenState extends State<HomeScreen> {
         message: state.failure.message,
         type: SnackBarType.error,
       );
-    }
+    } else if(state is LocationError) {
+
+      if (state.failure is LocationFailure){
+
+        final f = state.failure as LocationFailure;
+        if(f.locationErrorType == LocationErrorType.serviceDisabled){
+
+        }
+     //   LocationErrorHandler.handleError(f.locationErrorType, context);
+      }
+
+     }
   }
 
   // ── Loaded body ───────────────────────────────────────────────────────────

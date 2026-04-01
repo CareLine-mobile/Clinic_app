@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import '../../../../../core/errors/failures.dart';
+import '../../../../../core/utils/location/location_utils.dart';
 import '../../entities/user_location.dart';
 import '../../repositories/location_repository.dart';
 
@@ -9,6 +10,8 @@ class GetCurrentLocationUseCase {
   GetCurrentLocationUseCase(this.repository);
 
   Future<Either<Failure, UserLocation>> call() async {
+
+
     // First check permission
     final permissionResult = await repository.checkLocationPermission();
 
@@ -22,7 +25,7 @@ class GetCurrentLocationUseCase {
                 (failure) => Left(failure),
                 (granted) async {
               if (!granted) {
-                return const Left(ServerFailure('Location permission denied'));
+                return const Left(LocationFailure(LocationErrorType.permissionDenied, 'Location permission denied'));
               }
               return await repository.getCurrentLocation();
             },

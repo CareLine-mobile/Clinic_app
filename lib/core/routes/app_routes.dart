@@ -121,7 +121,7 @@ class AppRouter {
                 create: (_) => di.sl<HomeCubit>()..initHome(),
               ),
             ],
-            child: const PatientHomeScreen(),
+            child: const DashBoardScreen(),
           ),
         );
 

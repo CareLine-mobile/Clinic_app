@@ -13,6 +13,11 @@ class AppConstants {
   static const String themeMode       = 'settings_theme_mode';
   static const String languageCode    = 'settings_language_code';
   static const String notifications   = 'settings_notifications';
+   //----------------- App Location Permission -----------
+  static const int locationPermissionDinedForEver = 35;
+  static const int locationPermissionDenied = 34;
+  static const int locationPermissionGranted = 33;
+  static const int locationServiceDisabled = 32;
 
   // ==================== API Constants ====================
   static const int connectionTimeout = 30000; // 30 seconds

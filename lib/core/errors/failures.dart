@@ -1,3 +1,4 @@
+import 'package:clinic_app/core/utils/location/location_utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
 
@@ -17,7 +18,21 @@ abstract class Failure extends Equatable {
   /// Get error type for tracking/analytics
   String get errorType;
 }
+class LocationFailure extends Failure {
+  final LocationErrorType locationErrorType;
 
+  const LocationFailure(this.locationErrorType, String message)
+      : super(message);
+
+  @override
+  String get errorKey => 'errors.location.title'.tr();
+
+  @override
+  String get errorType => locationErrorType.toString();
+
+  @override
+  List<Object?> get props => [locationErrorType, message, code];
+}
 class ServerFailure extends Failure {
   const ServerFailure(super.message, [super.code]);
 
@@ -93,5 +108,6 @@ class AccountNotVerifiedFailure extends Failure {
   @override
   List<Object?> get props => [email, message, code];
 }
+
 
 

@@ -1,38 +1,52 @@
 // lib/features/dashboard/patient_home_screen.dart
 
+// lib/features/dashboard/patient_home_screen.dart
+
 import 'dart:ui';
+
 import 'package:clinic_app/core/di/injection_container.dart';
 import 'package:clinic_app/core/utils/assets.dart';
 import 'package:clinic_app/core/widgets/CustomIcon.dart';
+import 'package:clinic_app/features/dashboard/widgets/dashboard_body.dart';
+import 'package:clinic_app/features/dashboard/widgets/floating_nav_bar.dart';
+import 'package:clinic_app/features/dashboard/widgets/location_banner.dart';
 import 'package:clinic_app/features/favourite/presentation/view/favourites_screen.dart';
+import 'package:clinic_app/features/home/presentation/cubit/home_cubit.dart';
 import 'package:clinic_app/features/home/presentation/view/home_screen.dart';
-import 'package:clinic_app/features/home/presentation/view/medication_tap_screen.dart';
 import 'package:clinic_app/features/my_booking/presentation/view/booking_list_screen.dart';
 import 'package:clinic_app/features/search/presentation/cubit/search_cubit.dart';
 import 'package:clinic_app/features/search/presentation/view/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geolocator/geolocator.dart';
+
 import '../../../../core/di/injection_container.dart' as di;
 import '../../../../core/theme/colors.dart';
 import '../../../../core/utils/app_size.dart';
 import '../auth/presentation/cubit/auth_cubit.dart';
 import '../auth/presentation/cubit/auth_state.dart';
+import '../home/data/datasources/localdatasource/location_data_source_impl.dart';
 import '../my_booking/presentation/cubit/booking_cubit.dart';
 import '../settings/presentation/view/settings_screen.dart';
 import '../user_data/user_repo.dart';
 
-class PatientHomeScreen extends StatefulWidget {
-  const PatientHomeScreen({Key? key}) : super(key: key);
+class DashBoardScreen extends StatefulWidget {
+  const DashBoardScreen({Key? key}) : super(key: key);
 
   @override
-  State<PatientHomeScreen> createState() => _PatientHomeScreenState();
+  State<DashBoardScreen> createState() => _DashBoardScreenState();
 }
 
-class _PatientHomeScreenState extends State<PatientHomeScreen> {
+class _DashBoardScreenState extends State<DashBoardScreen>
+    with WidgetsBindingObserver {            // ← observe app lifecycle
   int _currentIndex = 0;
   bool _isNavBarVisible = true;
   double _lastScrollPosition = 0;
+
+  // ── Location banner state ────────────────────────────────
+  bool _showLocationBanner = false;
+  bool _bannerDismissed = false;             // user tapped ✕ → never re-show this session
 
   late final List<Widget> _screens;
 
@@ -41,35 +55,75 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     Assets.searchIcon,
     Assets.myBookingIcon,
     Assets.settingIcon,
-    'assets/icons/favourite-heart2.svg'
+    'assets/icons/favourite-heart2.svg',
   ];
+
+  // ── Lifecycle ────────────────────────────────────────────
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _screens = [
-      HomeScreen(
-        onNavigateToSearch: (index) {
-          setState(() => _currentIndex = index);
-        },
-      ),
+      HomeScreen(onNavigateToSearch: (i) => setState(() => _currentIndex = i)),
       BlocProvider<SearchCubit>(
         create: (_) => sl<SearchCubit>(),
         child: const SearchScreen(),
       ),
-
       const BookingListScreen(),
       const SettingsTabScreen(),
-      const FavouritesScreen()
+      const FavouritesScreen(),
     ];
+
+    // Check after first frame so context is ready
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkLocationService());
   }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Re-check when user returns from the Settings app
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkLocationService();
+    }
+  }
+
+  // ── Location check ───────────────────────────────────────
+
+  Future<void> _checkLocationService() async {
+    if (_bannerDismissed) return;
+    final enabled = await Geolocator.isLocationServiceEnabled();
+    if (!mounted) return;
+    setState(() => _showLocationBanner = !enabled);
+
+    if (enabled) {
+      context.read<HomeCubit>().refresh();
+    }
+  }
+
+  void _dismissBanner() {
+    setState(() {
+      _showLocationBanner = false;
+      _bannerDismissed = true;
+    });
+  }
+
+  Future<void> _openLocationSettings() async {
+    await LocationDataSourceUtilits.openLocationSettings();
+    // didChangeAppLifecycleState will re-check when the user comes back
+  }
+
+  // ── Scroll hide/show nav bar ─────────────────────────────
 
   bool _onScroll(ScrollNotification notification) {
     if (notification.metrics.axis != Axis.vertical) return true;
-
     if (notification is ScrollUpdateNotification) {
       final current = notification.metrics.pixels;
-
       if ((current - _lastScrollPosition).abs() > 5) {
         if (current > _lastScrollPosition && current > 100) {
           if (_isNavBarVisible) setState(() => _isNavBarVisible = false);
@@ -85,205 +139,40 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     return true;
   }
 
+  // ── Build ────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<BookingCubit>(
-      // يتخلق مرة واحدة فوق الـ IndexedStack
-      // كل الـ tabs (HomeScreen, BookingListScreen...) تقدر توصله
       create: (_) {
         final cubit = di.sl<BookingCubit>();
         if (UserRepository().isLoggedIn) cubit.loadBookings();
         return cubit;
       },
       child: BlocListener<AuthCubit, AuthState>(
-        // امسح data البوكينج فور ما logout يحصل
         listenWhen: (_, curr) => curr is AuthUnauthenticated,
         listener: (context, _) => context.read<BookingCubit>().close(),
-        child: _PatientHomeBody(
+        child: DashBoardBody(
           currentIndex: _currentIndex,
           screens: _screens,
           icons: _icons,
           isNavBarVisible: _isNavBarVisible,
           onScroll: _onScroll,
           onTabTap: (index) {
-            // Unfocus any open keyboard when switching tabs
             FocusManager.instance.primaryFocus?.unfocus();
-
             setState(() => _currentIndex = index);
           },
+          // ── Banner props ──────────────────────────────
+          showLocationBanner: _showLocationBanner,
+          onOpenLocationSettings: _openLocationSettings,
+          onDismissBanner: _dismissBanner,
         ),
       ),
     );
   }
 }
 
-// ─────────────────────────────────────────────
-// Body — مستقلة عن الـ provider logic
-// ─────────────────────────────────────────────
 
-class _PatientHomeBody extends StatelessWidget {
-  final int currentIndex;
-  final List<Widget> screens;
-  final List<String> icons;
-  final bool isNavBarVisible;
-  final bool Function(ScrollNotification) onScroll;
-  final ValueChanged<int> onTabTap;
 
-  const _PatientHomeBody({
-    required this.currentIndex,
-    required this.screens,
-    required this.icons,
-    required this.isNavBarVisible,
-    required this.onScroll,
-    required this.onTabTap,
-  });
 
-  @override
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final isRTL = Localizations.localeOf(context).languageCode == 'ar';
 
-    const Color activeColor = ColorsManager.primaryColor;
-    final Color inactiveColor = theme.colorScheme.onSurfaceVariant;
-    final Color glassColor = isDark
-        ? Colors.black.withValues(alpha: 0.3)
-        : Colors.white.withValues(alpha: 0.3);
-    final Color borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.15)
-        : Colors.black.withValues(alpha: 0.1);
-
-    final displayIcons = isRTL ? icons.reversed.toList() : icons;
-
-    final double bottomSafeArea = MediaQuery.of(context).padding.bottom;
-
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      extendBody: true,
-      body: Stack(
-        children: [
-          // ── Screens ───────────────────────────────────────
-          NotificationListener<ScrollNotification>(
-            onNotification: onScroll,
-            child: IndexedStack(
-              index: currentIndex,
-              children: screens,
-            ),
-          ),
-
-          // ── Floating nav bar ──────────────────────────────
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            bottom: isNavBarVisible
-                ? (SizeApp.s16 + bottomSafeArea)
-                : -(100.h + bottomSafeArea),
-            left: SizeApp.s12,
-            right: SizeApp.s12,
-            child: _FloatingNavBar(
-              displayIcons: displayIcons,
-              currentIndex: currentIndex,
-              isRTL: isRTL,
-              totalIcons: icons.length,
-              activeColor: activeColor,
-              inactiveColor: inactiveColor,
-              glassColor: glassColor,
-              borderColor: borderColor,
-              onTap: onTabTap,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────
-// Floating nav bar
-// ─────────────────────────────────────────────
-
-class _FloatingNavBar extends StatelessWidget {
-  final List<String> displayIcons;
-  final int currentIndex;
-  final bool isRTL;
-  final int totalIcons;
-  final Color activeColor;
-  final Color inactiveColor;
-  final Color glassColor;
-  final Color borderColor;
-  final ValueChanged<int> onTap;
-
-  const _FloatingNavBar({
-    required this.displayIcons,
-    required this.currentIndex,
-    required this.isRTL,
-    required this.totalIcons,
-    required this.activeColor,
-    required this.inactiveColor,
-    required this.glassColor,
-    required this.borderColor,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(SizeApp.s30),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-        child: Container(
-          height: SizeApp.s70,
-          padding: EdgeInsets.symmetric(horizontal: SizeApp.s4),
-          decoration: BoxDecoration(
-            color: glassColor,
-            borderRadius: BorderRadius.circular(SizeApp.s30),
-            border: Border.all(color: borderColor, width: 1),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(displayIcons.length, (displayIndex) {
-              final actualIndex =
-              isRTL ? (totalIcons - 1 - displayIndex) : displayIndex;
-              final isSelected = currentIndex == actualIndex;
-
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () => onTap(actualIndex),
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: SizeApp.s8),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          curve: Curves.easeInOut,
-                          padding:
-                          EdgeInsets.all(isSelected ? SizeApp.s8 : 0),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? activeColor.withOpacity(0.15)
-                                : Colors.transparent,
-                            borderRadius:
-                            BorderRadius.circular(SizeApp.s12),
-                          ),
-                          child: CustomIcon(
-                            assetPath: displayIcons[displayIndex],
-                            size: SizeApp.s24 + SizeApp.s2,
-                            color: isSelected ? activeColor : inactiveColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
-      ),
-    );
-  }
-}

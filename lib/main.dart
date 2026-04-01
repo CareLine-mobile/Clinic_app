@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geolocator/geolocator.dart';
 import 'core/routes/app_routes.dart';
 import 'core/routes/routes.dart';
 import 'core/service/app_initializer.dart';
@@ -10,11 +11,13 @@ import 'core/theme/app_theme.dart';
 import 'features/settings/presentation/cubit/settings_cubit.dart';
 import 'features/user_data/user_cubit.dart';
 import 'features/user_data/user_repo.dart';
-
+bool isServiceEnable =false;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await AppInitializer.init();
+  await Geolocator.requestPermission();
+// isServiceEnable = await Geolocator.isLocationServiceEnabled();
 
   // Load persisted user before UI starts
   await UserRepository().loadUser();

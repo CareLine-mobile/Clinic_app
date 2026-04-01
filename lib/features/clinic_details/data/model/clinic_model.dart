@@ -46,7 +46,7 @@ class ClinicModel extends ClinicEntity {
       reviewsCount: json['reviews_count'] ?? 0,
       price: (json['price'] ?? 0).toDouble(),
       isOpen: json['is_open'] ?? false,
-      isFavorite: json['is_favourites'] ?? false,
+      isFavorite: json['is_favourite'] ?? false,
       openingHours: json['opening_hours'] ?? '',
       services: List<String>.from(json['services'] ?? []),
       facilities: List<String>.from(json['facilities'] ?? []),

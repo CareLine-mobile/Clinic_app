@@ -1,5 +1,6 @@
 // lib/features/clinic_details/presentation/pages/content_view.dart
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -27,17 +28,18 @@ class ContentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('clicnc sdsd ${clinic.isFavorite}');
+
     return BlocBuilder<ClinicDetailsCubit, ClinicDetailsState>(
       builder: (context, state) {
         final loaded = state is ClinicDetailsLoaded ? state : null;
-
+       // print('dfdfdfdfd ${clinic.isFavorite}');
         return Scaffold(
           extendBodyBehindAppBar: true,
           appBar: ClinicAppBar(
             clinic: clinic,
             isTransparent: loaded?.isAppBarTransparent ?? true,
-            isFavorite: clinic.isFavorite,
+          isFavorite: clinic.isFavorite,
+
             onFavoriteToggle: () =>
                 context.read<ClinicDetailsCubit>().toggleFavorite(),
           ),
