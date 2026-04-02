@@ -16,6 +16,8 @@ import '../../features/auth/presentation/view/reset_password_screen.dart';
 import '../../features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
 import '../../features/dashboard/dashboard.dart';
 import '../../features/clinic_details/presentation/view/clinic_details_screen.dart';
+import '../../features/profile/presentation/cubit/profile_cubit.dart';
+import '../../features/profile/presentation/view/profile_screen.dart';
 import '../di/injection_container.dart' as di;
 
 class AppRouter {
@@ -77,7 +79,13 @@ class AppRouter {
             child: ResetPasswordScreen(email: email),
           ),
         );
-
+      case Routes.profile:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider<ProfileCubit>(
+            create: (_) => di.sl<ProfileCubit>(),
+            child: const ProfileScreen(),
+          ),
+        );
     // OTP — always shares the same cubit that started the signup/login flow.
     // Pass the cubit via arguments from AuthScreen.
       case Routes.verification:

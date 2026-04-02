@@ -203,7 +203,18 @@
     "initial_title": "Search Clinics",
     "initial_hint": "Start typing to find a clinic or doctor",
     "empty_title": "No Results",
-    "no_results": "We couldn't find any clinic matching your search"
+    "no_results": "We couldn't find any clinic matching your search",
+    "filter": {
+      "label": "Filter",
+      "title": "Filter Results",
+      "clear_all": "Clear All",
+      "apply": "Apply",
+      "all": "All",
+      "availability": "Availability",
+      "open": "Open",
+      "closed": "Closed",
+      "min_rating": "Min Rating"
+    }
   },
   "validation": {
     "emailRequired": "Email is required",
@@ -295,5 +306,49 @@
     "ok": "OK",
     "no": "No",
     "login": "Login"
+  },
+  "profile": {
+    "appBarTitle": "Complete Your Profile",
+    "completion": {
+      "title": "Profile Completion",
+      "done": "Done",
+      "of5": "{filled} of 5 fields completed",
+      "hint0": "Fill your name to get started",
+      "hint1": "Great start! Keep going 💪",
+      "hint2": "You're almost halfway there!",
+      "hint3": "Almost there, 2 fields left!",
+      "hint4": "One more field to complete your profile!"
+    },
+    "sections": {
+      "personal": "Personal Information",
+      "medical": "Medical Information",
+      "emergency": "Emergency Contact"
+    },
+    "fields": {
+      "fullName": "Full Name",
+      "dateOfBirth": "Date of Birth",
+      "gender": "Gender",
+      "bloodType": "Blood Type (Optional)",
+      "chronicDiseases": "Chronic Diseases (Optional)",
+      "chronicHint": "e.g. Diabetes, Hypertension…",
+      "emergencyContact": "Emergency contact number"
+    },
+    "gender": {
+      "male": "Male",
+      "female": "Female"
+    },
+    "actions": {
+      "save": "Save Profile",
+      "retry": "Try Again"
+    },
+    "validation": {
+      "nameRequired": "Name is required",
+      "birthDateRequired": "Please select your date of birth",
+      "genderRequired": "Please select your gender",
+      "emergencyRequired": "Emergency contact is required"
+    },
+    "messages": {
+      "saveSuccess": "Profile saved successfully! 🎉"
+    }
   }
 }

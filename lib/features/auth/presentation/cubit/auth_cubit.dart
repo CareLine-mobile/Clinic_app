@@ -3,6 +3,7 @@ import '../../../../core/errors/failures.dart';
 import '../../../user_data/user_repo.dart';
 import '../../domain/entities/verify_otp_params.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../domain/usecases/delete_acount_usecase.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/reset_password_usecase.dart';
 import '../../domain/usecases/send_forgot_password_usecase.dart';
@@ -20,6 +21,8 @@ class AuthCubit extends Cubit<AuthState> {
   final UserRepository userRepository;
   final SendForgotPasswordUseCase sendForgotPasswordUseCase;
   final ResetPasswordUseCase resetPasswordUseCase;
+  final DeleteAccountUseCase deleteAccountUseCase;
+
 
   AuthCubit({
     required this.loginUseCase,
@@ -30,6 +33,7 @@ class AuthCubit extends Cubit<AuthState> {
     required this.userRepository,
     required this.sendForgotPasswordUseCase,
     required this.resetPasswordUseCase,
+    required this.deleteAccountUseCase,
   }) : super(AuthInitial());
 
   Future<void> loadCurrentUser() async {
@@ -154,6 +158,14 @@ class AuthCubit extends Cubit<AuthState> {
     result.fold(
           (failure) => emit(AuthUnauthenticated()),
           (_) => emit(AuthUnauthenticated()),
+    );
+  }
+  Future<void> deleteAccount() async {
+    emit(DeleteAccountLoading());
+    final result = await deleteAccountUseCase();
+    result.fold(
+          (failure) => emit(DeleteAccountFailure(failure.message)),
+          (_) => emit(DeleteAccountSuccess()),
     );
   }
 }

@@ -1,0 +1,29 @@
+import 'package:clinic_app/core/api/base_api_services.dart';
+import 'package:clinic_app/core/api/model/endpoints.dart';
+import 'package:clinic_app/core/api/model/http_method.dart';
+import 'package:clinic_app/features/profile/data/profile_model.dart';
+
+
+/// Direct implementation — no abstract class (as requested).
+class ProfileRemoteDataSource {
+  final BaseApiServices _api;
+
+  ProfileRemoteDataSource(this._api);
+
+  Future<ProfileModel> getProfile() async {
+    final response = await _api.request(
+      method: HttpMethod.get,
+      url: Endpoints.profile,
+    );
+    return ProfileModel.fromJson(response as Map<String, dynamic>);
+  }
+
+  Future<ProfileModel> updateProfile(ProfileModel profile) async {
+    final response = await _api.request(
+      method: HttpMethod.put,
+      url: Endpoints.profile,
+      body: profile.toUpdateJson(),
+    );
+    return ProfileModel.fromJson(response as Map<String, dynamic>);
+  }
+}

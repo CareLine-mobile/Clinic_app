@@ -2,6 +2,9 @@
 
 import 'package:clinic_app/core/widgets/card/clinic_card.dart';
 import 'package:clinic_app/features/home/domain/entities/clinic_summary.dart';
+import 'package:clinic_app/features/search/presentation/view/widget/search_error_view.dart';
+import 'package:clinic_app/features/search/presentation/view/widget/search_laoding_widget.dart';
+import 'package:clinic_app/features/search/presentation/view/widget/search_result_view.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +14,7 @@ import '../../../../../core/utils/assets.dart';
 import '../../../../../core/widgets/CustomIcon.dart';
 import '../../../../../core/widgets/app_text_feild.dart';
 import '../../../../../core/widgets/empty_state_widget.dart';
+import '../../domain/model/search_filter.dart';
 import '../cubit/search_cubit.dart';
 import '../../../../../core/utils/enums.dart';
 import '../../../../../core/routes/routes.dart';
@@ -60,7 +64,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 }
 
-// ─── Search Header ────────────────────────────────────────────────────────────
+
 
 class _SearchHeader extends StatelessWidget {
   final TextEditingController controller;
@@ -132,7 +136,7 @@ class _SearchHeader extends StatelessWidget {
   }
 }
 
-// ─── Body ─────────────────────────────────────────────────────────────────────
+
 
 class _SearchBody extends StatelessWidget {
   const _SearchBody();
@@ -142,18 +146,22 @@ class _SearchBody extends StatelessWidget {
     return BlocBuilder<SearchCubit, SearchState>(
       builder: (context, state) => switch (state) {
         SearchInitial() => const _SearchInitialView(),
-        SearchLoading() => const _SearchLoadingView(),
-        SearchLoaded(:final clinics) => _SearchResultsView(clinics: clinics),
+        SearchLoading() => const SearchLoadingView(),
+       // SearchLoaded(:final clinics) => _SearchResultsView(clinics: clinics, loadedState: null,),
+        SearchLoaded(:final allClinics, :final filteredClinics) =>
+        filteredClinics.isEmpty
+            ? const _SearchEmptyView()    // filtered to zero
+            : SearchResultsView(
+          clinics: filteredClinics,   // ← render filtered
+          loadedState: state,         // ← pass for filter bar
+        ),
         SearchEmpty() => const _SearchEmptyView(),
-        SearchError(:final message) => _SearchErrorView(message: message),
+        SearchError(:final message) => SearchErrorView(message: message),
         _ => const SizedBox.shrink(),
       },
     );
   }
 }
-
-// ─── Initial ──────────────────────────────────────────────────────────────────
-
 class _SearchInitialView extends StatelessWidget {
   const _SearchInitialView();
 
@@ -167,70 +175,6 @@ class _SearchInitialView extends StatelessWidget {
     );
   }
 }
-
-// ─── Loading ──────────────────────────────────────────────────────────────────
-
-class _SearchLoadingView extends StatelessWidget {
-  const _SearchLoadingView();
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: EdgeInsets.symmetric(vertical: 8.h),
-      itemCount: 6,
-      itemBuilder: (_, __) => const _ShimmerCard(),
-    );
-  }
-}
-
-class _ShimmerCard extends StatelessWidget {
-  const _ShimmerCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      height: 100.h,
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
-      decoration: BoxDecoration(
-        color: isDark ? ColorsManager.secondaryDarkColor : Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(16.r),
-      ),
-    );
-  }
-}
-
-// ─── Results ──────────────────────────────────────────────────────────────────
-
-class _SearchResultsView extends StatelessWidget {
-  final List<ClinicSummary> clinics;
-  const _SearchResultsView({required this.clinics});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: EdgeInsets.symmetric(vertical: 8.h),
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      itemCount: clinics.length,
-      itemBuilder: (context, index) {
-        final clinic = clinics[index];
-        return ClinicCard(
-          key: ValueKey(clinic.id),
-          clinic: clinic,
-          layout: ClinicCardLayout.list,
-          onTap: () => Navigator.pushNamed(
-            context,
-            Routes.clinicDetails,
-            arguments: clinic.id,
-          ),
-        );
-      },
-    );
-  }
-}
-
-// ─── Empty ────────────────────────────────────────────────────────────────────
-
 class _SearchEmptyView extends StatelessWidget {
   const _SearchEmptyView();
 
@@ -245,21 +189,5 @@ class _SearchEmptyView extends StatelessWidget {
   }
 }
 
-// ─── Error ────────────────────────────────────────────────────────────────────
 
-class _SearchErrorView extends StatelessWidget {
-  final String message;
-  const _SearchErrorView({required this.message});
 
-  @override
-  Widget build(BuildContext context) {
-    return EmptyStateWidget(
-      icon: Icons.wifi_off_rounded,
-      title: 'errors.network.title'.tr(),
-      subtitle: message,
-      enableBackButton: false,   // ← no back button
-      actionLabel: 'common.retry'.tr(),
-      onActionPressed: () => context.read<SearchCubit>().retry(),
-    );
-  }
-}

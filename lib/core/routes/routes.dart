@@ -17,4 +17,6 @@ abstract class Routes {
   static const String bookingDetails = '/booking-details';
   // screens
   static const String search = '/search';
+
+  static const String profile = '/profile';
 }

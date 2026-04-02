@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // Features - Auth
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
+import '../../features/auth/domain/usecases/delete_acount_usecase.dart';
 import '../../features/auth/domain/usecases/login_usecase.dart';
 import '../../features/auth/domain/usecases/logout_usecase.dart';
 import '../../features/auth/domain/usecases/reset_password_usecase.dart';
@@ -61,6 +62,9 @@ import '../../features/home/domain/usecases/get_latest_clinics_usecase.dart';
 import '../../features/home/domain/usecases/location/get_current_location_usecase.dart';
 import '../../features/home/presentation/cubit/home_cubit.dart';
 import '../../features/home/presentation/cubit/home_ui_cubit.dart';
+import '../../features/profile/data/profile_remote_data_source.dart';
+import '../../features/profile/data/profile_repository.dart';
+import '../../features/profile/presentation/cubit/profile_cubit.dart';
 import '../../features/user_data/user_repo.dart';
 import '../api/model/endpoints.dart';
 
@@ -78,7 +82,7 @@ Future<void> init() async {
   setUpClinicModule();
   setUpSearchModule();
   setUpFavouriteModule();
-
+  setUpProfileModule();
   sl.registerLazySingleton(() => UserRepository());
 }
 
@@ -116,6 +120,8 @@ void setUpAuthModule() {
   sl.registerLazySingleton(() => VerifyOtpUseCase(sl()));
   sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
   sl.registerLazySingleton(() => SendForgotPasswordUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteAccountUseCase(sl()));
+
 
   sl.registerFactory(
     () => AuthCubit(
@@ -127,6 +133,7 @@ void setUpAuthModule() {
       logoutUseCase: sl(),
       sendForgotPasswordUseCase: sl(),
       resetPasswordUseCase: sl(),
+      deleteAccountUseCase: sl()
     ),
   );
 }
@@ -275,4 +282,12 @@ void setUpFavouriteModule() {
       userRepository: sl(),
     ),
   );
+}
+void setUpProfileModule() {
+  sl.registerLazySingleton(() => ProfileRemoteDataSource(sl()));
+  sl.registerLazySingleton(() => ProfileRepository(sl()));
+  sl.registerFactory(() => ProfileCubit(
+    repository: sl(),
+    userRepository: sl(),
+  ));
 }

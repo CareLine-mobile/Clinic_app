@@ -24,18 +24,18 @@ class DioApiService extends BaseApiServices {
       ),
     );
     // Add pretty logger to debug responses
-    // _dio.interceptors.add(
-    //   PrettyDioLogger(
-    //     requestHeader: true,
-    //     requestBody: true,
-    //   //  responseBody: true,
-    //   //  responseHeader: false,
-    //     error: true,
-    //     compact: true,
-    //     maxWidth: 90,
-    //   ),
-    // );
-    _dio.interceptors.add(CustomLoggerInterceptor());
+    _dio.interceptors.add(
+      PrettyDioLogger(
+        requestHeader: true,
+        requestBody: true,
+      //  responseBody: true,
+      //  responseHeader: false,
+        error: true,
+        compact: true,
+        maxWidth: 90,
+      ),
+    );
+    //_dio.interceptors.add(CustomLoggerInterceptor());
   }
 
   @override

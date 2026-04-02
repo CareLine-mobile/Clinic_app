@@ -11,6 +11,8 @@ class Endpoints {
   static const String resendOTP = '/auth/resend-otp';
   static const String resetPassword = '/auth/resend-otp';
   static const String sendForgetPassword = '/auth/resend-otp';
+  static const String deleteAccount = '/auth/delete-account';
+
 
   // Clinics
   static const String allClinics = '/clinicals';
@@ -29,6 +31,6 @@ class Endpoints {
   static String createReview(int clinicId) => '/clinicals/$clinicId/reviews';
 
   // Profile
-  static const String profile = '/profile';
-  static const String updateProfile = '/profile/update';
+
+  static const String profile = '/auth/patient/profile';
 }

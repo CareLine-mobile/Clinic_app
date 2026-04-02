@@ -174,4 +174,11 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> logout() async {
     await apiServices.request(method: HttpMethod.post, url: Endpoints.logout);
   }
+
+  @override
+  Future<void> deleteAccount() async{
+    await Future.delayed(const Duration(seconds: 4));
+    await apiServices.request(method: HttpMethod.delete, url: Endpoints.deleteAccount);
+  }
+
 }

@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../../core/utils/debouncer.dart';
 import '../../../home/domain/entities/clinic_summary.dart';
+import '../../domain/model/search_filter.dart';
 import '../../domain/usecases/search_clinics_usecase.dart';
 
 part 'search_state.dart';
@@ -11,6 +12,7 @@ part 'search_state.dart';
 class SearchCubit extends Cubit<SearchState> {
   final SearchClinicsUseCase searchClinicsUseCase;
   final Debouncer _debouncer;
+  String _lastQuery = '';
 
   SearchCubit({
     required this.searchClinicsUseCase,
@@ -18,7 +20,6 @@ class SearchCubit extends Cubit<SearchState> {
   })  : _debouncer = debouncer ?? Debouncer(),
         super(const SearchInitial());
 
-  // ─── Called on every keystroke ────────────────────────────────────────
   void onSearchQueryChanged(String query) {
     final trimmed = query.trim();
     _lastQuery = trimmed;
@@ -28,35 +29,51 @@ class SearchCubit extends Cubit<SearchState> {
       emit(const SearchInitial());
       return;
     }
-
-
     _debouncer(() => _search(trimmed));
   }
 
   Future<void> _search(String query) async {
     if (isClosed) return;
-
-    // حطينا الـ Loading هنا! (هتظهر بس لما الـ 600ms يخلصوا ونقرر نكلم السيرفر)
     emit(const SearchLoading());
 
     final result = await searchClinicsUseCase(query: query);
-
     if (isClosed) return;
 
     result.fold(
           (failure) => emit(SearchError(failure.message)),
           (clinics) => clinics.isEmpty
           ? emit(const SearchEmpty())
-          : emit(SearchLoaded(clinics)),
+          : emit(SearchLoaded.fromClinics(clinics)),  // ← clean factory
     );
   }
 
-  // ─── Retry بنفس الـ query الأخير ─────────────────────────────────────
-  String _lastQuery = '';
+  // ─── Filter actions ───────────────────────────────────────────────────
+
+  /// Toggle isOpen filter
+  void toggleIsOpen(bool? value) => _updateFilter(
+        (f) => f.copyWith(isOpen: value),
+  );
+
+  /// Set minimum rating (pass null to clear)
+  void setMinRating(double? rating) => _updateFilter(
+        (f) => f.copyWith(minRating: rating),
+  );
+
+  /// Clear all filters at once
+  void clearFilters() => _updateFilter((_) => const SearchFilter.empty());
+
+  // 🔮 Future: void setPriceRange(RangeValues? range) => _updateFilter(
+  //       (f) => f.copyWith(priceRange: range),
+  //     );
+
+  void _updateFilter(SearchFilter Function(SearchFilter) updater) {
+    final current = state;
+    if (current is! SearchLoaded) return;
+    emit(current.withFilter(updater(current.filter)));
+  }
 
   void retry() {
     if (_lastQuery.isEmpty) return;
-    emit(const SearchLoading());
     _search(_lastQuery);
   }
 
