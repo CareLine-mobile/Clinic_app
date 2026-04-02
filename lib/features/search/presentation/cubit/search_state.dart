@@ -52,6 +52,19 @@ final class SearchLoaded extends SearchState {
     );
   }
 
+  SearchLoaded copyWith({
+    List<ClinicSummary>? allClinics,
+    List<ClinicSummary>? filteredClinics,
+    SearchFilter? filter,
+    List<double>? availableRatings,
+  }) {
+    return SearchLoaded(
+      allClinics: allClinics ?? this.allClinics,
+      filteredClinics: filteredClinics ?? this.filteredClinics,
+      filter: filter ?? this.filter,
+      availableRatings: availableRatings ?? this.availableRatings,
+    );
+  }
   @override
   List<Object?> get props => [allClinics, filteredClinics, filter, availableRatings];
 }

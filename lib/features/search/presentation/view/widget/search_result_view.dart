@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/routes/routes.dart';
@@ -32,6 +33,7 @@ class SearchResultsView extends StatelessWidget {
                 onTap: () => Navigator.pushNamed(
                   context, Routes.clinicDetails, arguments: clinic.id,
                 ),
+                onFavoriteToggle:()=> context.read<SearchCubit>().toggleFavorite(clinic.id),
               );
             },
           ),

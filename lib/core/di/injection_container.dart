@@ -236,7 +236,7 @@ void setUpClinicModule() {
 void setUpSearchModule() {
 // Search feature
 // 1. Cubit
-  sl.registerFactory(() => SearchCubit(searchClinicsUseCase: sl()));
+  sl.registerFactory(() => SearchCubit(searchClinicsUseCase: sl(),favouriteRepository: sl(),toggleFavouriteUseCase: sl()));
 
   // 2. UseCase
   sl.registerLazySingleton(() => SearchClinicsUseCase(sl()));
