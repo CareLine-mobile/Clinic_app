@@ -63,6 +63,14 @@
       "no_bookings_subtitle": "You currently have no confirmed bookings"
     }
   },
+  "favorites": {
+    "title": "My Favorites",
+    "empty_title": "No Favorites",
+    "empty_subtitle": "You haven't added any clinics to your favorites yet",
+    "find_clinic": "Find a Clinic",
+    "retry": "Try Again",
+    "remove": "Remove from Favorites"
+  },
   "bookings": {
     "title": "My Bookings",
     "auth_required_title": "Login Required",

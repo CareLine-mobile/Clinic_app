@@ -53,9 +53,11 @@ class _DashBoardScreenState extends State<DashBoardScreen>
   final List<String> _icons = [
     Assets.homeIcon,
     Assets.searchIcon,
+    Assets.favouriteIcon,
     Assets.myBookingIcon,
     Assets.settingIcon,
-    'assets/icons/favourite-heart2.svg',
+
+
   ];
 
   // ── Lifecycle ────────────────────────────────────────────
@@ -70,9 +72,10 @@ class _DashBoardScreenState extends State<DashBoardScreen>
         create: (_) => sl<SearchCubit>(),
         child: const SearchScreen(),
       ),
+      const FavouritesScreen(),
       const BookingListScreen(),
       const SettingsTabScreen(),
-      const FavouritesScreen(),
+
     ];
 
     // Check after first frame so context is ready

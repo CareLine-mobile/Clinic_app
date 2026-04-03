@@ -1,10 +1,13 @@
 import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/core/theme/colors.dart';
 import 'package:clinic_app/core/utils/enums.dart';
+import 'package:clinic_app/core/widgets/custom_app_bar.dart';
 import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
+import 'package:clinic_app/core/widgets/empty_state_widget.dart';
 import 'package:clinic_app/core/widgets/error_state_widget.dart';
 import 'package:clinic_app/features/clinic_details/presentation/view/clinic_details_screen.dart';
 import 'package:clinic_app/features/home/domain/entities/clinic_summary.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -52,7 +55,12 @@ class _FavouritesBody extends StatelessWidget {
             child: CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
-                _AppBar(),
+               SliverToBoxAdapter(
+                 child: CustomAppBar(
+                   title: 'bookings.title'.tr(),
+                   showBackIcon: false,
+                 ),
+               ),
                 _bodySliver(context, state),  // No RefreshIndicator here anymore
               ],
             ),
@@ -67,7 +75,14 @@ class _FavouritesBody extends StatelessWidget {
         child: Center(child: CircularProgressIndicator()),
       ),
       FavouriteUnauthenticated() => SliverFillRemaining(
-        child: _UnauthenticatedView(),
+        child: EmptyStateWidget(
+          icon: Icons.lock_outline_rounded,
+          title: 'bookings.auth_required_title'.tr(),
+          subtitle: 'bookings.auth_required_subtitle'.tr(),
+          enableBackButton: false,
+          actionLabel: 'auth.login'.tr(),
+          onActionPressed: () => Navigator.pushNamed(context, Routes.auth),
+        ),
       ),
       FavouriteEmpty() => SliverFillRemaining(
         child: _EmptyView(),
@@ -84,45 +99,6 @@ class _FavouritesBody extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-
-class _AppBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return SliverAppBar(
-      pinned: true,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      surfaceTintColor: Colors.transparent,
-      elevation: 0,
-      centerTitle: true,
-      title: Text(
-        'المفضلة',
-        style: Theme.of(context)
-            .textTheme
-            .titleLarge
-            ?.copyWith(fontWeight: FontWeight.bold),
-      ),
-      actions: [
-        BlocBuilder<FavouriteCubit, FavouriteState>(
-          builder: (context, state) {
-            if (state is! FavouriteLoaded) return const SizedBox.shrink();
-            return Padding(
-              padding: EdgeInsets.only(left: 16.w),
-              child: Center(
-                child: Text(
-                  '${state.clinics.length} عيادة',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).hintColor,
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-}
 
 // ─────────────────────────────────────────────────────────────
 
@@ -169,87 +145,13 @@ class _ClinicListSliver extends StatelessWidget {
 class _EmptyView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(32.r),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.favorite_border_rounded,
-                size: 80.r, color: Colors.grey[300]),
-            SizedBox(height: 16.h),
-            Text(
-              'لا توجد عيادات مفضلة',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.grey[600],
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              'اضغط على قلب أي عيادة لإضافتها للمفضلة',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: Colors.grey[500]),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-
-class _UnauthenticatedView extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(32.r),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.lock_outline_rounded,
-              size: 80.r,
-              color: ColorsManager.primaryColor.withOpacity(0.4),
-            ),
-            SizedBox(height: 16.h),
-            Text(
-              'يرجى تسجيل الدخول',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              'سجل دخولك لعرض عياداتك المفضلة وإدارتها',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: Colors.grey[500]),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 28.h),
-            ElevatedButton(
-              onPressed: () =>
-                  Navigator.pushNamed(context, Routes.auth),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 48.w, vertical: 14.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text('تسجيل الدخول'),
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateWidget(
+      icon: Icons.favorite,
+      title: 'favorites.empty_title'.tr(),
+      subtitle: 'favorites.empty_subtitle'.tr(),
+      enableBackButton: false,
+      actionLabel: 'favorites.find_clinic'.tr(),
+      onActionPressed: () => Navigator.pushNamed(context, Routes.dashBoard),
     );
   }
 }

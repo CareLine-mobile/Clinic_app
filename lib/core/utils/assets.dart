@@ -10,6 +10,7 @@ class Assets {
   static const String favIcon = 'assets/icons/heart_Pop.json';
   // NavBar Icon
   static const String settingIcon = 'assets/icons/settings_icon.svg';
+  static const String favouriteIcon = 'assets/icons/favourite-heart2.svg';
   static const String searchIcon = 'assets/icons/search-normal.svg';
   // auth
   static const String verifiedIcon = 'assets/icons/verified.svg';
