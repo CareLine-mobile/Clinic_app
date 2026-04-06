@@ -71,8 +71,9 @@ class ErrorStateWidget extends StatelessWidget {
                 icon: const Icon(Icons.refresh),
                 label: Text(actionLabel),
                 style: ElevatedButton.styleFrom(
+                  iconColor: ColorsManager.defaultSurface,
                   padding: EdgeInsets.symmetric(
-                    horizontal: sizeH.s40,
+                    horizontal: sizeH.s32,
                     vertical: sizeV.s14,
                   ),
                 ),
