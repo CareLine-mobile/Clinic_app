@@ -224,6 +224,59 @@
       "min_rating": "Min Rating"
     }
   },
+  "settings": {
+    "guest": {
+      "title": "Welcome, Guest",
+      "subtitle": "Sign in to access all features"
+    },
+    "sections": {
+      "account": "Account",
+      "preferences": "Preferences",
+      "support": "Support",
+      "legal": "Legal"
+    },
+    "account": {
+      "profile": "Profile",
+      "profile_sub": "View and edit your information",
+      "change_password": "Change Password",
+      "change_password_sub": "Update your password",
+      "bookings": "My Bookings",
+      "bookings_sub": "Manage your appointments"
+    },
+    "preferences": {
+      "notifications": "Notifications",
+      "notifications_sub": "Manage app notifications",
+      "language": "Language",
+      "arabic": "العربية",
+      "english": "English",
+      "choose_language": "Choose Language",
+      "dark_mode": "Dark Mode",
+      "dark_on": "Enabled",
+      "dark_off": "Disabled"
+    },
+    "support": {
+      "help": "Help Center",
+      "help_sub": "FAQs and support",
+      "contact": "Contact Us",
+      "contact_sub": "Reach our support team",
+      "rate": "Rate the App",
+      "rate_sub": "Share your feedback"
+    },
+    "legal": {
+      "terms": "Terms & Conditions",
+      "terms_sub": "App usage terms",
+      "privacy": "Privacy Policy",
+      "privacy_sub": "How we protect your data",
+      "about": "About",
+      "version": "Version 1.0.0",
+      "delete_account": "Delete Account",
+      "delete_account_sub": "Terms and conditions apply",
+      "delete_confirm": "Are you sure you want to delete your account? This action cannot be undone.",
+      "delete_yes": "Yes, Delete"
+    },
+    "logout": "Log Out",
+    "logout_confirm": "Are you sure you want to log out?"
+  },
   "validation": {
     "emailRequired": "Email is required",
     "emailInvalid": "Invalid email format",

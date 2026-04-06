@@ -1,10 +1,14 @@
 import 'package:clinic_app/core/theme/colors.dart';
+import 'package:clinic_app/core/utils/assets.dart'; // Ensure Assets.errorServerIcon is here
+import 'package:clinic_app/core/widgets/custom_lottie_icon.dart';
 import 'package:flutter/material.dart';
 import '../errors/failure_message_mapper.dart';
 import '../errors/failures.dart';
 import '../utils/enums.dart';
 import '../utils/app_size.dart';
 
+// Assuming CustomLottieIcon is imported here or in the same file
+// import 'package:clinic_app/widgets/custom_lottie_icon.dart';
 
 class ErrorStateWidget extends StatelessWidget {
   final Failure failure;
@@ -37,68 +41,76 @@ class ErrorStateWidget extends StatelessWidget {
       )
           : null,
       body: Center(
-        child: Padding(
-          padding: EdgeInsets.all(sizeH.s32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                _getIconForErrorType(errorType),
-                size: 80,
-                color: _getColorForErrorType(errorType),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Replaced the Icon() widget with our dynamic widget builder
+            _buildErrorVisual(errorType),
+
+            SizedBox(height: sizeV.s24),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[800],
               ),
-              SizedBox(height: sizeV.s24),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[800],
-                ),
-                textAlign: TextAlign.center,
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: sizeV.s12),
+            Text(
+              subtitle,
+              maxLines: 2,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: ColorsManager.miscellaneous,
               ),
-              SizedBox(height: sizeV.s12),
-              Text(
-                subtitle,
-                maxLines: 2,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: ColorsManager.miscellaneous,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: sizeV.s32),
-              ElevatedButton.icon(
-                onPressed: onRetry,
-                icon: const Icon(Icons.refresh),
-                label: Text(actionLabel),
-                style: ElevatedButton.styleFrom(
-                  iconColor: ColorsManager.defaultSurface,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: sizeH.s32,
-                    vertical: sizeV.s14,
-                  ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: sizeV.s32),
+            ElevatedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: Text(actionLabel),
+              style: ElevatedButton.styleFrom(
+                iconColor: ColorsManager.defaultSurface,
+                padding: EdgeInsets.symmetric(
+                  horizontal: sizeH.s32,
+                  vertical: sizeV.s14,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  IconData _getIconForErrorType(ErrorType type) {
+  // Helper method that returns a Widget instead of IconData
+  Widget _buildErrorVisual(ErrorType type) {
+    final color = _getColorForErrorType(type);
+    const double iconSize = 80.0;
+    const double lottiSize = 180.0;
+
     switch (type) {
-      case ErrorType.network:
-        return Icons.wifi_off;
       case ErrorType.server:
-        return Icons.error_outline;
+        return const CustomLottieIcon(
+          assetPath: Assets.errorServerIcon,
+          width: lottiSize,
+          height: lottiSize,
+        );
+      case ErrorType.network:
+        return const CustomLottieIcon(
+          assetPath: Assets.errorConnectionIcon,
+          width: lottiSize,
+          height: iconSize,
+        );
       case ErrorType.auth:
-        return Icons.lock_outline;
+        return Icon(Icons.lock_outline, size: iconSize, color: color);
       case ErrorType.cache:
-        return Icons.storage;
+        return Icon(Icons.storage, size: iconSize, color: color);
       case ErrorType.validation:
-        return Icons.warning_amber;
+        return Icon(Icons.warning_amber, size: iconSize, color: color);
       case ErrorType.unknown:
-        return Icons.error_outline;
+      return Icon(Icons.error_outline, size: iconSize, color: color);
     }
   }
 

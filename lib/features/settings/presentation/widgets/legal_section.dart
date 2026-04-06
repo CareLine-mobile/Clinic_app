@@ -1,94 +1,89 @@
-import 'package:clinic_app/core/routes/routes.dart';
-import 'package:clinic_app/core/widgets/confirmation_dialog.dart';
-import 'package:clinic_app/features/home/presentation/widget/clinical_refresh_indicator.dart';
-import 'package:clinic_app/features/settings/presentation/widgets/settings_card.dart';
-import 'package:clinic_app/features/settings/presentation/widgets/settings_item.dart';
-import 'package:clinic_app/features/settings/presentation/widgets/settings_section.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import '../../../../core/routes/routes.dart';
 import '../../../../core/utils/app_size.dart';
+import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../../../core/widgets/custom_snack_bar.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
+import 'settings_card.dart';
+import 'settings_item.dart';
+import 'settings_section.dart';
 
 class LegalSection extends StatelessWidget {
   const LegalSection({super.key});
-  void closeDialog(BuildContext context) {
-    Navigator.of(context).pop();
-  }
+
   @override
   Widget build(BuildContext context) {
-    final vSize = AppSizeVertical.instance;
-
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
-          if (state is DeleteAccountSuccess) {
-            closeDialog(context);
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              Routes.auth,
-                  (route) => false,
-            );
-          }
-          if (state is DeleteAccountFailure) {
-            closeDialog(context);
-            CustomSnackBar.show(
-              context,
-              message: state.message,
-              type: SnackBarType.error,
-            );
-          }
-          if (state is DeleteAccountLoading) {
-            AppDialog.warning(context: context, message: 'جاري المسح');
-          }
+        if (state is DeleteAccountSuccess) {
+          Navigator.pushNamedAndRemoveUntil(
+            context, Routes.auth, (_) => false,
+          );
+        }
+        if (state is DeleteAccountFailure) {
+          CustomSnackBar.show(
+            context,
+            message: state.message,
+            type: SnackBarType.error,
+          );
+        }
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SettingsSection(title: 'القانونية'),
-          SizedBox(height: vSize.s12),
+          SettingsSection(title: 'settings.sections.legal'.tr()),
           SettingsCard(
             children: [
               SettingsItem(
                 icon: Icons.description_outlined,
-                title: 'الشروط والأحكام',
-                subtitle: 'شروط استخدام التطبيق',
+                title: 'settings.legal.terms'.tr(),
+                subtitle: 'settings.legal.terms_sub'.tr(),
                 onTap: () {},
               ),
-              const Divider(height: 1, thickness: 1),
+              _divider(),
               SettingsItem(
                 icon: Icons.privacy_tip_outlined,
-                title: 'سياسة الخصوصية',
-                subtitle: 'كيف نحمي بياناتك',
+                title: 'settings.legal.privacy'.tr(),
+                subtitle: 'settings.legal.privacy_sub'.tr(),
                 onTap: () {},
               ),
-              const Divider(height: 1, thickness: 1),
+              _divider(),
               SettingsItem(
-                icon: Icons.info_outline,
-                title: 'حول التطبيق',
-                subtitle: 'الإصدار 1.0.0',
+                icon: Icons.info_outline_rounded,
+                title: 'settings.legal.about'.tr(),
+                subtitle: 'settings.legal.version'.tr(),
                 onTap: () {},
               ),
-              const Divider(height: 1, thickness: 1),
+              _divider(),
+              // ─── Delete account — red icon ──────────────────────
               SettingsItem(
-                icon: Icons.delete,
-                title: 'مسح الحساب ',
-                subtitle: 'تتطبق الشروط والاحكام',
-                onTap: () {
-                  AppDialog.warning(context: context,
-                      message: 'هل انت متأكد من انك تريد حذف حسابك',
-                      onConfirm: () {
-                       context.read<AuthCubit>().deleteAccount();
-                      },
-                      confirmText: 'تأكيد');
-                },
-              )
+                icon: Icons.delete_outline_rounded,
+                iconColor: const Color(0xFFC62828),
+                iconBgColor: const Color(0xFFFFEBEE),
+                title: 'settings.legal.delete_account'.tr(),
+                subtitle: 'settings.legal.delete_account_sub'.tr(),
+                onTap: () => _confirmDelete(context),
+              ),
             ],
           ),
         ],
       ),
+    );
+  }
+
+  Widget _divider() => const Divider(height: 1, thickness: 1, indent: 68);
+
+  void _confirmDelete(BuildContext context) {
+    final cubit = context.read<AuthCubit>();
+    AppDialog.warning(
+      context: context,
+      title: 'settings.legal.delete_account'.tr(),
+      message: 'settings.legal.delete_confirm'.tr(),
+      confirmText: 'settings.legal.delete_yes'.tr(),
+      onConfirm: cubit.deleteAccount,
     );
   }
 }

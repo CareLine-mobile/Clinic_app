@@ -1,33 +1,28 @@
+import 'package:clinic_app/core/theme/colors.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/utils/app_size.dart';
 
 class SettingsCard extends StatelessWidget {
   final List<Widget> children;
 
-  const SettingsCard({
-    Key? key,
-    required this.children,
-  }) : super(key: key);
+  const SettingsCard({Key? key, required this.children}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? Colors.grey[850] : Colors.white,
-        borderRadius: BorderRadius.circular(SizeApp.s16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: isDark ? ColorsManager.secondaryDarkColor : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withOpacity(0.06)
+              : Colors.black.withOpacity(0.06),
+          width: 1,
+        ),
       ),
-      child: Column(
-        children: children,
-      ),
+      child: Column(children: children),
     );
   }
 }

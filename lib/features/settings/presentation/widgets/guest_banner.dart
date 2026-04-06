@@ -1,7 +1,5 @@
-
-import 'package:flutter/cupertino.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-
 import '../../../../core/theme/colors.dart';
 import '../../../../core/utils/app_size.dart';
 
@@ -10,46 +8,59 @@ class GuestBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vSize = AppSizeVertical.instance;
-    final hSize = AppSizeHorizontal.instance;
+    final v = AppSizeVertical.instance;
+    final h = AppSizeHorizontal.instance;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: hSize.s16,
-        vertical: vSize.s24,
-      ),
-      padding: EdgeInsets.all(hSize.s20),
+      margin: EdgeInsets.fromLTRB(h.s16, v.s60, h.s16, v.s8),
+      padding: EdgeInsets.all(h.s20),
       decoration: BoxDecoration(
-        color: ColorsManager.primaryColor.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ColorsManager.primaryColor.withOpacity(0.2)),
+        // ─── No heavy shadow, just a subtle border ──────────────
+        color: isDark ? ColorsManager.secondaryDarkColor : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withOpacity(0.07)
+              : ColorsManager.primaryColor.withOpacity(0.12),
+        ),
       ),
       child: Row(
         children: [
+          // ─── Avatar placeholder ───────────────────────────────
           Container(
-            padding: EdgeInsets.all(hSize.s12),
+            width: h.s50,
+            height: h.s50,
             decoration: BoxDecoration(
-              color: ColorsManager.primaryColor.withOpacity(0.15),
+              color: ColorsManager.primaryColor.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.person_outline, size: 32),
+            child: Icon(
+              Icons.person_outline_rounded,
+              color: ColorsManager.primaryColor,
+              size: h.s24,
+            ),
           ),
-          SizedBox(width: hSize.s16),
+          SizedBox(width: h.s14),
+
+          // ─── Text ─────────────────────────────────────────────
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'أهلاً بك كزائر',
-                  style: theme.textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  'settings.guest.title'.tr(),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                SizedBox(height: vSize.s4),
+                SizedBox(height: v.s4),
                 Text(
-                  'سجّل دخولك للاستفادة من كافة الخدمات',
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: theme.hintColor),
+                  'settings.guest.subtitle'.tr(),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.hintColor,
+                  ),
                 ),
               ],
             ),

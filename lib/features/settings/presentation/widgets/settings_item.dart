@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theme/colors.dart';
 import '../../../../core/utils/app_size.dart';
 
@@ -10,6 +9,8 @@ class SettingsItem extends StatelessWidget {
   final VoidCallback? onTap;
   final Widget? trailing;
   final bool showArrow;
+  final Color? iconColor;
+  final Color? iconBgColor;
 
   const SettingsItem({
     Key? key,
@@ -19,72 +20,80 @@ class SettingsItem extends StatelessWidget {
     this.onTap,
     this.trailing,
     this.showArrow = true,
+    this.iconColor,
+    this.iconBgColor,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final v = AppSizeVertical.instance;
+    final h = AppSizeHorizontal.instance;
+    final t = TextSizeApp.instance;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(SizeApp.s16),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: SizeApp.s16,
-          vertical: SizeApp.s12,
-        ),
-        child: Row(
-          children: [
-            // Icon Container
-            Container(
-              width: 40.w,
-              height: 40.w,
-              decoration: BoxDecoration(
-                color: ColorsManager.primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(SizeApp.s12),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: h.s16,
+            vertical: v.s12,
+          ),
+          child: Row(
+            children: [
+              // ─── Icon ──────────────────────────────────────────
+              Container(
+                width: h.s40,
+                height: h.s40,
+                decoration: BoxDecoration(
+                  color: iconBgColor ??
+                      (iconColor ?? ColorsManager.primaryColor)
+                          .withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  size: t.s18,
+                  color: iconColor ?? ColorsManager.primaryColor,
+                ),
               ),
-              child: Icon(
-                icon,
-                size: SizeApp.s20,
-                color: ColorsManager.primaryColor,
-              ),
-            ),
-            SizedBox(width: SizeApp.s12),
+              SizedBox(width: h.s12),
 
-            // Title & Subtitle
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+              // ─── Text ──────────────────────────────────────────
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: SizeApp.s4),
-                  Text(
-                    subtitle,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: isDark ? Colors.grey[400] : Colors.grey[600],
-                      fontSize: SizeApp.s12,
+                    SizedBox(height: v.s2),
+                    Text(
+                      subtitle,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.hintColor,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            // Trailing Widget
-            if (trailing != null)
-              trailing!
-            else if (showArrow)
-              Icon(
-                Icons.chevron_right,
-                color: isDark ? Colors.grey[400] : Colors.grey[400],
-                size: SizeApp.s20,
-              ),
-          ],
+              // ─── Trailing ──────────────────────────────────────
+              if (trailing != null)
+                trailing!
+              else if (showArrow)
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: theme.hintColor.withOpacity(0.4),
+                  size: TextSizeApp.instance.s20,
+                ),
+            ],
+          ),
         ),
       ),
     );

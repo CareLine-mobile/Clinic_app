@@ -223,6 +223,59 @@
       "closed": "مغلق",
       "min_rating": "الحد الأدنى للتقييم"
   }},
+  "settings": {
+    "guest": {
+      "title": "أهلاً بك كزائر",
+      "subtitle": "سجّل دخولك للاستفادة من كافة الخدمات"
+    },
+    "sections": {
+      "account": "الحساب",
+      "preferences": "التفضيلات",
+      "support": "الدعم والمساعدة",
+      "legal": "القانونية"
+    },
+    "account": {
+      "profile": "الملف الشخصي",
+      "profile_sub": "عرض وتعديل معلوماتك",
+      "change_password": "تغيير كلمة المرور",
+      "change_password_sub": "تحديث كلمة المرور",
+      "bookings": "حجوزاتي",
+      "bookings_sub": "إدارة مواعيدك"
+    },
+    "preferences": {
+      "notifications": "الإشعارات",
+      "notifications_sub": "إدارة إشعارات التطبيق",
+      "language": "اللغة",
+      "arabic": "العربية",
+      "english": "English",
+      "choose_language": "اختر اللغة",
+      "dark_mode": "الوضع الداكن",
+      "dark_on": "مفعّل",
+      "dark_off": "غير مفعّل"
+    },
+    "support": {
+      "help": "مركز المساعدة",
+      "help_sub": "الأسئلة الشائعة والدعم",
+      "contact": "تواصل معنا",
+      "contact_sub": "اتصل بفريق الدعم",
+      "rate": "قيّم التطبيق",
+      "rate_sub": "شاركنا رأيك"
+    },
+    "legal": {
+      "terms": "الشروط والأحكام",
+      "terms_sub": "شروط استخدام التطبيق",
+      "privacy": "سياسة الخصوصية",
+      "privacy_sub": "كيف نحمي بياناتك",
+      "about": "حول التطبيق",
+      "version": "الإصدار 1.0.0",
+      "delete_account": "حذف الحساب",
+      "delete_account_sub": "تطبق الشروط والأحكام",
+      "delete_confirm": "هل أنت متأكد من حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء.",
+      "delete_yes": "نعم، احذف"
+    },
+    "logout": "تسجيل الخروج",
+    "logout_confirm": "هل أنت متأكد من تسجيل الخروج؟"
+  },
   "validation": {
     "emailRequired": "البريد الإلكتروني مطلوب",
     "emailInvalid": "صيغة البريد الإلكتروني غير صحيحة",

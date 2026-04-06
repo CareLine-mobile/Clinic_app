@@ -1,27 +1,26 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/colors.dart';
 import '../../../../core/utils/app_size.dart';
 
 class SettingsSection extends StatelessWidget {
   final String title;
-
-  const SettingsSection({
-    Key? key,
-    required this.title,
-  }) : super(key: key);
+  const SettingsSection({Key? key, required this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: SizeApp.s4),
+      padding: EdgeInsets.only(
+        right: AppSizeHorizontal.instance.s4,
+        left: AppSizeHorizontal.instance.s4,
+        bottom: AppSizeVertical.instance.s8,
+      ),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.bold,
-          fontSize: SizeApp.s16,
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white
-              : ColorsManager.defaultText,
+        style: theme.textTheme.bodySmall?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: theme.hintColor,
+          letterSpacing: 0.5,
         ),
       ),
     );

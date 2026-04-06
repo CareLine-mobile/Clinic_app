@@ -1,42 +1,39 @@
-import 'package:clinic_app/features/settings/presentation/widgets/settings_card.dart';
-import 'package:clinic_app/features/settings/presentation/widgets/settings_item.dart';
-import 'package:clinic_app/features/settings/presentation/widgets/settings_section.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-
 import '../../../../core/utils/app_size.dart';
+import 'settings_card.dart';
+import 'settings_item.dart';
+import 'settings_section.dart';
 
 class SupportSection extends StatelessWidget {
-  const SupportSection();
+  const SupportSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final vSize = AppSizeVertical.instance;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SettingsSection(title: 'الدعم والمساعدة'),
-        SizedBox(height: vSize.s12),
+        SettingsSection(title: 'settings.sections.support'.tr()),
         SettingsCard(
           children: [
             SettingsItem(
-              icon: Icons.help_outline,
-              title: 'مركز المساعدة',
-              subtitle: 'الأسئلة الشائعة والدعم',
+              icon: Icons.help_outline_rounded,
+              title: 'settings.support.help'.tr(),
+              subtitle: 'settings.support.help_sub'.tr(),
               onTap: () {},
             ),
-            const Divider(height: 1, thickness: 1),
+            _divider(),
             SettingsItem(
               icon: Icons.phone_outlined,
-              title: 'تواصل معنا',
-              subtitle: 'اتصل بفريق الدعم',
+              title: 'settings.support.contact'.tr(),
+              subtitle: 'settings.support.contact_sub'.tr(),
               onTap: () {},
             ),
-            const Divider(height: 1, thickness: 1),
+            _divider(),
             SettingsItem(
-              icon: Icons.star_outline,
-              title: 'قيم التطبيق',
-              subtitle: 'شاركنا رأيك',
+              icon: Icons.star_outline_rounded,
+              title: 'settings.support.rate'.tr(),
+              subtitle: 'settings.support.rate_sub'.tr(),
               onTap: () {},
             ),
           ],
@@ -44,4 +41,6 @@ class SupportSection extends StatelessWidget {
       ],
     );
   }
+
+  Widget _divider() => const Divider(height: 1, thickness: 1, indent: 68);
 }
