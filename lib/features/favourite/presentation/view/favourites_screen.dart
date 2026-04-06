@@ -57,7 +57,7 @@ class _FavouritesBody extends StatelessWidget {
               slivers: [
                SliverToBoxAdapter(
                  child: CustomAppBar(
-                   title: 'bookings.title'.tr(),
+                   title: 'favorites.title'.tr(),
                    showBackIcon: false,
                  ),
                ),
