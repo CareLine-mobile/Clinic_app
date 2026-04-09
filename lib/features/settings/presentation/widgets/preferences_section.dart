@@ -8,6 +8,16 @@ import 'settings_card.dart';
 import 'settings_item.dart';
 import 'settings_section.dart';
 
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/theme/colors.dart';
+import '../../../../core/utils/app_size.dart';
+import '../cubit/settings_cubit.dart';
+import 'settings_card.dart';
+import 'settings_item.dart';
+import 'settings_section.dart';
+
 class PreferencesSection extends StatelessWidget {
   const PreferencesSection({super.key});
 
@@ -15,7 +25,30 @@ class PreferencesSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final v = AppSizeVertical.instance;
 
-    return BlocBuilder<SettingsCubit, SettingsState>(
+    return BlocConsumer<SettingsCubit, SettingsState>(
+      // Only rebuild when these specific fields change
+      buildWhen: (prev, curr) =>
+      prev.notificationsEnabled != curr.notificationsEnabled ||
+          prev.notificationsLoading != curr.notificationsLoading ||
+          prev.isDark != curr.isDark ||
+          prev.locale != curr.locale,
+
+      // Show a SnackBar whenever a notification error arrives
+      listenWhen: (prev, curr) =>
+      curr.notificationsError != null &&
+          prev.notificationsError != curr.notificationsError,
+      listener: (context, state) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(state.notificationsError!.tr()),
+              backgroundColor: Colors.redAccent,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+      },
+
       builder: (context, settings) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -29,10 +62,20 @@ class PreferencesSection extends StatelessWidget {
                   title: 'settings.preferences.notifications'.tr(),
                   subtitle: 'settings.preferences.notifications_sub'.tr(),
                   showArrow: false,
-                  trailing: Switch(
+                  trailing: settings.notificationsLoading
+                      ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                      : Switch(
                     value: settings.notificationsEnabled,
-                    onChanged: (_) =>
-                        context.read<SettingsCubit>().toggleNotifications(),
+                    // Disable taps while loading
+                    onChanged: settings.notificationsLoading
+                        ? null
+                        : (_) => context
+                        .read<SettingsCubit>()
+                        .toggleNotifications(),
                     activeColor: ColorsManager.primaryColor,
                   ),
                 ),

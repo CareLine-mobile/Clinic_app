@@ -6,32 +6,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/db/shared_pref_helper.dart';
 import '../../../../core/utils/app_constans.dart';
+import '../../data/setting_repo_impl.dart';
 
 part 'settings_state.dart';
 
 
-/// Manages persisted UI preferences: theme, language, notifications.
-/// Does NOT handle auth — that belongs to AuthCubit.
+
+
 class SettingsCubit extends Cubit<SettingsState> {
-  SettingsCubit()
-      : super(const SettingsState(
-    locale: Locale('ar'),
-    themeMode: ThemeMode.light,
-    notificationsEnabled: true,
-  ));
+  final SettingsRepositoryImpl _settingsRepo;
+
+  SettingsCubit({required SettingsRepositoryImpl settingsRepository})
+      : _settingsRepo = settingsRepository,
+        super(const SettingsState(
+        locale: Locale('ar'),
+        themeMode: ThemeMode.light,
+        notificationsEnabled: false,
+      ));
 
   // ── Init ─────────────────────────────────────────────────────────────────
 
-  /// Call once at startup to restore saved preferences.
   Future<void> loadSettings() async {
-    final savedTheme    = await SharedPrefHelper.getString(key: AppConstants.themeMode);
-    final savedLang     = await SharedPrefHelper.getString(key: AppConstants.languageCode);
-    final savedNotifs   = await SharedPrefHelper.getBool(key: AppConstants.notifications);
+    final savedTheme  = await SharedPrefHelper.getString(key: AppConstants.themeMode);
+    final savedLang   = await SharedPrefHelper.getString(key: AppConstants.languageCode);
+    final savedNotifs = await SharedPrefHelper.getBool(key: AppConstants.notifications);
 
     emit(state.copyWith(
       themeMode: _parseThemeMode(savedTheme),
       locale: savedLang != null ? Locale(savedLang) : const Locale('ar'),
-      notificationsEnabled: savedNotifs ?? true,
+      notificationsEnabled: savedNotifs ?? false,
+      clearError: true,
     ));
   }
 
@@ -48,7 +52,6 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   // ── Language ──────────────────────────────────────────────────────────────
 
-  /// Pass [context] so easy_localization can update the app locale immediately.
   Future<void> changeLanguage(BuildContext context, String languageCode) async {
     final newLocale = Locale(languageCode);
     await context.setLocale(newLocale);
@@ -61,12 +64,65 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   // ── Notifications ─────────────────────────────────────────────────────────
 
+  /// Toggles notifications.
+  ///
+  /// Enabling: requests OS permission → gets FCM token → POSTs to backend.
+  ///   • On success: persists enabled=true, emits enabled state.
+  ///   • On failure: stays disabled, emits error message for the UI to show.
+  ///
+  /// Disabling: simply persists and emits disabled (no API call needed).
   Future<void> toggleNotifications() async {
-    final newValue = !state.notificationsEnabled;
-    emit(state.copyWith(notificationsEnabled: newValue));
+    // Clear any stale error before a new attempt
+    emit(state.copyWith(clearError: true));
+
+    final enabling = !state.notificationsEnabled;
+
+    if (!enabling) {
+      // Turning off — instant, no network
+      await _persistNotifications(false);
+      emit(state.copyWith(notificationsEnabled: false));
+      return;
+    }
+
+    // ── Enabling path ──────────────────────────────────────────────────────
+    emit(state.copyWith(notificationsLoading: true));
+
+    try {
+      final token = await _settingsRepo.requestPermissionAndGetToken();
+
+      if (token == null) {
+        // User denied OS permission
+        emit(state.copyWith(
+          notificationsLoading: false,
+          notificationsEnabled: false,
+          notificationsError: 'settings.notifications.permission_denied',
+        ));
+        return;
+      }
+
+      await _settingsRepo.registerFcmToken(token);
+
+      // ✓ Success
+      await _persistNotifications(true);
+      emit(state.copyWith(
+        notificationsEnabled: true,
+        notificationsLoading: false,
+        clearError: true,
+      ));
+    } catch (_) {
+      // ✗ API failure — revert
+      emit(state.copyWith(
+        notificationsEnabled: false,
+        notificationsLoading: false,
+        notificationsError: 'settings.notifications.registration_failed',
+      ));
+    }
+  }
+
+  Future<void> _persistNotifications(bool value) async {
     await SharedPrefHelper.saveBool(
       key: AppConstants.notifications,
-      value: newValue,
+      value: value,
     );
   }
 

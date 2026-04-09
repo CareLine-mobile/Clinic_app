@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1051363714209",
+    "project_id": "careline-397d7",
+    "storage_bucket": "careline-397d7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1051363714209:android:4cbb6da382ddab97bb3ce0",
+        "android_client_info": {
+          "package_name": "com.careLine.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiv2SvFGnoqv4nPyTQfjc2xWSuTD_MwHo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

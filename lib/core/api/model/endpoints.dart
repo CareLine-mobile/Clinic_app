@@ -33,4 +33,7 @@ class Endpoints {
   // Profile
 
   static const String profile = '/auth/patient/profile';
+  //setting
+  static const String generateFcmToken = '/auth/generate-fcm-token';
+
 }

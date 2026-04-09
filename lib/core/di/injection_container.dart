@@ -65,6 +65,8 @@ import '../../features/home/presentation/cubit/home_ui_cubit.dart';
 import '../../features/profile/data/profile_remote_data_source.dart';
 import '../../features/profile/data/profile_repository.dart';
 import '../../features/profile/presentation/cubit/profile_cubit.dart';
+import '../../features/settings/data/setting_repo_impl.dart';
+import '../../features/settings/presentation/cubit/settings_cubit.dart';
 import '../../features/user_data/user_repo.dart';
 import '../api/model/endpoints.dart';
 
@@ -84,6 +86,11 @@ Future<void> init() async {
   setUpFavouriteModule();
   setUpProfileModule();
   sl.registerLazySingleton(() => UserRepository());
+  // In setUpAuthModule or a new setUpSettingsModule:
+  sl.registerLazySingleton<SettingsRepositoryImpl>(
+        () => SettingsRepositoryImpl(apiServices: sl()),
+  );
+  sl.registerFactory(() => SettingsCubit(settingsRepository: sl()));
 }
 
 void setUpDio() {

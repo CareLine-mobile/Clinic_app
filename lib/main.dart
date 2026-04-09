@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
+import 'core/di/injection_container.dart';
 import 'core/routes/app_routes.dart';
 import 'core/routes/routes.dart';
 import 'core/service/app_initializer.dart';
@@ -47,7 +48,7 @@ class MyApp extends StatelessWidget {
 
         // ── Settings: theme, language, notifications ──────────
         BlocProvider<SettingsCubit>(
-          create: (_) => SettingsCubit()..loadSettings(),
+         create: (_) => SettingsCubit(settingsRepository: sl())..loadSettings(),
         ),
 
 
