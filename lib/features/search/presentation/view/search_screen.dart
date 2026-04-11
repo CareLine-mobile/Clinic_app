@@ -33,9 +33,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
-    });
+
   }
 
   @override
@@ -97,7 +95,7 @@ class _SearchHeader extends StatelessWidget {
           return AppTextFieldFactory.search(
             controller: controller,
             focusNode: focusNode,
-            autofocus: true,
+          //  autofocus: true,
             hintText: 'search.hint'.tr(),
             prefixIcon: Padding(
               padding: EdgeInsets.all(10.r),

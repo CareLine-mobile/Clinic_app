@@ -79,7 +79,7 @@ class HomeCubit extends Cubit<HomeState> {
   // ════════════════════════════════════════════════════════════
   // INIT — same as before + seed repo after load
   // ════════════════════════════════════════════════════════════
-
+  bool _isLoading = false; // ✅ Add this guard
   Future<void> initHome() async {
     emit(HomeLoading());
     await _requestPermissions();
@@ -95,7 +95,7 @@ class HomeCubit extends Cubit<HomeState> {
 
       results[0].fold(
             (f) => failure ??= f,
-            (c) => _featuredClinics = c as List<ClinicSummary>,
+            (c) => _featuredClinics = c,
       );
       results[1].fold(
             (f) => {
@@ -104,12 +104,12 @@ class HomeCubit extends Cubit<HomeState> {
               }
 
             },
-            (c) => _nearbyClinics = c as List<ClinicSummary>,
+            (c) => _nearbyClinics = c,
       );
       results[2].fold(
             (f) => failure ??= f,
             (c) {
-          _allClinics   = c as List<ClinicSummary>;
+          _allClinics   = c;
           _currentPage  = 1;
           _hasMorePages = (c as List).isNotEmpty;
         },
@@ -151,6 +151,8 @@ class HomeCubit extends Cubit<HomeState> {
   // ════════════════════════════════════════════════════════════
 
   Future<void> refresh() async {
+    if (_isLoading) return; // ✅ Prevent duplicate calls
+    _isLoading = true;
     try {
       final results = await Future.wait([
         getLatestClinicsUseCase.call(),
@@ -158,10 +160,10 @@ class HomeCubit extends Cubit<HomeState> {
         getClinicsUseCase.call(page: 1),
       ]);
 
-      results[0].fold((_) {}, (c) => _featuredClinics = c as List<ClinicSummary>);
-      results[1].fold((_) {}, (c) => _nearbyClinics   = c as List<ClinicSummary>);
+      results[0].fold((_) {}, (c) => _featuredClinics = c);
+      results[1].fold((_) {}, (c) => _nearbyClinics   = c );
       results[2].fold((_) {}, (c) {
-        _allClinics   = c as List<ClinicSummary>;
+        _allClinics   = c;
         _currentPage  = 1;
         _hasMorePages = (c as List).isNotEmpty;
       });
@@ -170,6 +172,10 @@ class HomeCubit extends Cubit<HomeState> {
       _emitLoadedState();
     } catch (_) {
       // Keep current state on refresh error
+      _isLoading = false; // ✅ Always reset
+    }
+    finally {
+      _isLoading = false; // ✅ Always reset
     }
   }
 

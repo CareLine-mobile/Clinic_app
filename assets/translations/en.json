@@ -441,5 +441,27 @@
     "messages": {
       "saveSuccess": "Profile saved successfully! 🎉"
     }
+  },
+  "location": {
+    "access_needed": "Location access needed",
+    "enable_manually": "Enable it manually in Settings",
+    "why_we_use": "We use your location only to show nearby clinics.",
+    "open_settings": "Open Settings",
+    "enter_manually": "Enter location manually instead",
+    "steps_title_android": "Android steps",
+    "steps_title_ios": "iOS steps",
+    "android": {
+      "step1": "Tap \"Open Settings\" below",
+      "step2": "Tap Permissions",
+      "step3": "Tap Location",
+      "step4": "Select \"Allow only while using the app\"",
+      "step5": "Come back — we'll detect it automatically"
+    },
+    "ios": {
+      "step1": "Tap \"Open Settings\" below",
+      "step2": "Tap Location",
+      "step3": "Select \"While Using the App\"",
+      "step4": "Come back — we'll detect it automatically"
+    }
   }
 }
