@@ -2,6 +2,7 @@
 // booking_confirmation_page.dart
 // ══════════════════════════════════════════════════════════
 import 'package:clinic_app/core/widgets/app_buton.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -53,17 +54,17 @@ class BookingConfirmationPage extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              const Text(
-                "Confirm Your Booking",
-                style: TextStyle(
+               Text(
+                'booking.confirm_title'.tr(),
+                style:const  TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: ColorsManager.primaryColor,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                "Please review your booking details before confirming.",
+               Text(
+                 'booking.confirm_subtitle'.tr(),
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey),
               ),
@@ -81,31 +82,31 @@ class BookingConfirmationPage extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildRow("Clinic", loaded.clinic.name),
+                    _buildRow('booking.summary.clinic'.tr(), loaded.clinic.name),
                     const Divider(height: 24),
-                    _buildRow("Doctor", loaded.selectedDoctor?.name ?? "—"),
+                    _buildRow('booking.summary.doctor'.tr(), loaded.selectedDoctor?.name ?? "—"),
                     const Divider(height: 24),
-                    _buildRow("Patient", loaded.patientName ?? "—"),
+                    _buildRow('booking.summary.patient'.tr(), loaded.patientName ?? "—"),
                     const Divider(height: 24),
-                    _buildRow("Phone", loaded.patientPhone ?? "—"),
+                    _buildRow('booking.summary.phone'.tr(), loaded.patientPhone ?? "—"),
                     const Divider(height: 24),
                     _buildRow(
-                      "Date",
+                      'booking.summary.date'.tr(),
                       DateFormat('EEE, MMM d yyyy').format(loaded.selectedDate),
                     ),
                     const Divider(height: 24),
-                    _buildRow("Time", loaded.selectedTime ?? "—"),
+                    _buildRow('booking.summary.time'.tr(), loaded.selectedTime ?? "—"),
                     if (loaded.bookingNotes?.isNotEmpty == true) ...[
                       const Divider(height: 24),
-                      _buildRow("Notes", loaded.bookingNotes!),
+                      _buildRow('booking.summary.notes'.tr(), loaded.bookingNotes!),
                     ],
                   ],
                 ),
               ),
 
               const SizedBox(height: 20),
-              const Text(
-                "The clinic will contact you for payment instructions once approved.",
+               Text(
+                'booking.payment_note'.tr(),
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey, fontSize: 12),
               ),
@@ -114,7 +115,7 @@ class BookingConfirmationPage extends StatelessWidget {
               isSubmitting
                   ? const LoadingSpinner()
                   : AppButton(
-                text: "Confirm Booking",
+                text: 'booking.confirm_button'.tr(),
                 onPressed: () =>
                     context.read<ClinicDetailsCubit>().confirmBooking(),
               ),
@@ -166,14 +167,14 @@ class BookingConfirmationPage extends StatelessWidget {
                   color: Colors.green, size: 40),
             ),
             const SizedBox(height: 16),
-            const Text(
-              "Booking Confirmed!",
+             Text(
+              'booking.confirmed_title'.tr(),
               style:
               TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text(
-              "Your appointment has been booked successfully.",
+             Text(
+              'booking.confirmed_body'.tr(),
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey),
             ),
@@ -184,7 +185,7 @@ class BookingConfirmationPage extends StatelessWidget {
             onPressed: () => Navigator.of(context)
               ..pop()
               ..pop(),
-            child: const Text("Done"),
+            child: Text('booking.confirmed_done'.tr()),
           ),
         ],
       ),

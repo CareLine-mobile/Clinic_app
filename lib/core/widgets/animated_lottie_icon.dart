@@ -63,26 +63,19 @@ class _AnimatedLottieIconState extends State<AnimatedLottieIcon>
       duration: const Duration(milliseconds: 800),
     );
 
-    // Set initial state based on isActive
-    if (widget.isActive) {
-      _controller.value = 1.0; // Show last frame if active
-    } else {
-      _controller.value = 0.0; // Show first frame if inactive
-    }
+
   }
 
   @override
   void didUpdateWidget(AnimatedLottieIcon oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    // Handle state changes from parent
     if (oldWidget.isActive != widget.isActive) {
-      if (widget.isActive) {
-        // Play forward animation
-        _controller.forward();
-      } else {
-        // Reset to first frame
-        _controller.reset();
+      if (mounted) {
+        if (widget.isActive) {
+          _controller.forward();
+        } else {
+          _controller.reset();
+        }
       }
     }
   }
@@ -101,6 +94,7 @@ class _AnimatedLottieIconState extends State<AnimatedLottieIcon>
 
   @override
   Widget build(BuildContext context) {
+    print('zyad  {widget.isActive ${widget.isActive}');
     return GestureDetector(
       onTap: _handleTap,
       child: Container(
@@ -116,8 +110,13 @@ class _AnimatedLottieIconState extends State<AnimatedLottieIcon>
           height: widget.size,
           fit: BoxFit.contain,
           onLoaded: (composition) {
-            // Set animation duration based on the composition
             _controller.duration = composition.duration;
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted && widget.isActive) {
+                _controller.value = 1.0;
+              }
+            });
           },
         ),
       ),

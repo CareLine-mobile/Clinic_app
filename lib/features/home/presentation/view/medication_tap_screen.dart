@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -207,7 +208,7 @@ class _MedicationsTabScreenState extends State<MedicationsTabScreen> {
           children: [
             Expanded(
               child: _buildStatCard(
-                label: 'يومي',
+                label: 'medication.filter_daily'.tr(),
                 count: dailyCount.toString(),
                 icon: Icons.calendar_today,
                 color: const Color(0xFF1E88E5),
@@ -216,7 +217,7 @@ class _MedicationsTabScreenState extends State<MedicationsTabScreen> {
             SizedBox(width: 12.w),
             Expanded(
               child: _buildStatCard(
-                label: 'أسبوعي',
+                label: 'medication.filter_weekly'.tr(),
                 count: weeklyCount.toString(),
                 icon: Icons.event_repeat,
                 color: const Color(0xFF4CAF50),
@@ -225,7 +226,7 @@ class _MedicationsTabScreenState extends State<MedicationsTabScreen> {
             SizedBox(width: 12.w),
             Expanded(
               child: _buildStatCard(
-                label: 'عند الحاجة',
+                label: 'medication.filter_as_needed'.tr(),
                 count: asNeededCount.toString(),
                 icon: Icons.medication_liquid,
                 color: const Color(0xFF9C27B0),
@@ -312,10 +313,10 @@ class _MedicationsTabScreenState extends State<MedicationsTabScreen> {
   Widget _buildMedicationGroup(String frequency, List<MedicationModel> medications) {
     final theme = Theme.of(context);
     final label = frequency == 'daily'
-        ? 'يومي'
+        ? 'medication.group_daily'.tr()
         : frequency == 'weekly'
-        ? 'أسبوعي'
-        : 'عند الحاجة';
+        ? 'medication.group_weekly'.tr()
+        : 'medication.group_as_needed'.tr();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -347,8 +348,8 @@ class _MedicationsTabScreenState extends State<MedicationsTabScreen> {
     final theme = Theme.of(context);
     final (icon, color) = _getFrequencyStyle(medication.frequency);
     final timesText = medication.times.length > 1
-        ? '${medication.times.length} مرات'
-        : 'مرة واحدة';
+        ? 'medication.times_multiple'.tr().replaceAll('{count}', '${medication.times.length}')
+        : 'medication.times_once'.tr();
 
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
@@ -398,16 +399,16 @@ class _MedicationsTabScreenState extends State<MedicationsTabScreen> {
     return await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف الدواء'),
-        content: Text('هل أنت متأكد من حذف $name؟'),
+        title: Text('medication.delete_title'.tr()),
+        content: Text('medication.delete_confirm'.tr().replaceAll('{name}', name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: Text('medication.cancel'.tr()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('حذف'),
+            child: Text('medication.delete'.tr()),
           ),
         ],
       ),

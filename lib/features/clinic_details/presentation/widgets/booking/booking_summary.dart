@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../../core/theme/colors.dart';
 import '../../../../../core/widgets/app_buton.dart';
@@ -17,18 +18,18 @@ class BookingSummary extends StatelessWidget {
             color: ColorsManager.primaryColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Row(
+          child:  Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Consultation Fee:",
+                'booking.bottom_bar.fee_label'.tr(),
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 16,
                   color: Colors.black87,
                 ),
               ),
-              Text(
+              const Text(
                 "\$50",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -41,7 +42,7 @@ class BookingSummary extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         AppButton(
-          text: "Continue",
+          text: 'booking.continue'.tr(),
           onPressed: onContinue,
           horizontalPadding: 0,
         ),

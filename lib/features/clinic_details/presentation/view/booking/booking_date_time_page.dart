@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -35,7 +36,7 @@ class BookingDateTimePage extends StatelessWidget {
                       color: ColorsManager.primaryColor),
                   const SizedBox(width: 8),
                   Text(
-                    "Choose Date",
+                    'booking.choose_date'.tr(),
                     style: Theme.of(context)
                         .textTheme
                         .titleMedium
@@ -100,7 +101,7 @@ class BookingDateTimePage extends StatelessWidget {
                       color: ColorsManager.primaryColor),
                   const SizedBox(width: 8),
                   Text(
-                    "Choose Time",
+                    'booking.choose_time'.tr(),
                     style: Theme.of(context)
                         .textTheme
                         .titleMedium
@@ -116,7 +117,7 @@ class BookingDateTimePage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 32),
                   child: Text(
-                    "No available slots for this day",
+                    'booking.no_slots'.tr(),
                     style: TextStyle(color: Colors.grey[500]),
                   ),
                 ),
@@ -185,7 +186,7 @@ class BookingDateTimePage extends StatelessWidget {
 
               // ── Continue button ─────────────────────────────
               AppButton(
-                text: "Continue",
+                text: 'booking.continue'.tr(),
                 // canProceedStep1 is a computed getter on the STATE
                 onPressed: state.canProceedStep1
                     ? () => cubit.nextBookingStep()

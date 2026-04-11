@@ -606,7 +606,7 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
     bool showFavIcon = true,
   }) {
     final theme = Theme.of(context);
-
+    if(widget.clinic.id == 3 )print('clic data ${widget.clinic.id}${widget.clinic.name}  ${widget.clinic.isFavorite}');
     return Stack(
       children: [
         // Status Badge
@@ -643,9 +643,11 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
             top: _vSize.s10,
             right: _hSize.s10,
             child: AnimatedLottieIcon(
+           //   key: ValueKey(widget.clinic.isFavorite),
               assetPath: Assets.favIcon,
               size: _tSize.s32,
-              isActive: widget.clinic.isFavorite,
+            isActive: widget.clinic.isFavorite,
+             // isActive: true,
               onTap: widget.onFavoriteToggle,
             ),
           ),

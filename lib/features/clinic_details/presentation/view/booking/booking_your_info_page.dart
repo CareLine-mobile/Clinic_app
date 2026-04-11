@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/theme/colors.dart';
@@ -49,7 +50,7 @@ class _BookingYourInfoPageState extends State<BookingYourInfoPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Your Information",
+                'booking.your_info'.tr(),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: ColorsManager.primaryColor,
@@ -58,8 +59,8 @@ class _BookingYourInfoPageState extends State<BookingYourInfoPage> {
               const SizedBox(height: 24),
 
               _buildField(
-                label: "Full Name",
-                hint: "Enter your full name",
+                label: 'booking.full_name'.tr(),
+                hint: 'booking.full_name_hint'.tr(),
                 controller: _nameController,
                 icon: Icons.person_outline,
                 onChanged: cubit.updatePatientName,
@@ -67,8 +68,8 @@ class _BookingYourInfoPageState extends State<BookingYourInfoPage> {
               const SizedBox(height: 16),
 
               _buildField(
-                label: "Phone Number",
-                hint: "Enter your phone number",
+                label: 'booking.phone'.tr(),
+                hint: 'booking.phone_hint'.tr(),
                 controller: _phoneController,
                 icon: Icons.phone_outlined,
                 keyboardType: TextInputType.phone,
@@ -77,8 +78,8 @@ class _BookingYourInfoPageState extends State<BookingYourInfoPage> {
               const SizedBox(height: 16),
 
               _buildField(
-                label: "Notes (Optional)",
-                hint: "Any symptoms or notes for the doctor...",
+                label: 'booking.notes_optional'.tr(),
+                hint: 'booking.notes_hint'.tr(),
                 controller: _notesController,
                 icon: Icons.notes_outlined,
                 maxLines: 3,
@@ -88,7 +89,7 @@ class _BookingYourInfoPageState extends State<BookingYourInfoPage> {
               const SizedBox(height: 32),
 
               AppButton(
-                text: "Continue",
+                text: 'booking.continue'.tr(),
                 // canProceedStep2 lives on the STATE now
                 onPressed: state.canProceedStep2
                     ? () => cubit.nextBookingStep()

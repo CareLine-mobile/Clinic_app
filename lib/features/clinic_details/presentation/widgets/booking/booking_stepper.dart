@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../../core/theme/colors.dart';
 
@@ -17,11 +18,11 @@ class BookingStepperWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildStep("1", "Date & Time", index: 0, currentStep: currentStep),
+          _buildStep("1", 'booking.stepper.date_time'.tr(), index: 0, currentStep: currentStep),
           _buildDivider(),
-          _buildStep("2", "Your Info", index: 1, currentStep: currentStep),
+          _buildStep("2", 'booking.stepper.your_info'.tr(), index: 1, currentStep: currentStep),
           _buildDivider(),
-          _buildStep("3", "Confirmation", index: 2, currentStep: currentStep),
+          _buildStep("3", 'booking.stepper.confirm'.tr(), index: 2, currentStep: currentStep),
         ],
       ),
     );

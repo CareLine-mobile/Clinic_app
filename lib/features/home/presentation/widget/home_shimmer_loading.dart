@@ -1,5 +1,6 @@
 // lib/features/home/presentation/widget/shimmer/home_body_shimmer.dart
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../../core/utils/app_size.dart';
@@ -35,7 +36,7 @@ class HomeBodyShimmer extends StatelessWidget {
                 vertical: SizeApp.s8,
               ),
               child: Text(
-                "جميع العيادات",
+                'home.sections.all_clinics'.tr(),
                 style: TextStyle(
                   fontSize: SizeApp.s24,
                   fontWeight: FontWeight.bold,

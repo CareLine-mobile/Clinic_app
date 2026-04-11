@@ -2,6 +2,8 @@
 
 import 'package:clinic_app/core/utils/enums.dart';
 import 'package:clinic_app/features/home/domain/entities/clinic_summary.dart';
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'clinic_card.dart';
@@ -61,7 +63,7 @@ class _FeaturedClinicsSectionState extends State<FeaturedClinicsSection> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Text(
-            "العيادات المميزة",
+            'home.sections.featured'.tr(),
             style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
           ),
         ),

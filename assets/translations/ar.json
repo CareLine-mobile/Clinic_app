@@ -41,6 +41,34 @@
       "success": "تم تغيير كلمة المرور بنجاح"
     }
   },
+  "onboarding": {
+    "slide1_title": "نظم أدويتك بسهولة",
+    "slide1_subtitle": "تابع مواعيد أدويتك اليومية بطريقة بسيطة وفعالة مع تذكيرات ذكية",
+    "slide2_title": "لا تنسى جرعتك أبداً",
+    "slide2_subtitle": "استلم تنبيهات في الوقت المناسب لتضمن عدم تفويت أي جرعة من أدويتك",
+    "slide3_title": "تتبع تقدمك",
+    "slide3_subtitle": "راقب التزامك اليومي واحصل على إحصائيات مفصلة عن صحتك الدوائية"
+  },
+  "medication": {
+    "title": "الأدوية",
+    "count": "{count} دواء",
+    "filter_all": "الكل",
+    "filter_daily": "يومي",
+    "filter_weekly": "أسبوعي",
+    "filter_as_needed": "عند الحاجة",
+    "stat_daily": "يومي",
+    "stat_weekly": "أسبوعي",
+    "stat_as_needed": "عند الحاجة",
+    "times_once": "مرة واحدة",
+    "times_multiple": "{count} مرات",
+    "group_daily": "يومي",
+    "group_weekly": "أسبوعي",
+    "group_as_needed": "عند الحاجة",
+    "delete_title": "حذف الدواء",
+    "delete_confirm": "هل أنت متأكد من حذف {name}؟",
+    "delete": "حذف",
+    "cancel": "إلغاء"
+  },
   "home": {
     "header": {
       "title": "احجز في عيادتك بسهولة",
@@ -48,19 +76,20 @@
     },
     "no_notifications": "لا توجد إشعارات جديدة",
     "sections": {
-      "nearby":        "العيادات القريبة",
-      "all_clinics":   "جميع العيادات",
-      "no_more":       "لا توجد المزيد",
-      "empty_title":   "لا توجد عيادات",
-      "empty_subtitle":"لا توجد عيادات متاحة حالياً، حاول لاحقاً"
+      "nearby": "العيادات القريبة",
+      "all_clinics": "جميع العيادات",
+      "featured": "العيادات المميزة",
+      "no_more": "لا توجد المزيد",
+      "empty_title": "لا توجد عيادات",
+      "empty_subtitle": "لا توجد عيادات متاحة حالياً، حاول لاحقاً"
     },
     "last_booking": {
-      "badge":              "آخر حجز",
-      "queue_position":     "دورك",
-      "people_ahead":       "{count} قدامك",
-      "no_bookings_title":  "لا توجد حجوزات",
+      "badge": "آخر حجز",
+      "queue_position": "دورك",
+      "people_ahead": "{count} قدامك",
+      "no_bookings_title": "لا توجد حجوزات",
       "your_turn": "دورك الآن",
-      "no_bookings_subtitle":"ليس لديك أي حجوزات مؤكدة حالياً"
+      "no_bookings_subtitle": "ليس لديك أي حجوزات مؤكدة حالياً"
     }
   },
   "bookings": {
@@ -117,7 +146,8 @@
     "empty_title": "لا توجد عيادات مفضلة",
     "empty_subtitle": "أضف عياداتك المفضلة لسهولة الوصول إليها",
     "find_clinic": "ابحث عن عيادة",
-    "retry": "إعادة المحاولة"
+    "retry": "إعادة المحاولة",
+    "remove": "إزالة من المفضلة"
   },
   "booking": {
     "choose_date": "اختر التاريخ",
@@ -138,7 +168,7 @@
     "phone_hint": "أدخل رقم هاتفك",
     "notes_optional": "ملاحظات (اختياري)",
     "notes_hint": "أي أعراض أو ملاحظات للطبيب...",
-    "reviewed": "Reviewed",
+    "reviewed": "تم التقييم",
     "summary": {
       "clinic": "العيادة",
       "doctor": "الطبيب",
@@ -222,7 +252,8 @@
       "open": "مفتوح",
       "closed": "مغلق",
       "min_rating": "الحد الأدنى للتقييم"
-  }},
+    }
+  },
   "settings": {
     "guest": {
       "title": "أهلاً بك كزائر",

@@ -41,6 +41,34 @@
       "success": "Password reset successfully"
     }
   },
+  "onboarding": {
+    "slide1_title": "Organize Your Medications Easily",
+    "slide1_subtitle": "Track your daily medication schedule in a simple and effective way with smart reminders",
+    "slide2_title": "Never Miss a Dose",
+    "slide2_subtitle": "Receive timely alerts to ensure you never miss any dose of your medication",
+    "slide3_title": "Track Your Progress",
+    "slide3_subtitle": "Monitor your daily adherence and get detailed statistics about your medication health"
+  },
+  "medication": {
+    "title": "Medications",
+    "count": "{count} medications",
+    "filter_all": "All",
+    "filter_daily": "Daily",
+    "filter_weekly": "Weekly",
+    "filter_as_needed": "As Needed",
+    "stat_daily": "Daily",
+    "stat_weekly": "Weekly",
+    "stat_as_needed": "As Needed",
+    "times_once": "Once",
+    "times_multiple": "{count} times",
+    "group_daily": "Daily",
+    "group_weekly": "Weekly",
+    "group_as_needed": "As Needed",
+    "delete_title": "Delete Medication",
+    "delete_confirm": "Are you sure you want to delete {name}?",
+    "delete": "Delete",
+    "cancel": "Cancel"
+  },
   "home": {
     "header": {
       "title": "Book at your clinic easily",
@@ -50,6 +78,7 @@
     "sections": {
       "nearby": "Nearby clinics",
       "all_clinics": "All clinics",
+      "featured": "Featured Clinics",
       "no_more": "No more available",
       "empty_title": "No clinics",
       "empty_subtitle": "No clinics are currently available, please try again later"
@@ -139,6 +168,7 @@
     "phone_hint": "Enter your phone number",
     "notes_optional": "Notes (Optional)",
     "notes_hint": "Any symptoms or notes for the doctor...",
+    "reviewed": "Reviewed",
     "summary": {
       "clinic": "Clinic",
       "doctor": "Doctor",
