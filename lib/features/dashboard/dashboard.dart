@@ -1,22 +1,5 @@
-// lib/features/dashboard/patient_home_screen.dart
-
-// lib/features/dashboard/patient_home_screen.dart
-
 import 'dart:io';
-import 'dart:ui';
 
-import 'package:clinic_app/core/di/injection_container.dart';
-import 'package:clinic_app/core/utils/assets.dart';
-import 'package:clinic_app/core/widgets/CustomIcon.dart';
-import 'package:clinic_app/features/dashboard/widgets/dashboard_body.dart';
-import 'package:clinic_app/features/dashboard/widgets/floating_nav_bar.dart';
-import 'package:clinic_app/features/dashboard/widgets/location_banner.dart';
-import 'package:clinic_app/features/favourite/presentation/view/favourites_screen.dart';
-import 'package:clinic_app/features/home/presentation/cubit/home_cubit.dart';
-import 'package:clinic_app/features/home/presentation/view/home_screen.dart';
-import 'package:clinic_app/features/my_booking/presentation/view/booking_list_screen.dart';
-import 'package:clinic_app/features/search/presentation/cubit/search_cubit.dart';
-import 'package:clinic_app/features/search/presentation/view/search_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,14 +8,20 @@ import 'package:geolocator/geolocator.dart';
 
 import '../../../../core/di/injection_container.dart' as di;
 import '../../../../core/theme/colors.dart';
-import '../../../../core/utils/app_size.dart';
+import '../../../../core/utils/assets.dart';
 import '../../core/utils/location/location_utils.dart';
 import '../auth/presentation/cubit/auth_cubit.dart';
 import '../auth/presentation/cubit/auth_state.dart';
-import '../home/data/datasources/localdatasource/location_data_source_impl.dart';
+import '../favourite/presentation/view/favourites_screen.dart';
+import '../home/presentation/cubit/home_cubit.dart';
+import '../home/presentation/view/home_screen.dart';
 import '../my_booking/presentation/cubit/booking_cubit.dart';
+import '../my_booking/presentation/view/booking_list_screen.dart';
+import '../search/presentation/cubit/search_cubit.dart';
+import '../search/presentation/view/search_screen.dart';
 import '../settings/presentation/view/settings_screen.dart';
 import '../user_data/user_repo.dart';
+import 'widgets/dashboard_body.dart';
 
 class DashBoardScreen extends StatefulWidget {
   const DashBoardScreen({Key? key}) : super(key: key);
@@ -42,14 +31,15 @@ class DashBoardScreen extends StatefulWidget {
 }
 
 class _DashBoardScreenState extends State<DashBoardScreen>
-    with WidgetsBindingObserver {            // ← observe app lifecycle
+    with WidgetsBindingObserver {
+
   int _currentIndex = 0;
   bool _isNavBarVisible = true;
   double _lastScrollPosition = 0;
 
   // ── Location banner state ────────────────────────────────
   bool _showLocationBanner = false;
-  bool _bannerDismissed = false;             // user tapped ✕ → never re-show this session
+  bool _bannerDismissed = false; // user tapped ✕ → never re-show this session
 
   late final List<Widget> _screens;
 
@@ -59,8 +49,6 @@ class _DashBoardScreenState extends State<DashBoardScreen>
     Assets.favouriteIcon,
     Assets.myBookingIcon,
     Assets.settingIcon,
-
-
   ];
 
   // ── Lifecycle ────────────────────────────────────────────
@@ -72,16 +60,14 @@ class _DashBoardScreenState extends State<DashBoardScreen>
     _screens = [
       HomeScreen(onNavigateToSearch: (i) => setState(() => _currentIndex = i)),
       BlocProvider<SearchCubit>(
-        create: (_) => sl<SearchCubit>(),
+        create: (_) => di.sl<SearchCubit>(),
         child: const SearchScreen(),
       ),
       const FavouritesScreen(),
       const BookingListScreen(),
       const SettingsTabScreen(),
-
     ];
 
-    // Check after first frame so context is ready
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkLocationService());
   }
 
@@ -91,7 +77,6 @@ class _DashBoardScreenState extends State<DashBoardScreen>
     super.dispose();
   }
 
-  /// Re-check when user returns from the Settings app
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -120,9 +105,7 @@ class _DashBoardScreenState extends State<DashBoardScreen>
   }
 
   Future<void> _openLocationSettings() async {
-  //  await LocationDataSourceUtilits.openLocationSettings();
     showLocationPermissionSheet(context);
-    // didChangeAppLifecycleState will re-check when the user comes back
   }
 
   // ── Scroll hide/show nav bar ─────────────────────────────
@@ -169,7 +152,6 @@ class _DashBoardScreenState extends State<DashBoardScreen>
             FocusManager.instance.primaryFocus?.unfocus();
             setState(() => _currentIndex = index);
           },
-          // ── Banner props ──────────────────────────────
           showLocationBanner: _showLocationBanner,
           onOpenLocationSettings: _openLocationSettings,
           onDismissBanner: _dismissBanner,
@@ -178,8 +160,11 @@ class _DashBoardScreenState extends State<DashBoardScreen>
     );
   }
 
+  // ── Modern Location Permission Bottom Sheet ──────────────
+
   void showLocationPermissionSheet(BuildContext context) {
     final isAndroid = Platform.isAndroid;
+    final theme = Theme.of(context);
 
     showModalBottomSheet(
       context: context,
@@ -187,85 +172,122 @@ class _DashBoardScreenState extends State<DashBoardScreen>
       backgroundColor: Colors.transparent,
       builder: (_) => Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          color: theme.scaffoldBackgroundColor,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
         ),
-        padding: EdgeInsets.fromLTRB(20, 12, 20, 32),
+        padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 32.h),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-
-            // drag handle
+            // ── Drag handle
             Container(
-              width: 36, height: 4,
+              width: 40.w,
+              height: 4.h,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
+                color: ColorsManager.inputBorder.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(100.r),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 24.h),
 
-            // header
-            Row(children: [
-              Container(
-                width: 44, height: 44,
-                decoration: BoxDecoration(
-                  color: Colors.orange[50],
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.location_off, color: Colors.orange[700]),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'location.access_needed'.tr(),
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
-                    Text(
-                      'location.enable_manually'.tr(),
-                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
-              ),
-            ]),
-            SizedBox(height: 20),
-
-            // steps
-            ..._buildSteps(isAndroid),
-            SizedBox(height: 16),
-
-            // info note
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(children: [
-                Icon(Icons.info_outline, size: 16, color: Colors.blue[700]),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'location.why_we_use'.tr(),
-                    style: TextStyle(fontSize: 13, color: Colors.blue[700]),
+            // ── Header
+            Row(
+              children: [
+                Container(
+                  width: 48.r,
+                  height: 48.r,
+                  decoration: const BoxDecoration(
+                    color: ColorsManager.warningSurface,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.location_off_rounded,
+                    color: ColorsManager.warningFill,
+                    size: 24.sp,
                   ),
                 ),
-              ]),
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'location.access_needed'.tr(),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: ColorsManager.defaultText,
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        'location.enable_manually'.tr(),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: ColorsManager.defaultTextSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 24.h),
 
-            // primary CTA
+            // ── Steps
+            ..._buildSteps(context, isAndroid),
+            SizedBox(height: 20.h),
+
+            // ── Info note
+            Container(
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                color: ColorsManager.infoSurface,
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(
+                  color: ColorsManager.infoFill.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: 20.sp,
+                    color: ColorsManager.infoText,
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Text(
+                      'location.why_we_use'.tr(),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: ColorsManager.infoText,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 28.h),
+
+            // ── Primary CTA
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                icon: Icon(Icons.settings),
-                label: Text('location.open_settings'.tr()),
+                icon: Icon(Icons.settings_rounded, size: 20.sp, color: Colors.white),
+                label: Text(
+                  'location.open_settings'.tr(),
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 14),
+                  backgroundColor: ColorsManager.primaryColor,
+                  elevation: 0,
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
                 ),
                 onPressed: () async {
                   Navigator.pop(context);
@@ -273,47 +295,50 @@ class _DashBoardScreenState extends State<DashBoardScreen>
                 },
               ),
             ),
-            SizedBox(height: 8),
-
-
-
+            SizedBox(height: 8.h),
           ],
         ),
       ),
     );
   }
 
-  List<Widget> _buildSteps(bool isAndroid) {
+  // ── Steps Builder ──────────────
+
+  List<Widget> _buildSteps(BuildContext context, bool isAndroid) {
+    final theme = Theme.of(context);
     final prefix = isAndroid ? 'location.android' : 'location.ios';
-    final count  = isAndroid ? 5 : 4;
+    final count = isAndroid ? 5 : 4;
 
     return List.generate(count, (i) => Padding(
-      padding: EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.only(bottom: 16.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 22, height: 22,
+            width: 24.r,
+            height: 24.r,
             decoration: BoxDecoration(
-              color: Colors.purple[50],
+              color: ColorsManager.primaryColor.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Center(
               child: Text(
                 '${i + 1}',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.purple[700],
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: ColorsManager.primaryColor,
                 ),
               ),
             ),
           ),
-          SizedBox(width: 10),
+          SizedBox(width: 12.w),
           Expanded(
             child: Text(
               '$prefix.step${i + 1}'.tr(),
-              style: TextStyle(fontSize: 14, height: 1.5),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: ColorsManager.defaultText,
+                height: 1.4,
+              ),
             ),
           ),
         ],
@@ -321,8 +346,3 @@ class _DashBoardScreenState extends State<DashBoardScreen>
     ));
   }
 }
-
-
-
-
-

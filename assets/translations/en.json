@@ -455,6 +455,8 @@
     "enter_manually": "Enter location manually instead",
     "steps_title_android": "Android steps",
     "steps_title_ios": "iOS steps",
+    "disabled_title": "Location Services Disabled",
+    "enable_prompt": "Tap here to enable them now",
     "android": {
       "step1": "Tap \"Open Settings\" below",
       "step2": "Tap Permissions",

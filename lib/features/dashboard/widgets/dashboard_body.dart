@@ -40,8 +40,8 @@ class DashBoardBody extends StatelessWidget {
     const Color activeColor = ColorsManager.primaryColor;
     final Color inactiveColor = theme.colorScheme.onSurfaceVariant;
     final Color glassColor = isDark
-        ? Colors.black.withValues(alpha: 0.3)
-        : Colors.white.withValues(alpha: 0.3);
+        ? Colors.black
+        : Colors.white;
     final Color borderColor = isDark
         ? Colors.white.withValues(alpha: 0.15)
         : Colors.black.withValues(alpha: 0.1);

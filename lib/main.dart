@@ -17,7 +17,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await AppInitializer.init();
-  await Geolocator.requestPermission();
+ // await Geolocator.requestPermission();
 // isServiceEnable = await Geolocator.isLocationServiceEnabled();
 
   // Load persisted user before UI starts

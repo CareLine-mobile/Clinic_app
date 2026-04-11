@@ -455,6 +455,8 @@
     "enter_manually": "إدخال الموقع يدوياً",
     "steps_title_android": "خطوات أندرويد",
     "steps_title_ios": "خطوات iOS",
+    "disabled_title": "خدمة الموقع معطّلة",
+    "enable_prompt": "اضغط هنا لتفعيلها الآن",
     "android": {
       "step1": "اضغط على \"فتح الإعدادات\" أدناه",
       "step2": "اضغط على الأذونات",
