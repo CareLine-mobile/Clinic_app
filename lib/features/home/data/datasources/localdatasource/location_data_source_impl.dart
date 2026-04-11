@@ -16,6 +16,7 @@ class LocationDataSourceUtilits  {
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
+        print('dfsdfdsfdsfdsfdsfds $permission');
         if (permission == LocationPermission.denied) {
           throw LocationException(
             "Location permission denied",
