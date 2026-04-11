@@ -1,7 +1,9 @@
 import 'package:clinic_app/features/user_data/user_cubit.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/routes/routes.dart';
+import '../../../../core/widgets/confirmation_dialog.dart';
 
 class AuthGuard {
   /// Returns true if user is logged in.
@@ -17,38 +19,14 @@ class AuthGuard {
   }
 
   static void _showLoginDialog(BuildContext context) {
-    showDialog(
+    showConfirmationDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'تسجيل الدخول مطلوب',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: const Text(
-          'هذه الخاصية تتطلب تسجيل الدخول.\nهل تريد تسجيل الدخول الآن؟',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.grey),
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('لاحقاً', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.pushNamed(context, Routes.auth);
-            },
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: const Text('تسجيل الدخول'),
-          ),
-        ],
-      ),
+      icon: Icons.lock_outline_rounded,
+      title: 'auth_guard.title'.tr(),
+      message: 'auth_guard.message'.tr(),
+      confirmText: 'common.login'.tr(),
+      cancelText: 'auth_guard.later'.tr(),
+      onConfirm: () => Navigator.pushNamed(context, Routes.auth),
     );
   }
 }

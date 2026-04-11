@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/theme/colors.dart';
 import '../../../../../core/widgets/app_buton.dart';
 import '../../cubit/clinic_details_cubit.dart';
@@ -20,7 +21,6 @@ class _BookingYourInfoPageState extends State<BookingYourInfoPage> {
   @override
   void initState() {
     super.initState();
-    // Read initial values from state — not cubit getters
     final state = context.read<ClinicDetailsCubit>().state;
     final loaded = state is ClinicDetailsLoaded ? state : null;
     _nameController = TextEditingController(text: loaded?.patientName ?? '');
@@ -38,6 +38,8 @@ class _BookingYourInfoPageState extends State<BookingYourInfoPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return BlocBuilder<ClinicDetailsCubit, ClinicDetailsState>(
       builder: (context, state) {
         if (state is! ClinicDetailsLoaded) return const SizedBox.shrink();
@@ -45,29 +47,32 @@ class _BookingYourInfoPageState extends State<BookingYourInfoPage> {
         final cubit = context.read<ClinicDetailsCubit>();
 
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.w),
+          physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'booking.your_info'.tr(),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: ColorsManager.primaryColor,
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
 
               _buildField(
+                theme: theme,
                 label: 'booking.full_name'.tr(),
                 hint: 'booking.full_name_hint'.tr(),
                 controller: _nameController,
                 icon: Icons.person_outline,
                 onChanged: cubit.updatePatientName,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
 
               _buildField(
+                theme: theme,
                 label: 'booking.phone'.tr(),
                 hint: 'booking.phone_hint'.tr(),
                 controller: _phoneController,
@@ -75,9 +80,10 @@ class _BookingYourInfoPageState extends State<BookingYourInfoPage> {
                 keyboardType: TextInputType.phone,
                 onChanged: cubit.updatePatientPhone,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
 
               _buildField(
+                theme: theme,
                 label: 'booking.notes_optional'.tr(),
                 hint: 'booking.notes_hint'.tr(),
                 controller: _notesController,
@@ -86,16 +92,15 @@ class _BookingYourInfoPageState extends State<BookingYourInfoPage> {
                 onChanged: cubit.updateBookingNotes,
               ),
 
-              const SizedBox(height: 32),
+              SizedBox(height: 32.h),
 
               AppButton(
                 text: 'booking.continue'.tr(),
-                // canProceedStep2 lives on the STATE now
                 onPressed: state.canProceedStep2
                     ? () => cubit.nextBookingStep()
                     : null,
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
             ],
           ),
         );
@@ -104,6 +109,7 @@ class _BookingYourInfoPageState extends State<BookingYourInfoPage> {
   }
 
   Widget _buildField({
+    required ThemeData theme,
     required String label,
     required String hint,
     required TextEditingController controller,
@@ -115,35 +121,23 @@ class _BookingYourInfoPageState extends State<BookingYourInfoPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-        const SizedBox(height: 8),
+        Text(
+          label,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: ColorsManager.defaultText,
+          ),
+        ),
+        SizedBox(height: 8.h),
         TextField(
           controller: controller,
           keyboardType: keyboardType,
           maxLines: maxLines,
           onChanged: onChanged,
+          style: theme.textTheme.bodyMedium,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-            prefixIcon: Icon(icon, color: Colors.grey[500], size: 20),
-            filled: true,
-            fillColor: Colors.grey[50],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey[300]!),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey[300]!),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                  color: ColorsManager.primaryColor, width: 2),
-            ),
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            prefixIcon: Icon(icon, color: ColorsManager.inputBorder, size: 20.sp),
           ),
         ),
       ],

@@ -146,7 +146,24 @@ class ClinicDetailsLoaded extends ClinicDetailsState {
 
 // ─── Booking states ───────────────────────────────────────────────────────────
 
-class BookingLoading extends ClinicDetailsState {}
+// في clinic_details_state.dart
+class BookingLoading extends ClinicDetailsLoaded {
+  const BookingLoading({
+    required super.clinic,
+    required super.selectedDate,
+    super.selectedDoctor,
+    super.selectedTime,
+    super.selectedTimeFrom,
+    super.patientName,
+    super.patientPhone,
+    super.bookingNotes,
+  }) : super(
+    selectedTabIndex: 0,
+    isAppBarTransparent: false,
+    isFavoriteLoading: false,
+    bookingStep: 2,
+  );
+}
 
 class BookingSuccess extends ClinicDetailsState {
   final String message;

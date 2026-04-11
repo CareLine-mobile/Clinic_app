@@ -7,7 +7,26 @@ plugins {
 
 }
 
-// 1. ضيف الجزء ده فوق خالص عشان يقرأ ملف الـ key.properties
+// --- الجزء ده هو اللي كان ناقص عشان يقرأ الـ Version من الـ pubspec ---
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+// ---------------------------------------------------------------------
+
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
@@ -29,7 +48,6 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8
     }
 
-    // 2. ضيف الجزء ده عشان يعرف بيانات المفتاح (Keystore)
     signingConfigs {
         release {
             keyAlias = keystoreProperties['keyAlias']
@@ -43,16 +61,15 @@ android {
         applicationId = "com.careLine.app"
         minSdk 24
         targetSdk = flutter.targetSdkVersion
-        versionCode = 1 // اتأكد إنه دايمًا رقم صحيح
-        versionName = "1.0.0"
+
+        // دلوقتي السطرين دول هيشتغلوا ويقرأوا الـ +2 من الـ pubspec
+        versionCode = flutterVersionCode.toInteger()
+        versionName = flutterVersionName
     }
 
     buildTypes {
         release {
-            // 3. هنا بقى بنقوله استخدم الـ release config بدل الـ debug
             signingConfig = signingConfigs.release
-
-            // دول عشان الأمان ولتصغير حجم الأبلكيشن (اختياري)
             minifyEnabled false
             shrinkResources false
         }

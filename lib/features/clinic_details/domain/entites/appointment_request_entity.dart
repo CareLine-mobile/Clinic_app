@@ -1,4 +1,3 @@
-// In domain/entites/appointment_request_entity.dart
 import 'package:equatable/equatable.dart';
 
 class AppointmentRequestEntity extends Equatable {
@@ -6,6 +5,8 @@ class AppointmentRequestEntity extends Equatable {
   final String doctorId;
   final String date;
   final String time;
+  final String name;
+  final String phone;
   final String? notes;
 
   const AppointmentRequestEntity({
@@ -13,17 +14,21 @@ class AppointmentRequestEntity extends Equatable {
     required this.doctorId,
     required this.date,
     required this.time,
+    required this.name,
+    required this.phone,
     this.notes,
   });
 
   Map<String, dynamic> toJson() => {
-    'clinical_id': clinicalId,
-    'doctor_id': doctorId,
+    'clinical_id': int.tryParse(clinicalId) ?? 0,
+    'doctor_id': int.tryParse(doctorId) ?? 0,
     'date': date,
     'time': time,
-    if (notes != null) 'notes': notes,
+    'name': name,
+    'phone': phone,
+    if (notes != null && notes!.isNotEmpty) 'notes': notes,
   };
 
   @override
-  List<Object?> get props => [clinicalId, doctorId, date, time, notes];
+  List<Object?> get props => [clinicalId, doctorId, date, time, name, phone, notes];
 }

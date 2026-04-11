@@ -200,12 +200,23 @@ class ClinicDetailsCubit extends Cubit<ClinicDetailsState> {
 
     if (s.selectedTimeFrom == null ||
         s.selectedDoctor == null ||
-        s.clinic.id.isEmpty) {
-      emit(BookingError('Missing required booking information'));
+        s.clinic.id.isEmpty ||
+        s.patientName == null ||
+        s.patientPhone == null) {
+      emit(const BookingError('Missing required booking information'));
       return;
     }
 
-    emit(BookingLoading());
+    emit(BookingLoading(
+      clinic: s.clinic,
+      selectedDate: s.selectedDate,
+      selectedDoctor: s.selectedDoctor,
+      selectedTime: s.selectedTime,
+      selectedTimeFrom: s.selectedTimeFrom,
+      patientName: s.patientName,
+      patientPhone: s.patientPhone,
+      bookingNotes: s.bookingNotes,
+    ));
 
     final result = await makeAppointmentUseCase(
       AppointmentRequestEntity(
@@ -213,6 +224,8 @@ class ClinicDetailsCubit extends Cubit<ClinicDetailsState> {
         doctorId: s.selectedDoctor!.id,
         date: _formatDate(s.selectedDate),
         time: s.selectedTimeFrom!,
+        name: s.patientName!,
+        phone: s.patientPhone!,
         notes: s.bookingNotes,
       ),
     );
@@ -220,7 +233,6 @@ class ClinicDetailsCubit extends Cubit<ClinicDetailsState> {
     result.fold(
           (failure) => emit(BookingError(failure.message)),
           (_) {
-        // Go back to loaded state with flow reset
         emit(s.copyWith(
           bookingStep: 0,
           selectedDoctor: null,

@@ -1,14 +1,9 @@
-// lib/features/clinics/presentation/widgets/details/
-
-// ==================== clinic_calendar_widget.dart ====================
-import 'package:clinic_app/features/clinic_details/domain/entites/doctor_entity.dart';
-import 'package:clinic_app/features/clinic_details/domain/entites/review_entity.dart';
+import 'package:clinic_app/core/utils/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../../core/utils/app_size.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:intl/intl.dart';
-
-
+import '../../../../../core/utils/app_size.dart';
 
 class ClinicCalendarWidget extends StatefulWidget {
   final DateTime selectedDate;
@@ -27,16 +22,12 @@ class ClinicCalendarWidget extends StatefulWidget {
 }
 
 class _ClinicCalendarWidgetState extends State<ClinicCalendarWidget> {
-  late DateTime _currentMonth;
   final ScrollController _scrollController = ScrollController();
 
-  @override
-  void initState() {
-    super.initState();
-    _currentMonth = DateTime(
-      widget.selectedDate.year,
-      widget.selectedDate.month,
-    );
+  List<DateTime> _getDays() {
+    final today = DateTime.now();
+    final start = DateTime(today.year, today.month, today.day); // midnight — strips time
+    return List.generate(14, (i) => start.add(Duration(days: i)));
   }
 
   @override
@@ -45,98 +36,119 @@ class _ClinicCalendarWidgetState extends State<ClinicCalendarWidget> {
     super.dispose();
   }
 
-  List<DateTime> _getDaysInWeek() {
-    final now = DateTime.now();
-    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-    return List.generate(14, (index) => startOfWeek.add(Duration(days: index)));
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final vSize = AppSizeVertical.instance;
     final hSize = AppSizeHorizontal.instance;
-    final days = _getDaysInWeek();
+    final days = _getDays();
+
+    final isArabic = context.locale.languageCode == 'ar';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'اختر التاريخ',
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
+          'clinic.choose_date'.tr(),
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
           ),
         ),
-        SizedBox(height: vSize.s16),
+        SizedBox(height: vSize.s12),
 
-        // Horizontal Calendar
         SizedBox(
-          height: 90.h,
+          height: 85.h,
           child: ListView.builder(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(), // إضافة حركة سحب سلسة
             itemCount: days.length,
             itemBuilder: (context, index) {
               final day = days[index];
               final isSelected = day.day == widget.selectedDate.day &&
                   day.month == widget.selectedDate.month &&
                   day.year == widget.selectedDate.year;
-              final isToday = day.day == DateTime.now().day &&
-                  day.month == DateTime.now().month &&
-                  day.year == DateTime.now().year;
+              final isToday = index == 0;
 
-              return GestureDetector(
-                onTap: () => widget.onDateSelected(day),
-                child: Container(
-                  width: 70.w,
-                  margin: EdgeInsets.only(right: hSize.s8),
+              final dayString = isArabic
+                  ? day.arabicDayName
+                  : day.dayName.substring(0, 3).toUpperCase();
+
+              return Padding(
+                padding: EdgeInsets.only(right: hSize.s8),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  width: 65.w, // عرض أقل لتوفير المساحة
                   decoration: BoxDecoration(
                     color: isSelected
                         ? widget.accentColor
                         : isToday
-                        ? widget.accentColor.withOpacity(0.1)
+                        ? widget.accentColor.withOpacity(0.08)
                         : theme.cardColor,
-                    borderRadius: BorderRadius.circular(hSize.s12),
+                    borderRadius: BorderRadius.circular(16.r),
                     border: Border.all(
                       color: isSelected
                           ? widget.accentColor
                           : isToday
-                          ? widget.accentColor.withOpacity(0.5)
-                          : theme.dividerColor,
-                      width: isSelected ? 2 : 1,
+                          ? widget.accentColor.withOpacity(0.3)
+                          : theme.dividerColor.withOpacity(0.5),
+                      width: isSelected ? 1.5 : 1,
                     ),
+                    boxShadow: isSelected
+                        ? [
+                      BoxShadow(
+                        color: widget.accentColor.withOpacity(0.25),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      )
+                    ]
+                        : [],
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        DateFormat('EEE', 'ar').format(day),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: isSelected
-                              ? Colors.white
-                              : theme.textTheme.bodySmall?.color,
-                          fontWeight: FontWeight.w500,
-                        ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16.r),
+                      onTap: () => widget.onDateSelected(day),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // اسم اليوم
+                          Text(
+                            dayString,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: isSelected
+                                  ? Colors.white.withOpacity(0.9)
+                                  : theme.textTheme.bodySmall?.color,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 11.sp,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 2.h),
+                          // رقم اليوم
+                          Text(
+                            day.day.toString(),
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: isSelected ? Colors.white : null,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                              height: 1.2,
+                            ),
+                          ),
+                          // اسم الشهر (يظل معتمد على intl لأنه غير موجود في الـ Extension)
+                          Text(
+                            DateFormat('MMM', context.locale.languageCode).format(day),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: isSelected
+                                  ? Colors.white.withOpacity(0.9)
+                                  : theme.textTheme.bodySmall?.color,
+                              fontSize: 10.sp,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: vSize.s4),
-                      Text(
-                        day.day.toString(),
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: isSelected
-                              ? Colors.white
-                              : theme.textTheme.titleLarge?.color,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        DateFormat('MMM', 'ar').format(day),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: isSelected
-                              ? Colors.white
-                              : theme.textTheme.bodySmall?.color,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               );
@@ -147,4 +159,3 @@ class _ClinicCalendarWidgetState extends State<ClinicCalendarWidget> {
     );
   }
 }
-

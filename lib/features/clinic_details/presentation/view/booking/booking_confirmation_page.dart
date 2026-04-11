@@ -1,194 +1,167 @@
-// ══════════════════════════════════════════════════════════
-// booking_confirmation_page.dart
-// ══════════════════════════════════════════════════════════
-import 'package:clinic_app/core/widgets/app_buton.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/theme/colors.dart';
-import '../../../../../core/widgets/loading_widget.dart';
+import '../../../../../core/widgets/app_buton.dart';
 import '../../cubit/clinic_details_cubit.dart';
 
-class BookingConfirmationPage extends StatelessWidget {
+// ✅ تم تحويلها لـ StatefulWidget عشان نقدر نحتفظ بالداتا
+class BookingConfirmationPage extends StatefulWidget {
   const BookingConfirmationPage({super.key});
 
   @override
+  State<BookingConfirmationPage> createState() => _BookingConfirmationPageState();
+}
+
+class _BookingConfirmationPageState extends State<BookingConfirmationPage> {
+  ClinicDetailsLoaded? _cachedData;
+
+  @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ClinicDetailsCubit, ClinicDetailsState>(
-      listenWhen: (_, curr) => curr is BookingSuccess,
-      listener: (context, state) {
-        if (state is BookingSuccess) _showSuccessDialog(context);
-      },
+    final theme = Theme.of(context);
+
+    return BlocBuilder<ClinicDetailsCubit, ClinicDetailsState>(
       builder: (context, state) {
-        // Guard
-        if (state is! ClinicDetailsLoaded && state is! BookingLoading) {
-          return const SizedBox.shrink();
+        if (state is ClinicDetailsLoaded) {
+          _cachedData = state;
         }
+
+        if (_cachedData == null) return const SizedBox.shrink();
 
         final isSubmitting = state is BookingLoading;
 
-        // Grab the last loaded snapshot for display (BookingLoading doesn't carry data)
-        final loaded = state is ClinicDetailsLoaded
-            ? state
-            : (context.read<ClinicDetailsCubit>().state is ClinicDetailsLoaded
-            ? context.read<ClinicDetailsCubit>().state as ClinicDetailsLoaded
-            : null);
+        return AbsorbPointer(
+          absorbing: isSubmitting,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(16.w),
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              children: [
+                SizedBox(height: 20.h),
 
-        if (loaded == null) return const SizedBox.shrink();
-
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
-                  shape: BoxShape.circle,
+                Container(
+                  padding: EdgeInsets.all(16.w),
+                  decoration: const BoxDecoration(
+                    color: ColorsManager.warningSurface,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.priority_high_rounded,
+                      color: ColorsManager.warningFill, size: 32.sp),
                 ),
-                child: const Icon(Icons.priority_high_rounded,
-                    color: Colors.orange, size: 32),
-              ),
-              const SizedBox(height: 24),
+                SizedBox(height: 24.h),
 
-               Text(
-                'booking.confirm_title'.tr(),
-                style:const  TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: ColorsManager.primaryColor,
+                Text(
+                  'booking.confirm_title'.tr(),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: ColorsManager.primaryColor,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-               Text(
-                 'booking.confirm_subtitle'.tr(),
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
-              ),
-              const SizedBox(height: 32),
+                SizedBox(height: 8.h),
+                Text(
+                  'booking.confirm_subtitle'.tr(),
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: ColorsManager.defaultTextSecondary,
+                  ),
+                ),
+                SizedBox(height: 32.h),
 
-              // ── Summary — reads from STATE ──────────────────
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 24),
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
-                child: Column(
-                  children: [
-                    _buildRow('booking.summary.clinic'.tr(), loaded.clinic.name),
-                    const Divider(height: 24),
-                    _buildRow('booking.summary.doctor'.tr(), loaded.selectedDoctor?.name ?? "—"),
-                    const Divider(height: 24),
-                    _buildRow('booking.summary.patient'.tr(), loaded.patientName ?? "—"),
-                    const Divider(height: 24),
-                    _buildRow('booking.summary.phone'.tr(), loaded.patientPhone ?? "—"),
-                    const Divider(height: 24),
-                    _buildRow(
-                      'booking.summary.date'.tr(),
-                      DateFormat('EEE, MMM d yyyy').format(loaded.selectedDate),
-                    ),
-                    const Divider(height: 24),
-                    _buildRow('booking.summary.time'.tr(), loaded.selectedTime ?? "—"),
-                    if (loaded.bookingNotes?.isNotEmpty == true) ...[
-                      const Divider(height: 24),
-                      _buildRow('booking.summary.notes'.tr(), loaded.bookingNotes!),
+                // ── Summary Container ──────────────────
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
+                  decoration: BoxDecoration(
+                    color: ColorsManager.backgroundCard,
+                    borderRadius: BorderRadius.circular(16.r),
+                    border: Border.all(
+                        color: ColorsManager.inputBorder.withOpacity(0.3)),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildRow(theme, 'booking.summary.clinic'.tr(), _cachedData!.clinic.name),
+                      Divider(height: 24.h, color: ColorsManager.inputBorder.withOpacity(0.2)),
+
+                      _buildRow(theme, 'booking.summary.doctor'.tr(), _cachedData!.selectedDoctor?.name ?? "—"),
+                      Divider(height: 24.h, color: ColorsManager.inputBorder.withOpacity(0.2)),
+
+                      _buildRow(theme, 'booking.summary.patient'.tr(), _cachedData!.patientName ?? "—"),
+                      Divider(height: 24.h, color: ColorsManager.inputBorder.withOpacity(0.2)),
+
+                      _buildRow(theme, 'booking.summary.phone'.tr(), _cachedData!.patientPhone ?? "—"),
+                      Divider(height: 24.h, color: ColorsManager.inputBorder.withOpacity(0.2)),
+
+                      _buildRow(
+                        theme,
+                        'booking.summary.date'.tr(),
+                        DateFormat('EEE, MMM d yyyy', context.locale.languageCode)
+                            .format(_cachedData!.selectedDate),
+                      ),
+                      Divider(height: 24.h, color: ColorsManager.inputBorder.withOpacity(0.2)),
+
+                      _buildRow(theme, 'booking.summary.time'.tr(), _cachedData!.selectedTime ?? "—"),
+
+                      if (_cachedData!.bookingNotes?.isNotEmpty == true) ...[
+                        Divider(height: 24.h, color: ColorsManager.inputBorder.withOpacity(0.2)),
+                        _buildRow(theme, 'booking.summary.notes'.tr(), _cachedData!.bookingNotes!),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 20),
-               Text(
-                'booking.payment_note'.tr(),
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-              const SizedBox(height: 32),
+                SizedBox(height: 20.h),
+                Text(
+                  'booking.payment_note'.tr(),
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: ColorsManager.miscellaneous,
+                  ),
+                ),
+                SizedBox(height: 32.h),
 
-              isSubmitting
-                  ? const LoadingSpinner()
-                  : AppButton(
-                text: 'booking.confirm_button'.tr(),
-                onPressed: () =>
-                    context.read<ClinicDetailsCubit>().confirmBooking(),
-              ),
+                AppButton(
+                  text: 'booking.confirm_button'.tr(),
+                  isLoading: isSubmitting,
+                  onPressed: isSubmitting
+                      ? null // تعطيل الزرار وقت التحميل
+                      : () => context.read<ClinicDetailsCubit>().confirmBooking(),
+                ),
 
-              const SizedBox(height: 20),
-            ],
+                SizedBox(height: 20.h),
+              ],
+            ),
           ),
         );
       },
     );
   }
 
-  Widget _buildRow(String label, String value) {
+  Widget _buildRow(ThemeData theme, String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(
-                color: Colors.grey, fontWeight: FontWeight.w500)),
+        Text(
+          label,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: ColorsManager.defaultTextSecondary,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        SizedBox(width: 16.w),
         Flexible(
           child: Text(
             value,
             textAlign: TextAlign.end,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: Colors.black87),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: ColorsManager.defaultText,
+            ),
           ),
         ),
       ],
-    );
-  }
-
-  void _showSuccessDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        shape:
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Color(0xFFE8F5E9),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.check_circle_outline,
-                  color: Colors.green, size: 40),
-            ),
-            const SizedBox(height: 16),
-             Text(
-              'booking.confirmed_title'.tr(),
-              style:
-              TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-             Text(
-              'booking.confirmed_body'.tr(),
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context)
-              ..pop()
-              ..pop(),
-            child: Text('booking.confirmed_done'.tr()),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -1,20 +1,20 @@
 // ══════════════════════════════════════════════════════════════════════════════
-// booking_bottom_bar.dart
+// booking_bottom_bar.dart  —  fixed
 // ══════════════════════════════════════════════════════════════════════════════
-// The bottom bar that appears when a doctor + slot are selected.
-// It owns the navigation to BookingScreen and passes the existing cubit.
+//  ✅ AuthGuard.check(context) before opening BookingScreen
+//  ✅ All hardcoded Arabic strings replaced with easy_localization keys
 // ══════════════════════════════════════════════════════════════════════════════
 
 import 'package:clinic_app/features/clinic_details/domain/entites/clinic_entities.dart';
 import 'package:clinic_app/features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
 import 'package:clinic_app/features/clinic_details/presentation/view/booking/booking_screen.dart';
+import 'package:clinic_app/features/user_data/auth_guard.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import '../../../../../../core/theme/colors.dart';
-import '../../../domain/entites/doctor_entity.dart' show DoctorEntity;
-
+import '../../../domain/entites/doctor_entity.dart';
 
 class BookingBottomBar extends StatelessWidget {
   final ClinicEntity clinic;
@@ -43,20 +43,20 @@ class BookingBottomBar extends StatelessWidget {
       child: SafeArea(
         child: Row(
           children: [
-            // Fee info
+            // ── Fee info ────────────────────────────────────
             Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'رسوم الاستشارة',
+                  'booking.bottom_bar.fee_label'.tr(),
                   style: TextStyle(
                     fontSize: 12.sp,
                     color: Colors.grey.shade500,
                   ),
                 ),
                 Text(
-                  '${doctor.consultationFee.toInt()} ج.م',
+                  '${doctor.consultationFee.toInt()} ${'clinic.currency'.tr()}',
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
@@ -67,7 +67,7 @@ class BookingBottomBar extends StatelessWidget {
             ),
             SizedBox(width: 16.w),
 
-            // Book button
+            // ── Book Now button ─────────────────────────────
             Expanded(
               child: ElevatedButton(
                 onPressed: () => _openBookingScreen(context),
@@ -78,8 +78,9 @@ class BookingBottomBar extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                 ),
+                // ✅ was hardcoded 'احجز الآن'
                 child: Text(
-                  'احجز الآن',
+                  'booking.bottom_bar.book_now'.tr(),
                   style: TextStyle(
                     fontSize: 15.sp,
                     fontWeight: FontWeight.bold,
@@ -95,8 +96,8 @@ class BookingBottomBar extends StatelessWidget {
   }
 
   void _openBookingScreen(BuildContext context) {
-    // ✅ BlocProvider.value passes the EXISTING cubit to the new route
-    // without creating a new one — so all selected state is preserved.
+    if (!AuthGuard.check(context)) return;
+
     final cubit = context.read<ClinicDetailsCubit>();
 
     Navigator.of(context).push(

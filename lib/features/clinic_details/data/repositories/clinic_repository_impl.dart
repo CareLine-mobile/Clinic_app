@@ -1,17 +1,16 @@
-import 'package:clinic_app/core/api/model/endpoints.dart';
-import 'package:clinic_app/features/clinic_details/domain/entites/appointment_request_entity.dart';
-import 'package:clinic_app/features/clinic_details/domain/entites/clinic_entities.dart';
 import 'package:dartz/dartz.dart';
-
 import '../../../../core/api/base_api_services.dart';
+import '../../../../core/api/model/endpoints.dart';
 import '../../../../core/api/model/http_method.dart';
+import '../../../../core/errors/exceptions.dart';
 import '../../../../core/errors/failures.dart';
+import '../../domain/entites/appointment_request_entity.dart';
+import '../../domain/entites/clinic_entities.dart';
 import '../../domain/entites/time_slot_entity.dart';
 import '../../domain/repositories/clinic_repository.dart';
 import '../datasources/clinic_local_data_source.dart';
 import '../model/clinic_model.dart';
 import '../model/time_slot_model.dart';
-import '../../../../core/errors/exceptions.dart';
 
 class ClinicRepositoryImpl implements ClinicRepository {
   final BaseApiServices apiServices;
@@ -84,7 +83,6 @@ class ClinicRepositoryImpl implements ClinicRepository {
   @override
   Future<Either<Failure, void>> makeAppointment(AppointmentRequestEntity request) async {
     try {
-      // Convert Entity to Model if needed, or use entity directly if it has toJson()
       await apiServices.request(
         method: HttpMethod.post,
         url: Endpoints.bookAppointment,
