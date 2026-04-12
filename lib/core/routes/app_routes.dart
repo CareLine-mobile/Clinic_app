@@ -65,18 +65,15 @@ class AppRouter {
         );
 
       case Routes.resetPassword:
-        final args = settings.arguments as Map<String, dynamic>;
-        final email = args['email'] as String;
-        final cubit = args['cubit'] as AuthCubit?;
+
+        final args = settings.arguments as String;
+
+
         return MaterialPageRoute(
-          builder: (_) => cubit != null
-              ? BlocProvider.value(
-            value: cubit,
-            child: ResetPasswordScreen(email: email),
-          )
-              : BlocProvider<AuthCubit>(
+          builder: (_) =>
+              BlocProvider<AuthCubit>(
             create: (_) => di.sl<AuthCubit>(),
-            child: ResetPasswordScreen(email: email),
+            child: ResetPasswordScreen(email: args),
           ),
         );
       case Routes.profile:
