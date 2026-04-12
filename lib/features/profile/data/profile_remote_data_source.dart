@@ -10,15 +10,17 @@ class ProfileRemoteDataSource {
 
   ProfileRemoteDataSource(this._api);
 
-  Future<ProfileModel> getProfile() async {
+  Future<ProfileResponseModel> getProfile() async {
     final response = await _api.request(
       method: HttpMethod.get,
       url: Endpoints.profile,
     );
-    return ProfileModel.fromJson(response as Map<String, dynamic>);
+    final result = ProfileResponseModel.fromJson(response as Map<String, dynamic>);
+    return result;
   }
 
   Future<ProfileModel> updateProfile(ProfileModel profile,bool isProfileDataExists) async {
+    print('dfidjfidjifjd $isProfileDataExists');
     final response = await _api.request(
       method: isProfileDataExists ? HttpMethod.put: HttpMethod.post,
       url: Endpoints.profile,

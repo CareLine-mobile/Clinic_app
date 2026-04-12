@@ -1,5 +1,26 @@
 import 'package:equatable/equatable.dart';
+class ProfileResponseModel{
+  final ProfileModel? profile;
+  final bool success;
 
+  ProfileResponseModel({required this.profile, required this.success});
+  // factory ProfileResponseModel.fromJson(Map<String, dynamic> json) {
+  //   return ProfileResponseModel(
+  //     profile: ProfileModel.fromJson(json['data']),
+  //     success: json['success'],
+  //   );
+  // }
+
+  factory ProfileResponseModel.fromJson(Map<String, dynamic> json) {
+    final data = json['data'];
+    return ProfileResponseModel(
+      profile: (data != null && data is Map<String, dynamic>)
+          ? ProfileModel.fromJson(data)
+          : null,
+      success: json['success'] as bool? ?? false,
+    );
+  }
+}
 class ProfileModel extends Equatable {
   final int? id;
   final String? fullName;

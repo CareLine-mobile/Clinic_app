@@ -11,7 +11,7 @@ class ProfileRepository {
 
   ProfileRepository(this._dataSource);
 
-  Future<Either<Failure, ProfileModel>> getProfile() async {
+  Future<Either<Failure, ProfileResponseModel>> getProfile() async {
     try {
       return Right(await _dataSource.getProfile());
     } catch (e) {

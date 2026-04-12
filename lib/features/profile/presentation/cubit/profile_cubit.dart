@@ -20,22 +20,37 @@ class ProfileCubit extends Cubit<ProfileState> {
   // ── Load ─────────────────────────────────────────────────────────────────
   Future<void> loadProfile() async {
     emit(ProfileLoading());
-    final result = await _repository.getProfile();  result.fold(
+    final result = await _repository.getProfile();
+
+    result.fold(
           (failure) => emit(ProfileLoadError(failure.message)),
-          (profile) {
-        // enrich profile لو البيانات ناقصة
-        final enriched =
-        (profile.fullName == null || profile.fullName!.trim().isEmpty)
+          (profileResponseModel) {
+        final profile = profileResponseModel.profile;
+
+
+        if (profile == null ) {
+          isProfileDataExists = false;
+
+
+          final emptyProfile = ProfileModel(
+            fullName: _userRepository.currentUser?.name,
+            phone: _userRepository.currentUser?.phone,
+          );
+          emit(ProfileLoaded(emptyProfile));
+          return;
+        }
+
+
+        isProfileDataExists = true;
+
+
+        final enriched = (profile.fullName == null || profile.fullName!.trim().isEmpty)
             ? profile.copyWith(
           fullName: _userRepository.currentUser?.name,
           phone: profile.phone ?? _userRepository.currentUser?.phone,
         )
             : profile;
 
-        // ✅ هنا تحدد هل فيه بيانات ولا لا
-        isProfileDataExists = enriched.hasData;
-
-        // ✅ emit مرة واحدة بس
         emit(ProfileLoaded(enriched));
       },
     );
