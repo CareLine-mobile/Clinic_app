@@ -122,12 +122,13 @@ class AppOutlinedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: horizontalPadding ?? 80,
-        vertical: verticalPadding ?? 15,
+        horizontal: horizontalPadding ?? 80.h,
+        vertical: verticalPadding ?? 15.w,
       ),
       child: SizedBox(
         width: double.infinity,
-        height: 44.h,
+        //height: 44.h,
+        height: null,
         child: OutlinedButton(
           onPressed: isLoading || !active ? null : onPressed,
           style: OutlinedButton.styleFrom(
