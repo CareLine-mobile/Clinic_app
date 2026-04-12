@@ -77,7 +77,6 @@ class ClinicServicesWidget extends StatelessWidget {
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
           decoration: BoxDecoration(
-            // ✨ التعديل هنا: استخدمنا لون السطح مع شفافية عشان يشتغل في الفاتح والغامق
             color: theme.colorScheme.onSurface.withOpacity(0.04),
             borderRadius: BorderRadius.circular(16.r),
           ),
@@ -95,7 +94,6 @@ class ClinicServicesWidget extends StatelessWidget {
               Expanded(
                 child: Text(
                   items[index],
-                  // ✨ التعديل هنا: اعتمدنا على لون الـ Theme الافتراضي (أسود في الفاتح وأبيض في الغامق)
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -108,7 +106,6 @@ class ClinicServicesWidget extends StatelessWidget {
     );
   }
 
-  // ─── 2. تصميم المرافق والتأمينات ───
   Widget _buildDotChips(List<String> items, BuildContext context) {
     final theme = Theme.of(context);
 
@@ -122,7 +119,6 @@ class ClinicServicesWidget extends StatelessWidget {
             color: Colors.transparent,
             borderRadius: BorderRadius.circular(100.r),
             border: Border.all(
-              // ✨ التعديل هنا: لون الحدود يتكيف مع الـ Dark Mode
               color: theme.dividerColor.withOpacity(0.5),
               width: 1,
             ),
@@ -141,7 +137,6 @@ class ClinicServicesWidget extends StatelessWidget {
               SizedBox(width: 8.w),
               Text(
                 item,
-                // ✨ التعديل هنا: عدم إجبار النص على لون ثابت
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
@@ -154,7 +149,6 @@ class ClinicServicesWidget extends StatelessWidget {
   }
 }
 
-// ─── هيدر القسم ───
 class _SectionWrapper extends StatelessWidget {
   final String title;
   final int count;
