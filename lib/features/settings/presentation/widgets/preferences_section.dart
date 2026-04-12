@@ -8,16 +8,6 @@ import 'settings_card.dart';
 import 'settings_item.dart';
 import 'settings_section.dart';
 
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/theme/colors.dart';
-import '../../../../core/utils/app_size.dart';
-import '../cubit/settings_cubit.dart';
-import 'settings_card.dart';
-import 'settings_item.dart';
-import 'settings_section.dart';
-
 class PreferencesSection extends StatelessWidget {
   const PreferencesSection({super.key});
 
