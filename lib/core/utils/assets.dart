@@ -1,5 +1,6 @@
 class Assets {
   static const String appBarBg = 'assets/images/appbar_bg.png';
+  static const String logoApp = 'assets/icons/logo.png';
 
   // details icons
   static const String doctorIcon = 'assets/icons/doctor_icon.svg';

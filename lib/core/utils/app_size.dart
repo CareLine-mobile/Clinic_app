@@ -58,6 +58,7 @@ abstract class AppSizeBase {
   double get s85;
   double get s90;
   double get s100;
+  double get logoSize;
   double get s230 ;
 }
 
@@ -90,6 +91,7 @@ class AppSizeVertical extends AppSizeBase {
   @override double get s85 => 85.h;
   @override double get s90 => 90.h;
   @override double get s100 => 100.h;
+  @override double get logoSize => 150.h;
   @override double get s230 => 230.h;
 
   @override
@@ -126,6 +128,7 @@ class AppSizeHorizontal extends AppSizeBase {
   @override double get s85 => 85.w;
   @override double get s90 => 90.w;
   @override double get s100 => 100.w;
+  @override double get logoSize => 150.w;
   @override double get s230 => 230.w;
 
   @override
@@ -209,9 +212,11 @@ class TextSizeApp extends AppSizeBase {
   double get s100 => 100.sp;
 
   @override
+  double get logoSize => 100.sp;
+
+  @override
   double get s230 => 230.sp;
 
   @override
-  // TODO: implement s18
   double get s18 => 18.sp;
 }

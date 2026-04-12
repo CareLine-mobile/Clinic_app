@@ -2,9 +2,10 @@
 // AUTH SCREEN - MAIN (Clean & Modern)
 // lib/features/auth/presentation/screens/auth_screen.dart
 // ============================================
-
 import 'package:flutter/material.dart';
-import '../widget/auth_logo.dart';
+import '../../../../core/utils/app_size.dart';
+import '../../../../core/utils/assets.dart';
+import '../../../../core/widgets/CustomIcon.dart';
 import '../widget/auth_tab_selector.dart';
 import '../widget/auth_title.dart';
 import '../widget/taps/login_tab.dart';
@@ -55,7 +56,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const SizedBox(height: 20),
-                    const AuthLogo(),
+                    CustomIcon(assetPath: Assets.logoApp,isImage: true,size: AppSizeVertical.instance.logoSize,),
                     const SizedBox(height: 24),
                     ValueListenableBuilder<bool>(
                       valueListenable: _isLoginNotifier,

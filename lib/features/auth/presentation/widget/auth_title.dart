@@ -3,45 +3,52 @@
 // lib/features/auth/presentation/widgets/auth_title.dart
 // ============================================
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class AuthTitle extends StatelessWidget {
   final bool isLogin;
 
   const AuthTitle({
-    Key? key,
+    super.key,
     required this.isLogin,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 300),
       transitionBuilder: (child, animation) {
         return FadeTransition(
           opacity: animation,
-          child: child,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0.0, 0.1),
+              end: Offset.zero,
+            ).animate(animation),
+            child: child,
+          ),
         );
       },
       child: Column(
-        key: ValueKey(isLogin),
+        key: ValueKey<bool>(isLogin),
         children: [
           Text(
-            isLogin ? 'Welcome Back' : 'Create Account',
-            style: const TextStyle(
-              fontSize: 28,
+            isLogin ? 'auth.welcomeBack'.tr() : 'auth.createAccountTitle'.tr(),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: theme.colorScheme.onSurface, // متوافق مع الوضع الداكن/الفاتح
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            isLogin
-                ? 'Sign in to continue'
-                : 'Fill your details to get started',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
+            isLogin ? 'auth.loginSubtitle'.tr() : 'auth.signupSubtitle'.tr(),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant, // لون رمادي يتكيف مع النظام
               height: 1.5,
             ),
           ),
