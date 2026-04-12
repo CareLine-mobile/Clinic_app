@@ -1,3 +1,4 @@
+import 'package:clinic_app/features/user_data/user_repo.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/routes/routes.dart';
@@ -30,7 +31,9 @@ class AccountSection extends StatelessWidget {
               icon: Icons.lock_outline_rounded,
               title: 'settings.account.change_password'.tr(),
               subtitle: 'settings.account.change_password_sub'.tr(),
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, Routes.forgotPassword,arguments: UserRepository().currentUser!.email);
+              },
             ),
             _divider(),
             SettingsItem(

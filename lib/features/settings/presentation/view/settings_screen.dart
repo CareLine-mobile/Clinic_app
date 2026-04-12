@@ -56,7 +56,7 @@ class _SettingsScrollView extends StatelessWidget {
         userPhotoUrl: user!.avatar,
       );
     }
-    return SliverToBoxAdapter(
+    return const SliverToBoxAdapter(
       child: SafeArea(child: GuestBanner()),
     );
   }
@@ -81,14 +81,14 @@ class _SettingsBody extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (user != null) ...[
-              AccountSection(),
+              const AccountSection(),
               SizedBox(height: v.s20),
             ],
-            PreferencesSection(),
+            const PreferencesSection(),
             SizedBox(height: v.s20),
-            SupportSection(),
+          //  const SupportSection(),
             SizedBox(height: v.s20),
-            LegalSection(),
+            const LegalSection(),
             SizedBox(height: v.s20),
             user != null
                 ? const LogoutSection()

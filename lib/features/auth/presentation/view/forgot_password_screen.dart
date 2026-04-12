@@ -1,5 +1,3 @@
-// lib/features/auth/presentation/pages/forgot_password_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -13,7 +11,9 @@ import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({Key? key}) : super(key: key);
+  final String? initialEmail;
+
+  const ForgotPasswordScreen({super.key, this.initialEmail});
 
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
@@ -21,7 +21,15 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  late final TextEditingController _emailController;
+
+  bool get _isLoggedIn => widget.initialEmail != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController(text: widget.initialEmail ?? '');
+  }
 
   @override
   void dispose() {
@@ -43,7 +51,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       current is ForgotPasswordSuccess || current is ForgotPasswordFailure,
       listener: (context, state) {
         if (state is ForgotPasswordSuccess) {
-          // navigate لصفحة الـ reset وبعّت الـ email
           Navigator.pushNamed(
             context,
             Routes.resetPassword,
@@ -59,43 +66,44 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       },
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: CustomAppBar(title: 'auth.forgotPassword.title'.tr(),),
+        appBar: CustomAppBar(title: 'auth.forgotPassword.title'.tr()),
         body: SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 24, vertical: 32),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _ForgotHeader(),
-                      const SizedBox(height: 32),
-                      Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            AppTextFieldFactory.email(
-                              controller: _emailController,
-                              hintText: 'auth.email'.tr(),
-                              validator: Validators.validateEmail,
-                            ),
-                            const SizedBox(height: 24),
-                            BlocBuilder<AuthCubit, AuthState>(
-                              builder: (context, state) {
-                                final isLoading =
-                                state is ForgotPasswordLoading;
-                                return AppButton(
-                                  text: 'auth.forgotPassword.send'.tr(),
-                                  onPressed: isLoading ? null : _handleSend,
-                                  isLoading: isLoading,
-                                  horizontalPadding: 0,
-                                  verticalPadding: 0,
-                                );
-                              },
-                            ),
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _ForgotHeader(),
+                    const SizedBox(height: 32),
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          AppTextFieldFactory.email(
+                            controller: _emailController,
+                            hintText: 'auth.email'.tr(),
+                            validator: Validators.validateEmail,
+                            readOnly: _isLoggedIn,
+                          ),
+                          const SizedBox(height: 24),
+
+                          BlocBuilder<AuthCubit, AuthState>(
+                            builder: (context, state) {
+                              final isLoading = state is ForgotPasswordLoading;
+                              return AppButton(
+                                text: 'auth.forgotPassword.send'.tr(),
+                                onPressed: isLoading ? null : _handleSend,
+                                isLoading: isLoading,
+                                horizontalPadding: 0,
+                                verticalPadding: 0,
+                              );
+                            },
+                          ),
+                          if (!_isLoggedIn) ...[
                             const SizedBox(height: 16),
                             AppOutlinedButton(
                               text: 'auth.forgotPassword.backToLogin'.tr(),
@@ -105,15 +113,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               verticalPadding: 0,
                             ),
                           ],
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-
+        ),
       ),
     );
   }
@@ -129,7 +137,7 @@ class _ForgotHeader extends StatelessWidget {
           width: 72,
           height: 72,
           decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withValues(alpha:0.1),
+            color: theme.colorScheme.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(

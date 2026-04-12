@@ -9,8 +9,8 @@ class Endpoints {
   static const String logout = '/auth/logout';
   static const String verifyOTP = '/auth/verify-otp';
   static const String resendOTP = '/auth/resend-otp';
-  static const String resetPassword = '/auth/resend-otp';
-  static const String sendForgetPassword = '/auth/resend-otp';
+  static const String resetPassword = '/auth/reset-password';
+  static const String sendForgetPassword = '/auth/forgot-password';
   static const String deleteAccount = '/auth/delete-account';
 
 

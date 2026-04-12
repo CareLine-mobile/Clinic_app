@@ -37,13 +37,13 @@ class LegalSection extends StatelessWidget {
           SettingsSection(title: 'settings.sections.legal'.tr()),
           SettingsCard(
             children: [
-              SettingsItem(
-                icon: Icons.description_outlined,
-                title: 'settings.legal.terms'.tr(),
-                subtitle: 'settings.legal.terms_sub'.tr(),
-                onTap: () {},
-              ),
-              _divider(),
+              // SettingsItem(
+              //   icon: Icons.description_outlined,
+              //   title: 'settings.legal.terms'.tr(),
+              //   subtitle: 'settings.legal.terms_sub'.tr(),
+              //   onTap: () {},
+              // ),
+              // _divider(),
               SettingsItem(
                 icon: Icons.privacy_tip_outlined,
                 title: 'settings.legal.privacy'.tr(),

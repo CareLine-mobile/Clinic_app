@@ -50,25 +50,15 @@ class AppRouter {
     // ForgotPassword needs to share the cubit created in Routes.auth
     // so we pass it via arguments instead of creating a new one.
       case Routes.forgotPassword:
-        final cubit = settings.arguments as AuthCubit?;
+        final email = settings.arguments as String?;
         return MaterialPageRoute(
-          builder: (_) => cubit != null
-              ? BlocProvider.value(
-            value: cubit,
-            child: const ForgotPasswordScreen(),
-          )
-          // fallback: create a fresh one if navigated to directly
-              : BlocProvider<AuthCubit>(
+          builder: (_) => BlocProvider<AuthCubit>(
             create: (_) => di.sl<AuthCubit>(),
-            child: const ForgotPasswordScreen(),
+            child: ForgotPasswordScreen(initialEmail: email),
           ),
         );
-
       case Routes.resetPassword:
-
         final args = settings.arguments as String;
-
-
         return MaterialPageRoute(
           builder: (_) =>
               BlocProvider<AuthCubit>(

@@ -43,7 +43,8 @@
       "subtitle": "Enter the code sent to",
       "newPassword": "New Password",
       "submit": "Reset Password",
-      "success": "Password reset successfully"
+      "success": "Password reset successfully",
+      "otpRequired": "OTP Required"
     }
   },
   "onboarding": {
