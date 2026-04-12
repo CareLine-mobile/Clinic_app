@@ -1,111 +1,110 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProfileGenderSelector extends StatelessWidget {
   final String? value;
   final ValueChanged<String?> onChanged;
 
   const ProfileGenderSelector({
-    Key? key,
+    super.key,
     required this.value,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final genders = <String, String>{
-      'Male': 'profile.gender.male'.tr(),
-      'Female': 'profile.gender.female'.tr(),
-    };
+
+    // البيانات (استخدام Dart Records)
+    final genders = [
+      (id: 'male', label: 'profile.gender.male'.tr(), icon: Icons.male_rounded),
+      (id: 'female', label: 'profile.gender.female'.tr(), icon: Icons.female_rounded),
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _fieldLabel(theme, 'profile.fields.gender'.tr()),
-        const SizedBox(height: 8),
-        Row(
-          children: genders.entries.toList().asMap().entries.map((entry) {
-            final idx = entry.key;
-            final backendValue = entry.value.key;
-            final displayLabel = entry.value.value;
-            final selected = value == backendValue;
+        Text(
+          'profile.fields.gender'.tr(),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        SizedBox(height: 12.h),
 
-            return Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(right: idx == 0 ? 8 : 0),
-                child: InkWell(
-                  onTap: () => onChanged(backendValue.toLowerCase()),
-                  borderRadius: BorderRadius.circular(12),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    padding: const EdgeInsets.symmetric(vertical: 11),
-                    decoration: BoxDecoration(
-                      color: selected
-                          ? theme.colorScheme.primary.withOpacity(0.1)
-                          : theme.inputDecorationTheme.fillColor,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: selected
-                            ? theme.colorScheme.primary
-                            : (theme.inputDecorationTheme.enabledBorder
-                            ?.borderSide.color ??
-                            Colors.grey.shade300),
-                        width: selected ? 1.5 : 1,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Radio<String>(
-                          value: backendValue,
-                          groupValue: value,
-                          onChanged: onChanged,
-                          activeColor: theme.colorScheme.primary,
-                          materialTapTargetSize:
-                          MaterialTapTargetSize.shrinkWrap,
-                          visualDensity: VisualDensity.compact,
-                        ),
-                        Text(
-                          displayLabel,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: selected
-                                ? FontWeight.w600
-                                : FontWeight.normal,
-                            color: selected
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          backendValue == 'Male'
-                              ? Icons.male_rounded
-                              : Icons.female_rounded,
-                          size: 18,
-                          color: selected
-                              ? theme.colorScheme.primary
-                              : Colors.grey.shade500,
-                        ),
-                      ],
-                    ),
-                  ),
+        // استخدام Collection For لوضع SizedBox بين العناصر بأمان تام مع اللغتين
+        Row(
+          children: [
+            for (int i = 0; i < genders.length; i++) ...[
+              Expanded(
+                child: _buildGenderCard(
+                  context: context,
+                  theme: theme,
+                  gender: genders[i],
+                  isSelected: value?.toLowerCase() == genders[i].id,
                 ),
               ),
-            );
-          }).toList(),
+              // وضع مسافة بين العناصر فقط (ولا نضعها بعد العنصر الأخير)
+              if (i != genders.length - 1) SizedBox(width: 12.w),
+            ]
+          ],
         ),
       ],
     );
   }
 
-  Widget _fieldLabel(ThemeData theme, String text) {
-    return Text(
-      text,
-      style: theme.textTheme.bodySmall?.copyWith(
-        color: theme.colorScheme.onSurfaceVariant,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 0.2,
+  Widget _buildGenderCard({
+    required BuildContext context,
+    required ThemeData theme,
+    required dynamic gender,
+    required bool isSelected,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => onChanged(gender.id),
+        borderRadius: BorderRadius.circular(12.r),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          padding: EdgeInsets.symmetric(vertical: 14.h),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? theme.colorScheme.primary.withOpacity(0.08)
+                : theme.inputDecorationTheme.fillColor ?? Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.dividerColor.withOpacity(0.4),
+              width: isSelected ? 1.5 : 1,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                gender.icon,
+                size: 20.sp,
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : Colors.grey.shade500,
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                gender.label,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : Colors.grey.shade600,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

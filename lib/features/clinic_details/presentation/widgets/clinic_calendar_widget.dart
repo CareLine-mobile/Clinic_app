@@ -79,7 +79,7 @@ class _ClinicCalendarWidgetState extends State<ClinicCalendarWidget> {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeInOut,
-                  width: 65.w, // عرض أقل لتوفير المساحة
+                  width: 65.w,
                   decoration: BoxDecoration(
                     color: isSelected
                         ? widget.accentColor
@@ -95,15 +95,6 @@ class _ClinicCalendarWidgetState extends State<ClinicCalendarWidget> {
                           : theme.dividerColor.withOpacity(0.5),
                       width: isSelected ? 1.5 : 1,
                     ),
-                    boxShadow: isSelected
-                        ? [
-                      BoxShadow(
-                        color: widget.accentColor.withOpacity(0.25),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      )
-                    ]
-                        : [],
                   ),
                   child: Material(
                     color: Colors.transparent,
