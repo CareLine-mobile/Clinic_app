@@ -56,7 +56,6 @@ class FavouriteRepositoryImpl implements FavouriteRepository {
   Future<Either<Failure, bool>> toggleFavourite(int clinicId) async {
     // ── Guard: ignore rapid double-tap ──────────────────────
     if (_pendingIds.contains(clinicId)) {
-      log('[FavRepo] toggle ignored — already pending for $clinicId');
       return const Right(false);
     }
 
@@ -86,7 +85,6 @@ class FavouriteRepositoryImpl implements FavouriteRepository {
 
       return Right(isFavOnServer);
     } catch (e, st) {
-      log('[FavRepo] toggle failed', error: e, stackTrace: st);
       _pendingIds.remove(clinicId);
 
       // ── Rollback optimistic update ──────────────────────
@@ -115,7 +113,6 @@ class FavouriteRepositoryImpl implements FavouriteRepository {
 
       return Right(clinics);
     } catch (e, st) {
-      log('[FavRepo] getFavourites failed', error: e, stackTrace: st);
       return Left(_mapError(e));
     }
   }
@@ -123,8 +120,6 @@ class FavouriteRepositoryImpl implements FavouriteRepository {
   // ── Private helpers ──────────────────────────────────────────
 
   void _emit() {
-    print('📡 Repo emitting: $_favouriteIds');
-    print(StackTrace.current); // ← This will show EXACTLY what called _emit()
     if (!_controller.isClosed) {
       _controller.add(Set.unmodifiable(_favouriteIds));
     }
