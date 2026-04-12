@@ -93,7 +93,7 @@ class _SettingsBody extends StatelessWidget {
             user != null
                 ? const LogoutSection()
                 : const _GuestAuthButtons(),
-            SizedBox(height: v.s50),
+            SizedBox(height: v.s70),
           ],
         ),
       ),

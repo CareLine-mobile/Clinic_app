@@ -1,5 +1,6 @@
 // lib/features/settings/presentation/widgets/settings_header.dart
 
+import 'package:clinic_app/core/widgets/CustomIcon.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -106,20 +107,9 @@ class SettingsHeader extends StatelessWidget {
                   Container(
                     width: AppSizeHorizontal.instance.s100,
                     height: AppSizeHorizontal.instance.s100,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.white,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 4,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          blurRadius: 20,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
                     ),
                     child: ClipOval(
                       child: userPhotoUrl != null && userPhotoUrl!.isNotEmpty
@@ -132,41 +122,10 @@ class SettingsHeader extends StatelessWidget {
                           color: ColorsManager.primaryColor,
                         ),
                       )
-                          : Icon(
-                        Icons.person,
+                          : CustomIcon(
+                        assetPath: Assets.logoApp,
+                        isImage: true,
                         size: 50.sp,
-                        color: ColorsManager.primaryColor,
-                      ),
-                    ),
-                  ),
-                  // Edit Button
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: GestureDetector(
-                      onTap: onEditPressed,
-                      child: Container(
-                        padding: EdgeInsets.all(AppSizeHorizontal.instance.s8),
-                        decoration: BoxDecoration(
-                          color: ColorsManager.primaryColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 3,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          Icons.edit,
-                          color: Colors.white,
-                          size: 16.sp,
-                        ),
                       ),
                     ),
                   ),
