@@ -9,6 +9,8 @@ import 'core/routes/app_routes.dart';
 import 'core/routes/routes.dart';
 import 'core/service/app_initializer.dart';
 import 'core/theme/app_theme.dart';
+import 'features/auth/presentation/cubit/auth_cubit.dart';
+import 'features/auth/presentation/view/otp_verification_page.dart';
 import 'features/settings/presentation/cubit/settings_cubit.dart';
 import 'features/user_data/user_cubit.dart';
 import 'features/user_data/user_repo.dart';
@@ -70,10 +72,9 @@ class MyApp extends StatelessWidget {
                 localizationsDelegates: context.localizationDelegates,
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,           // driven by easy_localization
-                initialRoute: UserRepository().isLoggedIn
-                    ? Routes.dashBoard
-                    : Routes.auth,
-                onGenerateRoute: AppRouter.onGenerateRoute,
+                initialRoute: UserRepository().isLoggedIn ? Routes.dashBoard : Routes.auth,
+              onGenerateRoute: AppRouter.onGenerateRoute,
+
               );
             },
           );

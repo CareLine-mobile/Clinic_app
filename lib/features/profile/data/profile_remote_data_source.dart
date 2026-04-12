@@ -18,11 +18,11 @@ class ProfileRemoteDataSource {
     return ProfileModel.fromJson(response as Map<String, dynamic>);
   }
 
-  Future<ProfileModel> updateProfile(ProfileModel profile) async {
+  Future<ProfileModel> updateProfile(ProfileModel profile,bool isProfileDataExists) async {
     final response = await _api.request(
-      method: HttpMethod.put,
+      method: isProfileDataExists ? HttpMethod.put: HttpMethod.post,
       url: Endpoints.profile,
-      body: profile.toUpdateJson(),
+      body: profile.toJson(),
     );
     return ProfileModel.fromJson(response as Map<String, dynamic>);
   }

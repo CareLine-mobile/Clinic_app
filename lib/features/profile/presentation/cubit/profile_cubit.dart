@@ -16,17 +16,14 @@ class ProfileCubit extends Cubit<ProfileState> {
   })  : _repository = repository,
         _userRepository = userRepository,
         super(ProfileInitial());
-
+  bool isProfileDataExists = false;
   // ── Load ─────────────────────────────────────────────────────────────────
   Future<void> loadProfile() async {
     emit(ProfileLoading());
-    final result = await _repository.getProfile();
-    result.fold(
+    final result = await _repository.getProfile();  result.fold(
           (failure) => emit(ProfileLoadError(failure.message)),
           (profile) {
-        // For first-time users the API might return a bare user object
-        // with no profile fields yet. Pre-fill name from UserRepository
-        // so the field isn't empty on first open.
+        // enrich profile لو البيانات ناقصة
         final enriched =
         (profile.fullName == null || profile.fullName!.trim().isEmpty)
             ? profile.copyWith(
@@ -34,6 +31,11 @@ class ProfileCubit extends Cubit<ProfileState> {
           phone: profile.phone ?? _userRepository.currentUser?.phone,
         )
             : profile;
+
+        // ✅ هنا تحدد هل فيه بيانات ولا لا
+        isProfileDataExists = enriched.hasData;
+
+        // ✅ emit مرة واحدة بس
         emit(ProfileLoaded(enriched));
       },
     );
@@ -62,7 +64,7 @@ class ProfileCubit extends Cubit<ProfileState> {
 
     emit(ProfileUpdating(toUpdate));
 
-    final result = await _repository.updateProfile(toUpdate);
+    final result = await _repository.updateProfile(toUpdate,isProfileDataExists);
     result.fold(
           (failure) => emit(ProfileUpdateFailure(
         message: failure.message,

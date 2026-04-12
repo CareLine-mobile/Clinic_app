@@ -50,7 +50,7 @@ class ProfileModel extends Equatable {
     );
   }
 
-  Map<String, dynamic> toUpdateJson() {
+  Map<String, dynamic> toJson() {
     final map = <String, dynamic>{
       'full_name': fullName,
       'birth_date': birthDate != null
@@ -58,7 +58,8 @@ class ProfileModel extends Equatable {
           '${birthDate!.month.toString().padLeft(2, '0')}-'
           '${birthDate!.day.toString().padLeft(2, '0')}'
           : null,
-      'gender': gender!.toLowerCase(),
+    //  'gender': gender!.toLowerCase(),
+      'gender': gender!,
       'emergency_contact': emergencyContact,
     };
     if (bloodType != null) map['blood_type'] = bloodType;
@@ -110,4 +111,15 @@ class ProfileModel extends Equatable {
     id, fullName, email, phone, avatar,
     birthDate, gender, bloodType, chronicDiseases, emergencyContact,
   ];
+  bool get hasData {
+    return id != null ||
+        (fullName != null && fullName!.trim().isNotEmpty) ||
+        (email != null && email!.isNotEmpty) ||
+        (phone != null && phone!.isNotEmpty) ||
+        birthDate != null ||
+        (gender != null && gender!.isNotEmpty) ||
+        (bloodType != null && bloodType!.isNotEmpty) ||
+      //  (chronicDiseases != null && chronicDiseases!.isNotEmpty) ||
+        (emergencyContact != null && emergencyContact!.trim().isNotEmpty);
+  }
 }

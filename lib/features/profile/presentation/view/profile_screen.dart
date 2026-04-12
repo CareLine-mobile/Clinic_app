@@ -779,9 +779,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           keyboardType: TextInputType.phone,
           prefixIcon: Icon(Icons.phone_outlined,
               color: Colors.grey.shade500, size: 20),
-          validator: (v) => (v == null || v.trim().isEmpty)
-              ? 'profile.validation.emergencyRequired'.tr()
-              : null,
+          validator: (v) => (v == null || v.trim().isEmpty) ? 'profile.validation.emergencyRequired'.tr() : null,
         ),
       ],
     );

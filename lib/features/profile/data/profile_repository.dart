@@ -19,9 +19,9 @@ class ProfileRepository {
     }
   }
 
-  Future<Either<Failure, ProfileModel>> updateProfile(ProfileModel profile) async {
+  Future<Either<Failure, ProfileModel>> updateProfile(ProfileModel profile,bool isProfileDataExists) async {
     try {
-      return Right(await _dataSource.updateProfile(profile));
+      return Right(await _dataSource.updateProfile(profile,isProfileDataExists));
     } catch (e) {
       return Left(ErrorHandler.handleException(e));
     }

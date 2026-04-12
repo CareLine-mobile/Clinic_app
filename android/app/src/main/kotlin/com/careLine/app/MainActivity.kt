@@ -1,4 +1,4 @@
-package com.careLine
+package com.careLine.app
 
 import io.flutter.embedding.android.FlutterActivity
 
