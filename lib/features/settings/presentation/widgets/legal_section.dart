@@ -48,14 +48,17 @@ class LegalSection extends StatelessWidget {
                 icon: Icons.privacy_tip_outlined,
                 title: 'settings.legal.privacy'.tr(),
                 subtitle: 'settings.legal.privacy_sub'.tr(),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, Routes.privacyPolicy);
+                },
               ),
               _divider(),
               SettingsItem(
                 icon: Icons.info_outline_rounded,
                 title: 'settings.legal.about'.tr(),
                 subtitle: 'settings.legal.version'.tr(),
-                onTap: () {},
+                showArrow: false,
+
               ),
               _divider(),
               // ─── Delete account — red icon ──────────────────────

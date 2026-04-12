@@ -1,3 +1,4 @@
+import 'package:clinic_app/core/api/model/endpoints.dart';
 import 'package:clinic_app/core/di/injection_container.dart';
 import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/features/auth/presentation/cubit/auth_cubit.dart';
@@ -7,6 +8,8 @@ import 'package:clinic_app/features/my_booking/presentation/cubit/booking_cubit.
 import 'package:clinic_app/features/my_booking/presentation/view/booking_detail_screen.dart';
 import 'package:clinic_app/features/search/presentation/cubit/search_cubit.dart';
 import 'package:clinic_app/features/search/presentation/view/search_screen.dart';
+import 'package:clinic_app/features/settings/presentation/view/privacy_view.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/auth/presentation/view/auth_screen.dart';
@@ -47,7 +50,14 @@ class AppRouter {
             child: BookingDetailScreen(booking: booking),
           ),
         );
-    // ForgotPassword needs to share the cubit created in Routes.auth
+         case Routes.privacyPolicy:
+           return MaterialPageRoute(
+             builder: (_) => PolicyScreen(
+               url: Endpoints.policyLink,
+               title: 'settings.legal.privacy'.tr(),
+             ),
+           );
+
     // so we pass it via arguments instead of creating a new one.
       case Routes.forgotPassword:
         final email = settings.arguments as String?;

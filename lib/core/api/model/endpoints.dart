@@ -2,6 +2,7 @@
 class Endpoints {
   // Base URL
   static const String baseUrl = 'https://clinical.khorogat.com/api';
+  static const String policyLink = 'https://clinical.khorogat.com/policy';
 
   // Auth
   static const String login = '/auth/login';
