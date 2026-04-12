@@ -1,3 +1,4 @@
+import 'package:clinic_app/core/widgets/Loading_widget.dart';
 import 'package:clinic_app/core/widgets/app_buton.dart';
 import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -114,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         builder: (context, state) {
           if (!_ctrl.isInitialized &&
               (state is ProfileInitial || state is ProfileLoading)) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: LoadingSpinner());
           }
 
           if (!_ctrl.isInitialized && state is ProfileLoadError) {
