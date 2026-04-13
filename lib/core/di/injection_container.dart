@@ -1,5 +1,6 @@
 import 'package:clinic_app/core/api/base_api_services.dart';
 import 'package:clinic_app/core/api/dio_client.dart';
+import 'package:clinic_app/features/auth/domain/usecases/google_login_usecase.dart';
 import 'package:clinic_app/features/my_booking/data/data_sources/review_local_data_source.dart';
 import 'package:clinic_app/features/my_booking/domain/usecase/review_local_data_source.dart';
 import 'package:clinic_app/features/search/data/datasources/search_remote_data_source.dart';
@@ -122,6 +123,7 @@ void setUpAuthModule() {
   );
 
   sl.registerLazySingleton(() => LoginUseCase(sl()));
+  sl.registerLazySingleton(() => GoogleLoginUseCase(sl()));
   sl.registerLazySingleton(() => SignupUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
   sl.registerLazySingleton(() => VerifyOtpUseCase(sl()));
@@ -139,6 +141,7 @@ void setUpAuthModule() {
       authRepository: sl(),
       logoutUseCase: sl(),
       sendForgotPasswordUseCase: sl(),
+      googleLoginUseCase: sl(),
       resetPasswordUseCase: sl(),
       deleteAccountUseCase: sl()
     ),

@@ -14,7 +14,7 @@ class ErrorHandler {
     'please verify your email first':       'errors.server.accountNotVerified',
     'please verify your email.':            'errors.server.accountNotVerified',
     'please verify your email':             'errors.server.accountNotVerified',
-
+    'google_id_token_error':                'errors.auth.googleTokenError',
     'invalid credentials.':                 'errors.server.invalidCredentials',
     'invalid credentials':                  'errors.server.invalidCredentials',
     'unauthenticated.':                     'errors.server.unauthorized',

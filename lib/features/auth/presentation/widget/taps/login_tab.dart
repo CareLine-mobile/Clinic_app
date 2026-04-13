@@ -1,13 +1,16 @@
-import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
+// lib/features/auth/presentation/widgets/login_tab.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:clinic_app/core/theme/colors.dart';
 import 'package:clinic_app/core/widgets/app_buton.dart';
 import 'package:clinic_app/core/widgets/app_text_feild.dart';
 import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/core/utils/validators.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import '../../cubit/auth_cubit.dart';
 import '../../cubit/auth_state.dart';
 
@@ -74,6 +77,8 @@ class _LoginTabState extends State<LoginTab> {
           const SizedBox(height: 20),
           _buildDivider(),
           const SizedBox(height: 20),
+          _buildGoogleSignInButton(), // ⬅️ Google Sign-In Button
+          const SizedBox(height: 12),
           _buildGuestButton(),
         ],
       ),
@@ -86,7 +91,6 @@ class _LoginTabState extends State<LoginTab> {
       current is AuthFailure ||
           current is LoginSuccess ||
           current is AccountNotVerified,
-
       listener: (context, state) {
         if (state is AuthFailure) {
           _showErrorSnackBar(state.message);
@@ -115,6 +119,32 @@ class _LoginTabState extends State<LoginTab> {
     );
   }
 
+  // ⬅️ Google Sign-In Button Widget
+  Widget _buildGoogleSignInButton() {
+    return BlocConsumer<AuthCubit, AuthState>(
+      listenWhen: (_, current) =>
+      current is AuthFailure ||
+          current is LoginSuccess,
+      listener: (context, state) {
+        if (state is AuthFailure) {
+          _showErrorSnackBar(state.message);
+        } else if (state is LoginSuccess) {
+          Navigator.pushNamedAndRemoveUntil(context, Routes.dashBoard, (_) => false);
+        }
+      },
+      builder: (context, state) {
+        return AppOutlinedButton(
+          text: 'auth.signInWithGoogle'.tr(),
+          onPressed: state is AuthLoading ? null : _handleGoogleSignIn,
+          isLoading: state is AuthLoading,
+          horizontalPadding: 0,
+          verticalPadding: 12,
+          leadingIcon: Icons.g_mobiledata,
+        );
+      },
+    );
+  }
+
   Widget _buildDivider() {
     return Row(
       children: [
@@ -123,7 +153,11 @@ class _LoginTabState extends State<LoginTab> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             'OR',
-            style: TextStyle(color: Colors.grey.shade500, fontSize: 12, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              color: Colors.grey.shade500,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
         Expanded(child: Divider(color: Colors.grey.shade300)),
@@ -144,13 +178,17 @@ class _LoginTabState extends State<LoginTab> {
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthCubit>().login(
-          _emailController.text.trim(),
-          _passwordController.text,
+        _emailController.text.trim(),
+        _passwordController.text,
       );
     }
   }
 
+  void _handleGoogleSignIn() {
+    context.read<AuthCubit>().googleLogin();
+  }
+
   void _showErrorSnackBar(String message) {
-    CustomSnackBar.show(context, message: message,type: SnackBarType.error);
+    CustomSnackBar.show(context, message: message, type: SnackBarType.error);
   }
 }

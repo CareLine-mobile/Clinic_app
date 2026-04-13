@@ -19,6 +19,7 @@
     "loginSubtitle": "سجل دخولك لمتابعة رحلتك الصحية",
     "createAccountTitle": "إنشاء حساب جديد",
     "signupSubtitle": "انضم إلينا للحصول على رعاية صحية أفضل",
+    "signInWithGoogle": "الدخول باستخدام جوجل",
     "otp": {
       "title": "التحقق",
       "headline": "تحقق من بريدك الإلكتروني",

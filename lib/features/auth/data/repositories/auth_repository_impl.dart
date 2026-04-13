@@ -1,5 +1,7 @@
 import 'package:clinic_app/core/api/base_api_services.dart';
 import 'package:dartz/dartz.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../../../../core/api/model/endpoints.dart';
 import '../../../../core/api/model/http_method.dart';
 import '../../../../core/errors/error_handler.dart';
@@ -44,6 +46,56 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       return Left(failure);
+    }
+  }
+
+  @override
+  Future<Either<Failure, User>> googleLogin() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        scopes: ['email', 'profile'],
+      );
+
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        // User cancelled the sign-in flow
+        return Left(ServerFailure(
+          'errors.auth.cancelled'.tr(),
+          'CANCELLED',
+        ));
+      }
+
+      // Get authentication details
+      final response = await apiServices.request(
+        method: HttpMethod.post,
+        url: Endpoints.googleLogin,
+        body: {
+          'email': googleUser.email,
+          'name': googleUser.displayName ?? '',
+          'google_id': googleUser.id,
+        },
+      );
+
+      final authResponse = AuthResponseModel.fromJson(response);
+
+      if (authResponse.user != null) {
+        return Right(authResponse.user!.toEntity());
+      }
+
+      throw ServerException(
+        authResponse.message.isNotEmpty
+            ? authResponse.message
+            : 'errors.server.unexpected'.tr(),
+        'GOOGLE_LOGIN_FAILED',
+      );
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(
+        'errors.auth.googleSignInFailed'.tr(),
+        'GOOGLE_SIGN_IN_ERROR',
+      );
     }
   }
 

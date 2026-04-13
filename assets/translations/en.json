@@ -19,6 +19,7 @@
     "loginSubtitle": "Login to continue your health journey",
     "createAccountTitle": "Create Account",
     "signupSubtitle": "Join us for better healthcare",
+    "signInWithGoogle": "Sign in with Google",
     "otp": {
       "title": "Verification",
       "headline": "Check your email",
