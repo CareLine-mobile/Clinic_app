@@ -12,7 +12,20 @@
           "package_name": "com.careLine.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1051363714209-qmc89vnv3g507bp6j2a8m4i1trl4v9nn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.careLine.app",
+            "certificate_hash": "383729b7b3576d2f718f26a690daabb4ecd821b7"
+          }
+        },
+        {
+          "client_id": "1051363714209-kuqsn9psu5bhsj0dut8shp9nbblpndlg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBiv2SvFGnoqv4nPyTQfjc2xWSuTD_MwHo"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1051363714209-kuqsn9psu5bhsj0dut8shp9nbblpndlg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

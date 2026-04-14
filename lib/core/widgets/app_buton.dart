@@ -102,6 +102,7 @@ class AppOutlinedButton extends StatelessWidget {
   final double? horizontalPadding;
   final double? verticalPadding;
   final double borderWidth;
+  final Widget? leadingWidget;
 
   const AppOutlinedButton({
     Key? key,
@@ -113,6 +114,7 @@ class AppOutlinedButton extends StatelessWidget {
     this.borderRadius = 8.0,
     this.textStyle,
     this.leadingIcon,
+    this.leadingWidget,
     this.horizontalPadding = 0,
     this.verticalPadding = 15,
     this.borderWidth = 1.0,
@@ -151,9 +153,14 @@ class AppOutlinedButton extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (leadingIcon != null)
+              if (leadingWidget != null)
                 Padding(
-                  padding: const EdgeInsets.only(right: 8),
+                  padding: EdgeInsets.symmetric(horizontal: 8.w),
+                  child: leadingWidget!,
+                )
+              else if (leadingIcon != null)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w),
                   child: Icon(
                     leadingIcon,
                     size: 20,
@@ -161,6 +168,7 @@ class AppOutlinedButton extends StatelessWidget {
                         ? ColorsManager.secondaryColor : ColorsManager.primaryColor,
                   ),
                 ),
+
               Text(
                 text,
                 style: textStyle ??

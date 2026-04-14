@@ -72,7 +72,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> googleLogin() async {
-    emit(AuthLoading());
+    emit(GoogleLoginLoading());
 
     final result = await googleLoginUseCase();
 

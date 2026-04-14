@@ -1,6 +1,7 @@
 import 'package:clinic_app/core/api/base_api_services.dart';
 import 'package:dartz/dartz.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../../../core/api/model/endpoints.dart';
 import '../../../../core/api/model/http_method.dart';
@@ -59,14 +60,15 @@ class AuthRepositoryImpl implements AuthRepository {
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
       if (googleUser == null) {
-        // User cancelled the sign-in flow
         return Left(ServerFailure(
           'errors.auth.cancelled'.tr(),
           'CANCELLED',
         ));
       }
 
-      // Get authentication details
+      final GoogleSignInAuthentication googleAuth =
+      await googleUser.authentication;
+
       final response = await apiServices.request(
         method: HttpMethod.post,
         url: Endpoints.googleLogin,
@@ -74,6 +76,7 @@ class AuthRepositoryImpl implements AuthRepository {
           'email': googleUser.email,
           'name': googleUser.displayName ?? '',
           'google_id': googleUser.id,
+          'id_token': googleAuth.idToken ?? '',
         },
       );
 
@@ -83,19 +86,24 @@ class AuthRepositoryImpl implements AuthRepository {
         return Right(authResponse.user!.toEntity());
       }
 
-      throw ServerException(
+      return Left(ServerFailure(
         authResponse.message.isNotEmpty
             ? authResponse.message
             : 'errors.server.unexpected'.tr(),
         'GOOGLE_LOGIN_FAILED',
-      );
-    } on ServerException {
-      rethrow;
+      ));
+
     } catch (e) {
-      throw ServerException(
-        'errors.auth.googleSignInFailed'.tr(),
-        'GOOGLE_SIGN_IN_ERROR',
-      );
+      // لو المستخدم كنسل من غير ما يختار حساب
+      if (e is PlatformException && e.code == 'CANCELLED') {
+        return Left(ServerFailure(
+          'errors.auth.cancelled'.tr(),
+          'CANCELLED',
+        ));
+      }
+
+      // باقي الـ errors يروا على ErrorHandler
+      return Left(ErrorHandler.handleException(e));
     }
   }
 

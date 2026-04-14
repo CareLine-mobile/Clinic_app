@@ -7,6 +7,7 @@ class Assets {
   static const locationIcon = 'assets/icons/location.svg';
   // icon
   static const String searchBarIcon = 'assets/icons/search-icon.svg';
+  static const String googleIcon = 'assets/icons/google-icon.svg';
   // lotti icon
   static const String favIcon = 'assets/icons/heart_Pop.json';
   static const String errorServerIcon = 'assets/icons/error_state.json';

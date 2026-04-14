@@ -40,6 +40,13 @@ class ErrorHandler {
 
   static String _translateMessage(String raw) {
     if (raw.isEmpty) return raw;
+
+    if (raw.toLowerCase().contains('sqlstate') ||
+        raw.toLowerCase().contains('sql:') ||
+        raw.toLowerCase().contains('column not found')) {
+      return 'errors.server.internal'.tr();
+    }
+
     final key = _serverMessageMap[raw.toLowerCase().trim()];
     return key != null ? key.tr() : raw;
   }

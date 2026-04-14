@@ -105,6 +105,7 @@ class _SignupTabState extends State<SignupTab> {
                   text: 'auth.createAccount'.tr(),
                   onPressed: state is AuthLoading ? null : _handleSignup,
                   isLoading: state is AuthLoading,
+                  active: state is! GoogleLoginLoading,
                   horizontalPadding: 0,
                   verticalPadding: 0,
                 ),

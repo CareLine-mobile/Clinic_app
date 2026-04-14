@@ -1,5 +1,7 @@
 // lib/features/auth/presentation/widgets/login_tab.dart
 
+import 'package:clinic_app/core/utils/assets.dart';
+import 'package:clinic_app/core/widgets/CustomIcon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -77,7 +79,7 @@ class _LoginTabState extends State<LoginTab> {
           const SizedBox(height: 20),
           _buildDivider(),
           const SizedBox(height: 20),
-          _buildGoogleSignInButton(), // ⬅️ Google Sign-In Button
+          _buildGoogleSignInButton(),
           const SizedBox(height: 12),
           _buildGuestButton(),
         ],
@@ -112,6 +114,7 @@ class _LoginTabState extends State<LoginTab> {
           text: 'auth.login'.tr(),
           onPressed: state is AuthLoading ? null : _handleLogin,
           isLoading: state is AuthLoading,
+          active: state is! GoogleLoginLoading,
           horizontalPadding: 0,
           verticalPadding: 0,
         );
@@ -119,27 +122,29 @@ class _LoginTabState extends State<LoginTab> {
     );
   }
 
-  // ⬅️ Google Sign-In Button Widget
+  // Google Sign-In Button Widget
   Widget _buildGoogleSignInButton() {
     return BlocConsumer<AuthCubit, AuthState>(
       listenWhen: (_, current) =>
-      current is AuthFailure ||
-          current is LoginSuccess,
+      current is AuthFailure || current is LoginSuccess,
       listener: (context, state) {
         if (state is AuthFailure) {
           _showErrorSnackBar(state.message);
         } else if (state is LoginSuccess) {
-          Navigator.pushNamedAndRemoveUntil(context, Routes.dashBoard, (_) => false);
+          Navigator.pushNamedAndRemoveUntil(
+              context, Routes.dashBoard, (_) => false);
         }
       },
       builder: (context, state) {
+        final isGoogleLoading = state is GoogleLoginLoading;
+        final isAnyLoading = state is AuthLoading || isGoogleLoading;
+
         return AppOutlinedButton(
           text: 'auth.signInWithGoogle'.tr(),
-          onPressed: state is AuthLoading ? null : _handleGoogleSignIn,
-          isLoading: state is AuthLoading,
-          horizontalPadding: 0,
-          verticalPadding: 12,
-          leadingIcon: Icons.g_mobiledata,
+          onPressed: isAnyLoading ? null : _handleGoogleSignIn,
+          isLoading: isGoogleLoading,
+          active: !isAnyLoading,
+          leadingWidget: const CustomIcon(assetPath: Assets.googleIcon, noColor: true,size: 20,),
         );
       },
     );
@@ -152,7 +157,7 @@ class _LoginTabState extends State<LoginTab> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            'OR',
+            'auth.or'.tr(),
             style: TextStyle(
               color: Colors.grey.shade500,
               fontSize: 12,
