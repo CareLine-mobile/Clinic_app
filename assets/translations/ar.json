@@ -18,6 +18,7 @@
     "welcomeBack": "مرحباً بعودتك",
     "loginSubtitle": "سجل دخولك لمتابعة رحلتك الصحية",
     "createAccountTitle": "إنشاء حساب جديد",
+    "googleSignInFailed": "فشل تسجيل الدخول باستخدام جوجل",
     "signupSubtitle": "انضم إلينا للحصول على رعاية صحية أفضل",
     "signInWithGoogle": "الدخول باستخدام جوجل",
     "otp": {
