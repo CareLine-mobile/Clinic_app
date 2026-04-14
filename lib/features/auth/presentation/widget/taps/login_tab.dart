@@ -4,15 +4,14 @@ import 'package:clinic_app/core/utils/assets.dart';
 import 'package:clinic_app/core/widgets/CustomIcon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:clinic_app/core/theme/colors.dart';
 import 'package:clinic_app/core/widgets/app_buton.dart';
 import 'package:clinic_app/core/widgets/app_text_feild.dart';
 import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/core/utils/validators.dart';
 import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
+import 'package:clinic_app/core/utils/app_size.dart';
 import '../../cubit/auth_cubit.dart';
 import '../../cubit/auth_state.dart';
 
@@ -28,6 +27,10 @@ class _LoginTabState extends State<LoginTab> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  final _v = AppSizeVertical.instance;
+  final _h = AppSizeHorizontal.instance;
+  final _t = TextSizeApp.instance;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -42,25 +45,25 @@ class _LoginTabState extends State<LoginTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: 8),
+          SizedBox(height: _v.s8),
           AppTextFieldFactory.email(
             controller: _emailController,
             hintText: 'auth.email'.tr(),
             validator: Validators.validateEmail,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: _v.s16),
           AppTextFieldFactory.password(
             controller: _passwordController,
             hintText: 'auth.password'.tr(),
             validator: Validators.validatePassword,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: _v.s12),
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () => Navigator.pushNamed(context, Routes.forgotPassword),
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: EdgeInsets.symmetric(horizontal: _h.s8),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
@@ -68,19 +71,19 @@ class _LoginTabState extends State<LoginTab> {
                 'auth.forgotPassword.title'.tr(),
                 style: TextStyle(
                   color: ColorsManager.primaryColor,
-                  fontSize: 13.sp,
+                  fontSize: _t.s12,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: _v.s16),
           _buildLoginButton(),
-          const SizedBox(height: 20),
+          SizedBox(height: _v.s20),
           _buildDivider(),
-          const SizedBox(height: 20),
+          SizedBox(height: _v.s20),
           _buildGoogleSignInButton(),
-          const SizedBox(height: 12),
+          SizedBox(height: _v.s12),
           _buildGuestButton(),
         ],
       ),
@@ -97,7 +100,8 @@ class _LoginTabState extends State<LoginTab> {
         if (state is AuthFailure) {
           _showErrorSnackBar(state.message);
         } else if (state is LoginSuccess) {
-          Navigator.pushNamedAndRemoveUntil(context, Routes.dashBoard, (_) => false);
+          Navigator.pushNamedAndRemoveUntil(
+              context, Routes.dashBoard, (_) => false);
         } else if (state is AccountNotVerified) {
           Navigator.pushNamed(
             context,
@@ -122,7 +126,6 @@ class _LoginTabState extends State<LoginTab> {
     );
   }
 
-  // Google Sign-In Button Widget
   Widget _buildGoogleSignInButton() {
     return BlocConsumer<AuthCubit, AuthState>(
       listenWhen: (_, current) =>
@@ -144,7 +147,13 @@ class _LoginTabState extends State<LoginTab> {
           onPressed: isAnyLoading ? null : _handleGoogleSignIn,
           isLoading: isGoogleLoading,
           active: !isAnyLoading,
-          leadingWidget: const CustomIcon(assetPath: Assets.googleIcon, noColor: true,size: 20,),
+          horizontalPadding: 0,
+          verticalPadding: 0,
+          leadingWidget: CustomIcon(
+            assetPath: Assets.googleIcon,
+            noColor: true,
+            size: _h.s20,
+          ),
         );
       },
     );
@@ -155,12 +164,12 @@ class _LoginTabState extends State<LoginTab> {
       children: [
         Expanded(child: Divider(color: Colors.grey.shade300)),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: _h.s16),
           child: Text(
             'auth.or'.tr(),
             style: TextStyle(
               color: Colors.grey.shade500,
-              fontSize: 12,
+              fontSize: _t.s12,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -173,10 +182,14 @@ class _LoginTabState extends State<LoginTab> {
   Widget _buildGuestButton() {
     return AppOutlinedButton(
       text: 'auth.continueAsGuest'.tr(),
-      leadingIcon: Icons.person_outline,
-      onPressed: () => Navigator.pushNamedAndRemoveUntil(context, Routes.dashBoard, (_) => false),
+      onPressed: () => Navigator.pushNamedAndRemoveUntil(
+          context, Routes.dashBoard, (_) => false),
       horizontalPadding: 0,
       verticalPadding: 0,
+      leadingWidget: CustomIcon(
+        assetPath: Assets.personIcon,
+        size: _h.s20,
+      ),
     );
   }
 
