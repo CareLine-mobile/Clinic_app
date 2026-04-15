@@ -6,11 +6,13 @@ import 'package:clinic_app/core/utils/enums.dart';
 import 'package:clinic_app/core/widgets/CustomIcon.dart';
 import 'package:clinic_app/core/widgets/custom_network_image.dart';
 import 'package:clinic_app/features/home/domain/entities/clinic_summary.dart';
+import 'package:clinic_app/features/user_data/user_repo.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/widgets/animated_lottie_icon.dart';
+import '../custom_snack_bar.dart';
 
 class ClinicCard extends StatefulWidget {
   final ClinicSummary clinic;
@@ -601,7 +603,23 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
       ),
     );
   }
+  void _toggleFavorite(BuildContext context) {
+    final user = UserRepository().currentUser; // see step 2
 
+    if (user == null) {
+      CustomSnackBar.show(
+        context,
+          message: 'يجب تسجيل الدخول أولاً للإضافة إلى المفضلة',
+
+        type: SnackBarType.warning,
+
+
+      );
+      return;
+    }
+
+    widget.onFavoriteToggle;
+  }
   Widget _buildBadges({
     bool showFavIcon = true,
   }) {
@@ -648,7 +666,7 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
               size: _tSize.s32,
             isActive: widget.clinic.isFavorite,
              // isActive: true,
-              onTap: widget.onFavoriteToggle,
+              onTap: () => _toggleFavorite(context),
             ),
           ),
 
