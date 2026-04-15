@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1051363714209-mghad9of727bdoq5iph7bdju6alv99uq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.careLine.app",
+            "certificate_hash": "8a7e6aeef0fa900ff626f0b874c440ffe3b32bce"
+          }
+        },
+        {
           "client_id": "1051363714209-qmc89vnv3g507bp6j2a8m4i1trl4v9nn.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

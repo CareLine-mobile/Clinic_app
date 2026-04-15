@@ -31,7 +31,7 @@ class CustomIcon extends StatelessWidget {
         assetPath, // Path to the SVG file in the assets folder
         width: size, // Optional: Set the width of the icon
         height: size, // Optional: Set the height of the icon
-          colorFilter: noColor == true ?  null : ColorFilter.mode( color ?? ColorsManager.secondaryColor, BlendMode.srcIn) ,
+          colorFilter: noColor == true ?  null : ColorFilter.mode( color ?? Theme.of(context).primaryColor, BlendMode.srcIn) ,
         fit: fit ?? BoxFit.contain, // Optional: Define how the SVG should be fitted
       ),
     );
