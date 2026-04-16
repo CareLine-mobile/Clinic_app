@@ -604,7 +604,7 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
     );
   }
   void _toggleFavorite(BuildContext context) {
-    final user = UserRepository().currentUser; // see step 2
+    final user = UserRepository().currentUser;
 
     if (user == null) {
       CustomSnackBar.show(
@@ -618,7 +618,7 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
       return;
     }
 
-    widget.onFavoriteToggle;
+    widget.onFavoriteToggle!();
   }
   Widget _buildBadges({
     bool showFavIcon = true,
