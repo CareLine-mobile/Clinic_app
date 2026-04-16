@@ -13,7 +13,7 @@ class EmptyStateWidget extends StatelessWidget {
   final bool enableBackButton;
   final VoidCallback? onBackPressed;
 
-  const EmptyStateWidget({
+   EmptyStateWidget({
     Key? key,
     required this.icon,
     required this.title,

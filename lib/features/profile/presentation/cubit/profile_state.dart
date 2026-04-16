@@ -53,3 +53,11 @@ class ProfileUpdateFailure extends ProfileState {
   @override
   List<Object?> get props => [message, currentProfile];
 }
+/// User tapped Save but nothing was modified
+
+class ProfileNoChanges extends ProfileState {
+  final ProfileModel currentProfile;
+  const ProfileNoChanges(this.currentProfile);
+  @override
+  List<Object?> get props => [currentProfile];
+}

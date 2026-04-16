@@ -448,7 +448,8 @@
       "emergencyRequired": "جهة الاتصال في حالات الطوارئ مطلوبة"
     },
     "messages": {
-      "saveSuccess": "تم حفظ الملف الشخصي بنجاح! 🎉"
+      "saveSuccess": "تم حفظ الملف الشخصي بنجاح! 🎉",
+      "noChanges": "لم يتم إجراء أي تغييرات"
     }
   },
   "location": {

@@ -137,23 +137,23 @@ class _SearchHeader extends StatelessWidget {
 
 
 class _SearchBody extends StatelessWidget {
-  const _SearchBody();
+   const _SearchBody();
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SearchCubit, SearchState>(
       builder: (context, state) => switch (state) {
-        SearchInitial() => const _SearchInitialView(),
-        SearchLoading() => const SearchLoadingView(),
+        SearchInitial() =>  _SearchInitialView(),
+        SearchLoading() =>  SearchLoadingView(),
        // SearchLoaded(:final clinics) => _SearchResultsView(clinics: clinics, loadedState: null,),
         SearchLoaded(:final allClinics, :final filteredClinics) =>
         filteredClinics.isEmpty
-            ? const _SearchEmptyView()    // filtered to zero
+            ?  _SearchEmptyView()    // filtered to zero
             : SearchResultsView(
           clinics: filteredClinics,   // ← render filtered
           loadedState: state,         // ← pass for filter bar
         ),
-        SearchEmpty() => const _SearchEmptyView(),
+        SearchEmpty() =>  _SearchEmptyView(),
         SearchError(:final message) => SearchErrorView(message: message),
         _ => const SizedBox.shrink(),
       },
@@ -161,7 +161,7 @@ class _SearchBody extends StatelessWidget {
   }
 }
 class _SearchInitialView extends StatelessWidget {
-  const _SearchInitialView();
+   _SearchInitialView();
 
   @override
   Widget build(BuildContext context) {

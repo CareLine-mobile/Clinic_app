@@ -20,7 +20,7 @@ class ProfileRemoteDataSource {
   }
 
   Future<ProfileModel> updateProfile(ProfileModel profile,bool isProfileDataExists) async {
-    print('dfidjfidjifjd $isProfileDataExists');
+
     final response = await _api.request(
       method: isProfileDataExists ? HttpMethod.put: HttpMethod.post,
       url: Endpoints.profile,

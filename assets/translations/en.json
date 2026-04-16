@@ -448,7 +448,8 @@
       "emergencyRequired": "Emergency contact is required"
     },
     "messages": {
-      "saveSuccess": "Profile saved successfully! 🎉"
+      "saveSuccess": "Profile saved successfully! 🎉",
+      "noChanges": "No changes were made"
     }
   },
   "location": {

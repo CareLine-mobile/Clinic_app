@@ -91,7 +91,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         current is ProfileLoaded ||
             current is ProfileLoadError ||
             current is ProfileUpdateSuccess ||
-            current is ProfileUpdateFailure,
+            current is ProfileUpdateFailure||
+            current is ProfileNoChanges,
         listener: (context, state) {
           if (state is ProfileLoaded) {
             _ctrl.populateFrom(state.profile, () => setState(() {}));
@@ -110,6 +111,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           } else if (state is ProfileUpdateFailure) {
             CustomSnackBar.show(context,
                 message: state.message, type: SnackBarType.error);
+          }else if (state is ProfileNoChanges) {
+            print('no changes from state ');
+            CustomSnackBar.show(
+              context,
+              message: 'profile.messages.noChanges'.tr(),
+              type: SnackBarType.warning,
+            );
           }
         },
         builder: (context, state) {

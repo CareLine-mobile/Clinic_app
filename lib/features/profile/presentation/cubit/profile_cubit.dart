@@ -76,31 +76,39 @@ class ProfileCubit extends Cubit<ProfileState> {
       chronicDiseases: chronicDiseases,
       emergencyContact: emergencyContact,
     );
+    if (toUpdate == current) {
+      print('no changes');
+      emit(ProfileNoChanges(current));
+     // return;
+    }else{
+      final result = await _repository.updateProfile(toUpdate,isProfileDataExists);
+      result.fold(
+            (failure) => emit(ProfileUpdateFailure(
+          message: failure.message,
+          currentProfile: toUpdate,
+        )),
+            (updated) async {
+          // Keep UserRepository stream in sync (name may have changed)
+          await _userRepository.updateUser(
+            name: updated.fullName,
+            phone: updated.phone,
+            avatar: updated.avatar,
+          );
+          emit(ProfileUpdateSuccess(updated));
+        },
+      );
+      emit(ProfileUpdating(toUpdate));
+    }
 
-    emit(ProfileUpdating(toUpdate));
 
-    final result = await _repository.updateProfile(toUpdate,isProfileDataExists);
-    result.fold(
-          (failure) => emit(ProfileUpdateFailure(
-        message: failure.message,
-        currentProfile: toUpdate,
-      )),
-          (updated) async {
-        // Keep UserRepository stream in sync (name may have changed)
-        await _userRepository.updateUser(
-          name: updated.fullName,
-          phone: updated.phone,
-          avatar: updated.avatar,
-        );
-        emit(ProfileUpdateSuccess(updated));
-      },
-    );
+
   }
 
   ProfileModel? _currentProfileFromState() {
     final s = state;
     if (s is ProfileLoaded) return s.profile;
     if (s is ProfileUpdateFailure) return s.currentProfile;
+    if (s is ProfileNoChanges) return s.currentProfile;
     return null;
   }
 }
