@@ -279,7 +279,7 @@ class _QueueBadge extends StatelessWidget {
               child: Text(
                 waitTurns == 0
                     ? 'home.last_booking.your_turn'.tr()
-                    : 'home.last_booking.people_ahead'.tr(args: ['$waitTurns']),
+                    : 'home.last_booking.people_ahead'.tr(namedArgs: {'count': waitTurns.toString()}),
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: accent,

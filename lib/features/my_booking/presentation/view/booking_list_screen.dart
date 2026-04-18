@@ -379,7 +379,7 @@ class _CardDetails extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                WaitTurnsChip(waitTurns: booking.waitTurns!),
+                WaitTurnsChip(waitTurns: booking.waitTurns!, turnNumber: booking.turnNumber!,),
               ],
             ),
           ],
