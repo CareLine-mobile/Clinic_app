@@ -59,8 +59,8 @@ class _DashBoardScreenState extends State<DashBoardScreen>
     WidgetsBinding.instance.addObserver(this);
     _screens = [
       HomeScreen(onNavigateToSearch: (i) => setState(() => _currentIndex = i)),
-      BlocProvider<SearchCubit>(
-        create: (_) => di.sl<SearchCubit>(),
+      BlocProvider<SearchCubit>.value(
+        value: di.sl<SearchCubit>(),
         child: const SearchScreen(),
       ),
       const FavouritesScreen(),

@@ -81,18 +81,18 @@ class _SettingsBody extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (user != null) ...[
-              const AccountSection(),
+               AccountSection(),
               SizedBox(height: v.s20),
             ],
-            const PreferencesSection(),
+             PreferencesSection(),
             SizedBox(height: v.s20),
           //  const SupportSection(),
             SizedBox(height: v.s20),
-            const LegalSection(),
+             LegalSection(),
             SizedBox(height: v.s20),
             user != null
-                ? const LogoutSection()
-                : const _GuestAuthButtons(),
+                ?  LogoutSection()
+                :  _GuestAuthButtons(),
             SizedBox(height: v.s70),
           ],
         ),

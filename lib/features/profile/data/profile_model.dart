@@ -79,7 +79,7 @@ class ProfileModel extends Equatable {
           '${birthDate!.month.toString().padLeft(2, '0')}-'
           '${birthDate!.day.toString().padLeft(2, '0')}'
           : null,
-    //  'gender': gender!.toLowerCase(),
+   //'gender': gender!.toLowerCase(),
       'gender': gender!,
       'emergency_contact': emergencyContact,
     };
