@@ -1,56 +1,67 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../../../core/utils/app_size.dart';
 
 class WaitTurnsChip extends StatelessWidget {
-  final int waitTurns;
+  final int waitTurns; // قدامك كام واحد
+  final int turnNumber; // رقم دورك الأصلي
 
-  const WaitTurnsChip({super.key, required this.waitTurns});
+  const WaitTurnsChip({
+    super.key,
+    required this.waitTurns,
+    required this.turnNumber,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    // colour shifts: green → amber → red as queue grows
     final (bgColor, fgColor) = switch (waitTurns) {
-      0     => (const Color(0xFFE8F5E9), const Color(0xFF2E7D32)),
-      <= 3  => (const Color(0xFFFFF8E1), const Color(0xFFF57F17)),
-      _     => (const Color(0xFFFFEBEE), const Color(0xFFC62828)),
+      0     => (const Color(0xFFE8F5E9), const Color(0xFF2E7D32)), // دورك جه
+      <= 3  => (const Color(0xFFFFF8E1), const Color(0xFFF57F17)), // قربت
+      _     => (const Color(0xFFE3F2FD), const Color(0xFF1565C0)), // لسه بدري (أزرق هادي)
     };
 
-    final label = waitTurns == 0
-        ? 'bookings.wait_turns.your_turn'.tr()
-        : 'bookings.wait_turns.count'.tr(args: ['$waitTurns']);
-
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: SizeApp.s10, vertical: 6.h),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: fgColor.withOpacity(0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            waitTurns == 0
-                ? Icons.notifications_active_rounded
-                : Icons.people_alt_outlined,
-            size: 14.sp,
-            color: fgColor,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          '${'bookings.turn_number'.tr()}: $turnNumber',
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).primaryColor,
           ),
-          SizedBox(width: 5.w),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w700,
-              color: fgColor,
-            ),
+        ),
+        SizedBox(height: 4.h),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(8.r),
+            border: Border.all(color: fgColor.withOpacity(0.2)),
           ),
-        ],
-      ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                waitTurns == 0 ? Icons.check_circle_outline : Icons.timer_outlined,
+                size: 12.sp,
+                color: fgColor,
+              ),
+              SizedBox(width: 4.w),
+              Text(
+                waitTurns == 0
+                    ? 'bookings.wait_turns.your_turn'.tr()
+                    : 'home.last_booking.people_ahead'.tr(namedArgs: {'count': waitTurns.toString()}),
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w600,
+                  color: fgColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

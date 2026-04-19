@@ -211,6 +211,7 @@ class _AppointmentInfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool showQueueInfo = booking.status == 'confirmed' || booking.status == 'checked_in';
     return SectionCard(
       title: 'bookings.detail.appointment_info'.tr(),
       children: [
@@ -220,43 +221,45 @@ class _AppointmentInfoSection extends StatelessWidget {
           value: booking.doctor.name,
         ),
         BookingDetailRow(
-          icon: Icons.medical_services_outlined,
-          label: 'bookings.detail.specialty'.tr(),
-          value: booking.doctor.specialty,
-        ),
-        BookingDetailRow(
           icon: Icons.calendar_today_outlined,
           label: 'bookings.date'.tr(),
           value: _formatDate(booking.date),
         ),
-        BookingDetailRow(
-          icon: Icons.access_time_rounded,
-          label: 'bookings.time'.tr(),
-          value: _formatTime(booking.time),
-        ),
-        if (booking.isPending && booking.waitTurns != null) ...[
-          SizedBox(height: SizeApp.s4),
+
+        if (showQueueInfo && booking.waitTurns != null && booking.turnNumber != null) ...[
+          const Divider(height: 20),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(Icons.hourglass_top_rounded,
-                  size: 16.sp, color: Theme.of(context).primaryColor),
-              SizedBox(width: SizeApp.s8),
-              Text(
-                '${'bookings.wait_turns.label'.tr()}:',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).hintColor,
-                  fontWeight: FontWeight.w500,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'bookings.time'.tr(),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).hintColor),
+                  ),
+                  Text(
+                    _formatTime(booking.time),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                  ),
+                ],
               ),
-              const Spacer(),
-              WaitTurnsChip(waitTurns: booking.waitTurns!),
+              WaitTurnsChip(
+                waitTurns: booking.waitTurns!,
+                turnNumber: booking.turnNumber!,
+              ),
             ],
+          ),
+        ] else ...[
+          BookingDetailRow(
+            icon: Icons.access_time_rounded,
+            label: 'bookings.time'.tr(),
+            value: _formatTime(booking.time),
           ),
         ],
       ],
     );
   }
-
   String _formatDate(String date) {
     try {
       return DateFormat('EEEE، d MMMM yyyy', 'ar').format(DateTime.parse(date));
