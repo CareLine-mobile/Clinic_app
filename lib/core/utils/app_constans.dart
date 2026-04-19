@@ -6,6 +6,7 @@ class AppConstants {
 
   // ==================== Storage Keys ====================
   static const String userKey = 'userKey';
+
   static const String tokenKey = 'tokenKey';
   static const String languageKey = 'languageKey';
   static const String themeKey = 'themeKey';

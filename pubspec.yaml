@@ -120,6 +120,7 @@ flutter:
     - assets/
     - assets/icons/
     - assets/images/
+    - assets/lottie/
     - images/
     - assets/translations/
 

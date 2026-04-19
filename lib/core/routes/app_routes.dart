@@ -19,6 +19,7 @@ import '../../features/auth/presentation/view/reset_password_screen.dart';
 import '../../features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
 import '../../features/dashboard/dashboard.dart';
 import '../../features/clinic_details/presentation/view/clinic_details_screen.dart';
+import '../../features/onboarding/presentation/pages/onboarding_screen.dart';
 import '../../features/profile/presentation/cubit/profile_cubit.dart';
 import '../../features/profile/presentation/view/profile_screen.dart';
 import '../di/injection_container.dart' as di;
@@ -29,7 +30,10 @@ class AppRouter {
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
-
+    case Routes.onboarding:
+      return MaterialPageRoute(
+        builder: (_) => const OnboardingScreen(),
+      );
     // ── Auth ────────────────────────────────────────────────────────────
     // Each route gets its OWN fresh AuthCubit (Factory).
     // BlocProvider owns the lifecycle → closes it when the route pops.

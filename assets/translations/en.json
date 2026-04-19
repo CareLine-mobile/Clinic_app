@@ -51,12 +51,30 @@
     }
   },
   "onboarding": {
-    "slide1_title": "Organize Your Medications Easily",
-    "slide1_subtitle": "Track your daily medication schedule in a simple and effective way with smart reminders",
-    "slide2_title": "Never Miss a Dose",
-    "slide2_subtitle": "Receive timely alerts to ensure you never miss any dose of your medication",
-    "slide3_title": "Track Your Progress",
-    "slide3_subtitle": "Monitor your daily adherence and get detailed statistics about your medication health"
+   "page1": {
+     "title": "Track Your Turn Live",
+     "subtitle": "No more waiting in crowded rooms. Monitor exactly how many patients are ahead of you from home."
+
+   },
+    "page2": {
+      "title": "Arrive Just in Time",
+      "subtitle": "Receive smart notifications telling you exactly when to head to the clinic based on the current live queue"
+
+    },
+    "page3": {
+      "title": "Discover Top Clinics",
+      "subtitle": "Find specialist doctors near you with verified patient ratings and real-time availability."
+
+
+    },
+    "page4": {
+      "title": " Track Your Turn Live",
+      "subtitle": "No more waiting in crowded rooms. Monitor exactly how many patients are ahead of you from home."
+
+    },
+    "skip": "Skip",
+    "next": "Next",
+    "start": "Get Started"
   },
   "medication": {
     "title": "Medications",

@@ -1,6 +1,11 @@
 class Assets {
   static const String appBarBg = 'assets/images/appbar_bg.png';
   static const String logoApp = 'assets/icons/logo.png';
+//onboarding
+  static const String onboarding1 = 'assets/lottie/Arrive Just in Time.json';
+  static const String onboarding3 = 'assets/lottie/Discover Top Clinics.json';
+  static const String onboarding2 = 'assets/lottie/Waiting in a queue.json';
+ // static const String onboarding4 = 'assets/images/onboarding4.png';
 
   // details icons
   static const String doctorIcon = 'assets/icons/doctor_icon.svg';
