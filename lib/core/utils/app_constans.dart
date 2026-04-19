@@ -6,7 +6,7 @@ class AppConstants {
 
   // ==================== Storage Keys ====================
   static const String userKey = 'userKey';
-
+  static const String configurationKey = 'configuration';
   static const String tokenKey = 'tokenKey';
   static const String languageKey = 'languageKey';
   static const String themeKey = 'themeKey';
@@ -51,6 +51,8 @@ class AppConstants {
   static const String socketException = 'SocketException';
   static const String unauthorizedKeyword = '401';
   static const String authKeyword = 'مصرح';
+
+
 }
 
 class ErrorMessages {

@@ -54,7 +54,7 @@ class _SearchScreenState extends State<SearchScreen> {
               controller: _searchController,
               focusNode: _focusNode,
             ),
-            const Expanded(child: _SearchBody()),
+             Expanded(child: _SearchBody()),
           ],
         ),
       ),

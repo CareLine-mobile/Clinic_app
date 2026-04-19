@@ -53,8 +53,7 @@ class HomeCubit extends Cubit<HomeState> {
   // ════════════════════════════════════════════════════════════
 
   void _onFavouriteIdsUpdated(Set<int> ids) {
-    print('🔴 HomeCubit stream fired with ids: $ids');
-    print('🔴 Current state: $state');
+
     final current = state;
     if (current is! HomeLoaded) return;
 
@@ -82,7 +81,7 @@ class HomeCubit extends Cubit<HomeState> {
   bool _isLoading = false; // ✅ Add this guard
   Future<void> initHome() async {
     emit(HomeLoading());
-    await _requestPermissions();
+   // await _requestPermissions();
 
     try {
       final results = await Future.wait([
@@ -246,10 +245,6 @@ class HomeCubit extends Cubit<HomeState> {
   // ════════════════════════════════════════════════════════════
   // HELPERS
   // ════════════════════════════════════════════════════════════
-
-  Future<void> _requestPermissions() async {
-    NotificationPermissionService.requestPermission().ignore();
-  }
 
   void _emitLoadedState() {
     emit(HomeLoaded(

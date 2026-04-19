@@ -17,6 +17,7 @@ import '../../features/auth/presentation/view/forgot_password_screen.dart';
 import '../../features/auth/presentation/view/otp_verification_page.dart';
 import '../../features/auth/presentation/view/reset_password_screen.dart';
 import '../../features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
+import '../../features/configuration/presentation/screens/configuration_screen.dart';
 import '../../features/dashboard/dashboard.dart';
 import '../../features/clinic_details/presentation/view/clinic_details_screen.dart';
 import '../../features/onboarding/presentation/pages/onboarding_screen.dart';
@@ -30,7 +31,12 @@ class AppRouter {
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
-    case Routes.onboarding:
+      case Routes.configuration:
+        return MaterialPageRoute(
+          builder: (_) => const ConfigurationScreen(),
+        );
+
+      case Routes.onboarding:
       return MaterialPageRoute(
         builder: (_) => const OnboardingScreen(),
       );
