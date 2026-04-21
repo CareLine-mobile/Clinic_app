@@ -363,8 +363,9 @@ class _CardDetails extends StatelessWidget {
             label: 'bookings.time'.tr(),
             value: _formatTime(booking.time),
           ),
-          // Turn number — show only when available
-          if (booking.isPending && booking.waitTurns != null) ...[
+          if (!booking.isPending &&
+              booking.waitTurns != null &&
+              booking.turnNumber != null) ...[
             SizedBox(height: SizeApp.s8),
             Row(
               children: [
@@ -379,7 +380,10 @@ class _CardDetails extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                WaitTurnsChip(waitTurns: booking.waitTurns!, turnNumber: booking.turnNumber!,),
+                WaitTurnsChip(
+                  waitTurns: booking.waitTurns!,
+                  turnNumber: booking.turnNumber!, // ← safe now
+                ),
               ],
             ),
           ],
