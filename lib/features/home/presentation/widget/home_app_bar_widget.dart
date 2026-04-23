@@ -271,7 +271,7 @@ class HomeHeaderWidget extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 12,
+            blurRadius: 12.r,
             offset: const Offset(0, 4),
           ),
         ],
@@ -302,6 +302,7 @@ class HomeHeaderWidget extends StatelessWidget {
                   'home.last_booking.no_bookings_title'.tr(),
                   style: textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
+                    fontSize: 14.sp
                   ),
                 ),
                 SizedBox(height: SizeApp.s4),
@@ -309,6 +310,7 @@ class HomeHeaderWidget extends StatelessWidget {
                   'home.last_booking.no_bookings_subtitle'.tr(),
                   style: textTheme.bodySmall?.copyWith(
                     color: ColorsManager.defaultTextSecondary,
+                      fontSize: 14.sp
                   ),
                 ),
               ],

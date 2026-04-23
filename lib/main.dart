@@ -1,7 +1,9 @@
 // lib/main.dart
 import 'package:clinic_app/features/auth/presentation/view/otp_verification_page.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'core/db/shared_pref_helper.dart';
@@ -25,7 +27,7 @@ Locale initialLocale       = const Locale('ar'); // updated before runApp
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  //debugPaintSizeEnabled = true;
   await AppInitializer.init();
   NotificationPermissionService.requestPermission().ignore();
   await UserRepository().loadUser();
@@ -101,9 +103,10 @@ class MyApp extends StatelessWidget {
                   localizationsDelegates:  context.localizationDelegates,
                   supportedLocales:        context.supportedLocales,
                   locale:                  context.locale,
-                 initialRoute:            _initialRoute,
+                  debugShowCheckedModeBanner: kDebugMode,
+                  initialRoute:            _initialRoute,
                   onGenerateRoute:         AppRouter.onGenerateRoute,
-               //   builder: (context, child) => DevToolsOverlay(child:child!),
+                 builder: (context, child) => DevToolsOverlay(child:child!),
                 ),
               );
             },

@@ -133,10 +133,8 @@ class ReviewsSectionWidget extends StatelessWidget {
           SizedBox(height: vSize.s20),
 
           SectionHeader(title: 'clinic.reviews.patients_reviews'.tr()),
-          SizedBox(height: vSize.s12),
 
-          if (reviews.isEmpty)
-            Center(
+          if (reviews.isEmpty)Center(
               child: Padding(
                 padding: EdgeInsets.all(vSize.s32),
                 child: Column(
@@ -160,9 +158,11 @@ class ReviewsSectionWidget extends StatelessWidget {
           else
             ListView.builder(
               shrinkWrap: true,
+              padding:const  EdgeInsets.all(4),
               physics: const NeverScrollableScrollPhysics(),
               itemCount: reviews.length,
               itemBuilder: (_, index) => ReviewCard(review: reviews[index]),
+
             ),
         ],
       ),
