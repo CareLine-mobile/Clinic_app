@@ -8,6 +8,7 @@ import 'package:clinic_app/core/widgets/app_buton.dart';
 import 'package:clinic_app/core/widgets/app_text_feild.dart';
 import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/core/utils/validators.dart';
+import '../../../../../core/utils/app_size.dart';
 import '../../cubit/auth_cubit.dart';
 import '../../cubit/auth_state.dart';
 
@@ -25,6 +26,9 @@ class _SignupTabState extends State<SignupTab> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _v = AppSizeVertical.instance;
+  final _h = AppSizeHorizontal.instance;
+  final _t = TextSizeApp.instance;
 
   @override
   void dispose() {
@@ -110,19 +114,7 @@ class _SignupTabState extends State<SignupTab> {
                   verticalPadding: 0,
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(child: Divider(color: Colors.grey.shade300)),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        'OR',
-                        style: TextStyle(color: Colors.grey.shade500, fontSize: 12, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    Expanded(child: Divider(color: Colors.grey.shade300)),
-                  ],
-                ),
+                _buildDivider(),
                 const SizedBox(height: 16),
                 AppOutlinedButton(
                   text: 'auth.continueAsGuest'.tr(),
@@ -138,7 +130,25 @@ class _SignupTabState extends State<SignupTab> {
       },
     );
   }
-
+  Widget _buildDivider() {
+    return Row(
+      children: [
+        Expanded(child: Divider(color: Colors.grey.shade300)),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: _h.s16),
+          child: Text(
+            'auth.or'.tr(),
+            style: TextStyle(
+              color: Colors.grey.shade500,
+              fontSize: _t.s12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Expanded(child: Divider(color: Colors.grey.shade300)),
+      ],
+    );
+  }
   void _handleSignup() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthCubit>().signup(
