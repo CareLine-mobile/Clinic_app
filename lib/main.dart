@@ -12,6 +12,7 @@ import 'core/service/app_initializer.dart';
 import 'core/service/notification_permission_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/utils/app_constans.dart';
+import 'dev_widget.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
 import 'features/auth/presentation/view/otp_verification_page.dart';
 import 'features/settings/presentation/cubit/settings_cubit.dart';
@@ -35,9 +36,7 @@ void main() async {
       await SharedPrefHelper.getBool(key: AppConstants.configurationKey) ?? false;
   isOnBoarding =
       await SharedPrefHelper.getBool(key: AppConstants.onboardingKey) ?? false;
-  // ── FIX: read the saved language BEFORE runApp and feed it to
-  //         EasyLocalization as startLocale so it never boots in
-  //         Arabic after the user has chosen English. ──────────────────────
+
   final savedLang = await SharedPrefHelper.getString(key: AppConstants.languageCode);
   if (savedLang != null) {
     initialLocale = Locale(savedLang);
@@ -105,6 +104,7 @@ class MyApp extends StatelessWidget {
                   locale:                  context.locale,
                   initialRoute:            _initialRoute,
                   onGenerateRoute:         AppRouter.onGenerateRoute,
+              //    builder: (context, child) => DevToolsOverlay(child:child!),
                 ),
               );
             },

@@ -60,6 +60,7 @@ abstract class AppSizeBase {
   double get s100;
   double get logoSize;
   double get s230 ;
+  double get s400 ;
 }
 
 class AppSizeVertical extends AppSizeBase {
@@ -97,6 +98,10 @@ class AppSizeVertical extends AppSizeBase {
   @override
   // TODO: implement s18
   double get s18 => throw UnimplementedError();
+
+  @override
+  // TODO: implement s400
+  double get s400 => 400.h;
 }
 
 class AppSizeHorizontal extends AppSizeBase {
@@ -134,6 +139,10 @@ class AppSizeHorizontal extends AppSizeBase {
   @override
   // TODO: implement s18
   double get s18 => throw UnimplementedError();
+
+  @override
+  // TODO: implement s400
+  double get s400 => 400.w;
 }
 
 class TextSizeApp extends AppSizeBase {
@@ -219,4 +228,8 @@ class TextSizeApp extends AppSizeBase {
 
   @override
   double get s18 => 18.sp;
+
+  @override
+  // TODO: implement s400
+  double get s400 => throw UnimplementedError();
 }

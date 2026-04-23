@@ -1,9 +1,10 @@
 
 import 'package:flutter/material.dart';
+
+import 'app_text_style.dart';
 import 'colors.dart';
 import 'text_theme.dart';
 
-// ==================== Dark Theme ====================
 class DarkTheme {
   static final ThemeData theme = ThemeData(
     useMaterial3: true,
@@ -23,44 +24,29 @@ class DarkTheme {
     colorScheme: ColorScheme.dark(
       primary: ColorsManager.primaryColor,
       secondary: ColorsManager.secondaryColor,
-
-      // Surface colors
       surface: ColorsManager.secondaryDarkColor,
       surfaceContainerHighest: ColorsManager.darkColor,
-
-      // Background
       background: ColorsManager.darkColor,
-
-      // Error colors
       error: ColorsManager.errorFill,
       onError: ColorsManager.errorOnFill,
       errorContainer: ColorsManager.errorSurface,
-
-      // On colors (text on surfaces)
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onSurface: Colors.white,
       onBackground: Colors.white,
       onSurfaceVariant: ColorsManager.defaultTextSecondaryDark,
-
-      // Outline & Shadow
       outline: Colors.grey[700]!,
       shadow: Colors.black.withOpacity(0.3),
     ),
 
     // App Bar Theme
-    appBarTheme: const AppBarTheme(
+    appBarTheme: AppBarTheme(
       backgroundColor: ColorsManager.secondaryDarkColor,
       foregroundColor: Colors.white,
       elevation: 0,
       centerTitle: true,
-      iconTheme: IconThemeData(color: Colors.white),
-      titleTextStyle: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-        fontFamily: AppTextTheme.fontFamily,
-      ),
+      iconTheme: const IconThemeData(color: Colors.white),
+      titleTextStyle: AppTextStyles.titleLarge.copyWith(color: Colors.white),
     ),
 
     // Bottom Navigation Bar Theme
@@ -70,22 +56,12 @@ class DarkTheme {
       backgroundColor: ColorsManager.secondaryDarkColor,
       elevation: 8,
       type: BottomNavigationBarType.fixed,
-      selectedLabelStyle: const TextStyle(
-        fontWeight: FontWeight.w600,
-        fontFamily: AppTextTheme.fontFamily,
-      ),
-      unselectedLabelStyle: const TextStyle(
-        fontWeight: FontWeight.normal,
-        fontFamily: AppTextTheme.fontFamily,
+      selectedLabelStyle: AppTextStyles.navBarSelected,
+      unselectedLabelStyle: AppTextStyles.navBarSelected.copyWith(
+        color: Colors.grey[500],
+        fontWeight: FontWeight.w400,
       ),
     ),
-
-    // Bottom App Bar Theme
-    // bottomAppBarTheme: BottomAppBarTheme(
-    //   elevation: 0,
-    //   color: ColorsManager.secondaryDarkColor,
-    //   surfaceTintColor: ColorsManager.secondaryDarkColor,
-    // ),
 
     // Card Theme
     cardTheme: CardThemeData(
@@ -107,11 +83,7 @@ class DarkTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        textStyle: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          fontFamily: AppTextTheme.fontFamily,
-        ),
+        textStyle: AppTextStyles.labelLarge.copyWith(color: Colors.white),
       ),
     ),
 
@@ -119,11 +91,7 @@ class DarkTheme {
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: ColorsManager.primaryColor,
-        textStyle: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          fontFamily: AppTextTheme.fontFamily,
-        ),
+        textStyle: AppTextStyles.labelLarge,
       ),
     ),
 
@@ -132,8 +100,6 @@ class DarkTheme {
       filled: true,
       fillColor: ColorsManager.secondaryDarkColor,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-
-      // Borders
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: Colors.grey[700]!, width: 1),
@@ -154,20 +120,9 @@ class DarkTheme {
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: ColorsManager.errorFill, width: 2),
       ),
-
-      // Text styles
-      hintStyle: TextStyle(
-        color: Colors.grey[500],
-        fontFamily: AppTextTheme.fontFamily,
-      ),
-      labelStyle: TextStyle(
-        color: Colors.grey[400],
-        fontFamily: AppTextTheme.fontFamily,
-      ),
-      errorStyle: const TextStyle(
-        color: ColorsManager.errorText,
-        fontFamily: AppTextTheme.fontFamily,
-      ),
+      hintStyle: AppTextStyles.inputHint.copyWith(color: Colors.grey[500]),
+      labelStyle: AppTextStyles.bodyMedium.copyWith(color: Colors.grey[400]),
+      errorStyle: AppTextStyles.inputError,
     ),
 
     // Icon Theme
@@ -188,13 +143,9 @@ class DarkTheme {
       backgroundColor: ColorsManager.primaryColor.withOpacity(0.2),
       selectedColor: ColorsManager.primaryColor,
       disabledColor: Colors.grey[800],
-      labelStyle: const TextStyle(
-        color: ColorsManager.primaryColor,
-        fontFamily: AppTextTheme.fontFamily,
-      ),
-      secondaryLabelStyle: const TextStyle(
+      labelStyle: AppTextStyles.specialtyBadge,
+      secondaryLabelStyle: AppTextStyles.specialtyBadge.copyWith(
         color: Colors.white,
-        fontFamily: AppTextTheme.fontFamily,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       shape: RoundedRectangleBorder(
@@ -202,7 +153,7 @@ class DarkTheme {
       ),
     ),
 
-    // Text Theme
+    // Text Theme — sourced from AppTextThemeFactory (dark variant)
     textTheme: AppTextTheme.darkTextTheme,
   );
 }

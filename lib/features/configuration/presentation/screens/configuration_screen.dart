@@ -242,7 +242,7 @@ class _ConfigurationScreenState extends State<ConfigurationScreen>
         SizedBox(height: v.s8),
         Text(
           _isArabic
-              ? 'اختر لغتك ومظهرك المفضل للبدء'
+              ? 'اختر لغتك وشكل المفضل للبدء'
               : 'Choose your language & appearance to get started',
           textAlign: TextAlign.center,
           style: TextStyle(

@@ -1,5 +1,6 @@
 // ==================== Light Theme ====================
 import 'package:flutter/material.dart';
+import 'app_text_style.dart';
 import 'colors.dart';
 import 'text_theme.dart';
 
@@ -22,69 +23,44 @@ class LightTheme {
     colorScheme: ColorScheme.light(
       primary: ColorsManager.primaryColor,
       secondary: ColorsManager.secondaryColor,
-
-      // Surface colors
       surface: ColorsManager.defaultSurface,
       surfaceContainerHighest: ColorsManager.backgroundCard,
-
-      // Background
       background: ColorsManager.backgroundSurface,
-
-      // Error colors
       error: ColorsManager.errorFill,
       onError: ColorsManager.errorOnFill,
       errorContainer: ColorsManager.errorSurface,
-
-      // On colors (text on surfaces)
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onSurface: ColorsManager.defaultText,
       onBackground: ColorsManager.defaultText,
       onSurfaceVariant: ColorsManager.defaultTextSecondary,
-
-      // Outline & Shadow
       outline: ColorsManager.inputBorder,
       shadow: Colors.black.withOpacity(0.1),
     ),
 
-    // App Bar Theme
-    appBarTheme: const AppBarTheme(
+    // App Bar Theme — uses titleLarge from textTheme
+    appBarTheme: AppBarTheme(
       backgroundColor: ColorsManager.primaryColor,
       foregroundColor: Colors.white,
       elevation: 0,
       centerTitle: true,
-      iconTheme: IconThemeData(color: Colors.white),
-      titleTextStyle: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-        fontFamily: AppTextTheme.fontFamily,
-      ),
+      iconTheme: const IconThemeData(color: Colors.white),
+      titleTextStyle: AppTextStyles.titleLarge.copyWith(color: Colors.white),
     ),
 
-    // Bottom Navigation Bar Theme
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+    // Bottom Navigation Bar Theme — uses navBarSelected from AppTextStyles
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
       selectedItemColor: ColorsManager.primaryColor,
       unselectedItemColor: ColorsManager.inputBorder,
       backgroundColor: Colors.white,
       elevation: 8,
       type: BottomNavigationBarType.fixed,
-      selectedLabelStyle: TextStyle(
-        fontWeight: FontWeight.w600,
-        fontFamily: AppTextTheme.fontFamily,
-      ),
-      unselectedLabelStyle: TextStyle(
-        fontWeight: FontWeight.normal,
-        fontFamily: AppTextTheme.fontFamily,
+      selectedLabelStyle: AppTextStyles.navBarSelected,
+      unselectedLabelStyle: AppTextStyles.navBarSelected.copyWith(
+        color: ColorsManager.inputBorder,
+        fontWeight: FontWeight.w400,
       ),
     ),
-
-    // Bottom App Bar Theme
-    // bottomAppBarTheme: const BottomAppBarTheme(
-    //   elevation: 0,
-    //   color: Colors.transparent,
-    //   surfaceTintColor: Colors.transparent,
-    // ),
 
     // Card Theme
     cardTheme: CardThemeData(
@@ -96,7 +72,7 @@ class LightTheme {
       ),
     ),
 
-    // Elevated Button Theme
+    // Elevated Button Theme — label uses labelLarge
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: ColorsManager.primaryColor,
@@ -106,11 +82,7 @@ class LightTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        textStyle: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          fontFamily: AppTextTheme.fontFamily,
-        ),
+        textStyle: AppTextStyles.labelLarge.copyWith(color: Colors.white),
       ),
     ),
 
@@ -118,21 +90,15 @@ class LightTheme {
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: ColorsManager.primaryColor,
-        textStyle: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          fontFamily: AppTextTheme.fontFamily,
-        ),
+        textStyle: AppTextStyles.labelLarge,
       ),
     ),
 
-    // Input Decoration Theme
+    // Input Decoration Theme — uses inputHint / inputError styles
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: ColorsManager.inputSurface,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-
-      // Borders
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: ColorsManager.inputBorder, width: 1),
@@ -153,20 +119,11 @@ class LightTheme {
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: ColorsManager.errorFill, width: 2),
       ),
-
-      // Text styles
-      hintStyle: const TextStyle(
-        color: ColorsManager.inputBorder,
-        fontFamily: AppTextTheme.fontFamily,
-      ),
-      labelStyle: const TextStyle(
+      hintStyle: AppTextStyles.inputHint,
+      labelStyle: AppTextStyles.bodyMedium.copyWith(
         color: ColorsManager.defaultTextSecondary,
-        fontFamily: AppTextTheme.fontFamily,
       ),
-      errorStyle: const TextStyle(
-        color: ColorsManager.errorText,
-        fontFamily: AppTextTheme.fontFamily,
-      ),
+      errorStyle: AppTextStyles.inputError,
     ),
 
     // Icon Theme
@@ -182,18 +139,14 @@ class LightTheme {
       space: 1,
     ),
 
-    // Chip Theme
+    // Chip Theme — uses labelMedium / specialtyBadge
     chipTheme: ChipThemeData(
       backgroundColor: ColorsManager.primaryColor.withOpacity(0.1),
       selectedColor: ColorsManager.primaryColor,
       disabledColor: ColorsManager.inputBorder.withOpacity(0.3),
-      labelStyle: const TextStyle(
-        color: ColorsManager.primaryColor,
-        fontFamily: AppTextTheme.fontFamily,
-      ),
-      secondaryLabelStyle: const TextStyle(
+      labelStyle: AppTextStyles.specialtyBadge,
+      secondaryLabelStyle: AppTextStyles.specialtyBadge.copyWith(
         color: Colors.white,
-        fontFamily: AppTextTheme.fontFamily,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       shape: RoundedRectangleBorder(
@@ -201,7 +154,7 @@ class LightTheme {
       ),
     ),
 
-    // Text Theme
+    // Text Theme — sourced from AppTextThemeFactory
     textTheme: AppTextTheme.lightTextTheme,
   );
 }

@@ -40,52 +40,56 @@ class _LoginTabState extends State<LoginTab> {
 
   @override
   Widget build(BuildContext context) {
+
     return Form(
       key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(height: _v.s8),
-          AppTextFieldFactory.email(
-            controller: _emailController,
-            hintText: 'auth.email'.tr(),
-            validator: Validators.validateEmail,
-          ),
-          SizedBox(height: _v.s16),
-          AppTextFieldFactory.password(
-            controller: _passwordController,
-            hintText: 'auth.password'.tr(),
-            validator: Validators.validatePassword,
-          ),
-          SizedBox(height: _v.s12),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () => Navigator.pushNamed(context, Routes.forgotPassword),
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: _h.s8),
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                'auth.forgotPassword.title'.tr(),
-                style: TextStyle(
-                  color: ColorsManager.primaryColor,
-                  fontSize: _t.s12,
-                  fontWeight: FontWeight.w600,
+      child: SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(height: _v.s8),
+            AppTextFieldFactory.email(
+              controller: _emailController,
+              hintText: 'auth.email'.tr(),
+              validator: Validators.validateEmail,
+            ),
+            SizedBox(height: _v.s16),
+            AppTextFieldFactory.password(
+              controller: _passwordController,
+              hintText: 'auth.password'.tr(),
+              validator: Validators.validatePassword,
+            ),
+            SizedBox(height: _v.s12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => Navigator.pushNamed(context, Routes.forgotPassword),
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: _h.s8),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  'auth.forgotPassword.title'.tr(),
+                  style: TextStyle(
+                    color: ColorsManager.primaryColor,
+                    fontSize: _t.s12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
-          ),
-          SizedBox(height: _v.s16),
-          _buildLoginButton(),
-          SizedBox(height: _v.s20),
-          _buildDivider(),
-          SizedBox(height: _v.s20),
-          _buildGoogleSignInButton(),
-          SizedBox(height: _v.s12),
-          _buildGuestButton(),
-        ],
+            SizedBox(height: _v.s16),
+            _buildLoginButton(),
+            SizedBox(height: _v.s20),
+            _buildDivider(),
+            SizedBox(height: _v.s20),
+            _buildGoogleSignInButton(),
+            SizedBox(height: _v.s12),
+            _buildGuestButton(),
+          ],
+        ),
       ),
     );
   }

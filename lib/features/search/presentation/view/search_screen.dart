@@ -1,4 +1,3 @@
-// lib/features/search/presentation/pages/search_screen.dart
 
 import 'package:clinic_app/core/widgets/card/clinic_card.dart';
 import 'package:clinic_app/features/home/domain/entities/clinic_summary.dart';

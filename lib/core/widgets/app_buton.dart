@@ -39,18 +39,19 @@ class AppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding:EdgeInsets.symmetric(
-        horizontal: horizontalPadding ?? 80,
-        vertical: verticalPadding ?? 15,
+        horizontal: horizontalPadding ?? 80.w,
+        vertical: verticalPadding ?? 15.h,
       ),
       child: SizedBox(
         width: double.infinity,
-        height: 44.h,
+        //height: 44.h,
+       height: null,
         child: ElevatedButton(
           onPressed: isLoading || !active? null : onPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: active ? ColorsManager.primaryColor : ColorsManager.defaultTextSecondary,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(borderRadius),
+              borderRadius: BorderRadius.circular(borderRadius.r),
             ),
 
           ),
@@ -67,7 +68,7 @@ class AppButton extends StatelessWidget {
                           (Theme.of(context).brightness == Brightness.dark
                               ? Colors.black
                               : Colors.white),
-                      fontSize: 16.sp,
+                      fontSize: 14.sp,
                       fontWeight: FontWeight.w500,
                     ),
               ),
@@ -145,7 +146,7 @@ class AppOutlinedButton extends StatelessWidget {
             ),
             foregroundColor: active ? (Theme.of(context).brightness == Brightness.dark )
                 ? ColorsManager.secondaryColor : ColorsManager.primaryColor : Theme.of(context).disabledColor ,
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding:  EdgeInsets.symmetric(vertical: 12.w),
           ),
           child: isLoading
               ? LoadingSpinner(size: 25)
@@ -176,7 +177,7 @@ class AppOutlinedButton extends StatelessWidget {
                       color:  active
                           ? (Theme.of(context).brightness == Brightness.dark )
                           ? ColorsManager.secondaryColor : ColorsManager.primaryColor : Theme.of(context).disabledColor ,
-                      fontSize: 16.sp,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.w500,
                     ),
               ),

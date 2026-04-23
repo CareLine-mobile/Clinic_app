@@ -21,6 +21,9 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final ValueNotifier<bool> _isLoginNotifier = ValueNotifier(true);
+  AppSizeHorizontal appSizeHorizontal = AppSizeHorizontal.instance;
+  AppSizeVertical appSizeVertical = AppSizeVertical.instance;
+
 
   @override
   void initState() {
@@ -45,28 +48,29 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: EdgeInsets.symmetric(horizontal: appSizeHorizontal.s24),
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 400),
+                constraints:  BoxConstraints(maxWidth: appSizeHorizontal.s400),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 20),
-                    CustomIcon(assetPath: Assets.logoApp,isImage: true,size: AppSizeVertical.instance.logoSize,),
-                    const SizedBox(height: 24),
+                     SizedBox(height: appSizeVertical.s24),
+                    CustomIcon(assetPath: Assets.logoApp,isImage: true,size: appSizeVertical.logoSize,),
+                    SizedBox(height: appSizeVertical.s24),
                     ValueListenableBuilder<bool>(
                       valueListenable: _isLoginNotifier,
                       builder: (context, isLogin, child) {
                         return AuthTitle(isLogin: isLogin);
                       },
                     ),
-                    const SizedBox(height: 32),
+                     SizedBox(height: appSizeVertical.s32),
                     AuthTabSelector(controller: _tabController),
-                    const SizedBox(height: 24),
+                    SizedBox(height: appSizeVertical.s24),
                     SizedBox(
                       height: 480, // Fixed height for better performance
                       child: TabBarView(
