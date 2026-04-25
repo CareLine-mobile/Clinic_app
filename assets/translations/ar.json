@@ -111,7 +111,24 @@
       "people_ahead": "{count} قدامك",
       "no_bookings_title": "لا توجد حجوزات",
       "your_turn": "دورك الآن",
-      "no_bookings_subtitle": "ليس لديك أي حجوزات مؤكدة حالياً"
+      "no_bookings_subtitle": "ليس لديك أي حجوزات مؤكدة حالياً",
+      "tip": {
+        "pending_title": "في انتظار الموافقة",
+        "pending_body": "حجزك قيد المراجعة من قِبل العيادة. سيتم إخطارك فور التأكيد.",
+        "confirmed_title": "موعدك مؤكد ✓",
+        "confirmed_body": "أنت في قائمة الانتظار. تبقّى {count} شخص قبلك.",
+        "almost_title": "دورك اقترب!",
+        "almost_body": "تبقّى {count} أشخاص فقط قبلك. استعد للدخول.",
+        "your_turn_title": "دورك الآن!",
+        "your_turn_body": "توجه إلى العيادة الآن. لا تتأخر حتى لا يُلغى حجزك.",
+        "cancelled_title": "تم إلغاء الحجز",
+        "cancelled_body": "هذا الحجز ملغي. يمكنك حجز موعد جديد في أي وقت.",
+        "in_doctor_title": "أنت مع الطبيب الآن",
+        "in_doctor_body": "جارٍ فحصك. نتمنى لك سلامة وشفاءً عاجلاً.",
+        "completed_title": "زيارة مكتملة",
+        "completed_body": "شكراً لزيارتك. لا تنسَ تقييم تجربتك مع العيادة!",
+        "dismiss": "اضغط في أي مكان للإغلاق"
+      }
     }
   },
   "bookings": {
@@ -149,7 +166,8 @@
     "status": {
       "confirmed": "مؤكد",
       "cancelled": "ملغي",
-      "pending": "قيد الانتظار",
+      "pending": "في الانتظار",
+      "in-doctor": "مع الطبيب",
       "completed": "مكتمل"
     }
   },

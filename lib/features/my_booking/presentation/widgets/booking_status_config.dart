@@ -35,6 +35,12 @@ class BookingStatusConfig {
       color: const Color(0xFFE65100),
       bgColor: const Color(0xFFFFF3E0),
     ),
+    'in-doctor' => BookingStatusConfig(
+      label: 'bookings.status.in-doctor'.tr(),
+      icon: Icons.medical_services_rounded,
+      color: const Color(0xFF1565C0),
+      bgColor: const Color(0xFFE3F2FD),
+    ),
     'completed' => BookingStatusConfig(
       label: 'bookings.status.completed'.tr(),
       icon: Icons.task_alt_rounded,

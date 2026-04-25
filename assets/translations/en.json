@@ -103,20 +103,37 @@
     },
     "no_notifications": "No new notifications",
     "sections": {
-      "nearby": "Nearby clinics",
-      "all_clinics": "All clinics",
+      "nearby": "Nearby Clinics",
+      "all_clinics": "All Clinics",
       "featured": "Featured Clinics",
       "no_more": "No more available",
-      "empty_title": "No clinics",
+      "empty_title": "No Clinics",
       "empty_subtitle": "No clinics are currently available, please try again later"
     },
     "last_booking": {
-      "badge": "Last booking",
-      "queue_position": "Your turn",
+      "badge": "Last Booking",
+      "queue_position": "Your Turn",
       "your_turn": "Your turn now",
       "people_ahead": "{count} people ahead of you",
-      "no_bookings_title": "No bookings",
-      "no_bookings_subtitle": "You currently have no confirmed bookings"
+      "no_bookings_title": "No Bookings",
+      "no_bookings_subtitle": "You currently have no confirmed bookings",
+      "tip": {
+        "pending_title": "Waiting for Approval",
+        "pending_body": "Your booking is under review by the clinic. You'll be notified once confirmed.",
+        "confirmed_title": "Booking Confirmed ✓",
+        "confirmed_body": "You're in the queue. {count} people ahead of you.",
+        "almost_title": "Almost Your Turn!",
+        "almost_body": "Only {count} people ahead of you. Get ready.",
+        "your_turn_title": "It's Your Turn!",
+        "your_turn_body": "Head to the clinic now. Don't be late or your booking may be cancelled.",
+        "cancelled_title": "Booking Cancelled",
+        "cancelled_body": "This booking was cancelled. You can make a new appointment anytime.",
+        "in_doctor_title": "You are with the doctor",
+        "in_doctor_body": "You are currently being examined. We wish you a speedy recovery.",
+        "completed_title": "Visit Completed",
+        "completed_body": "Thanks for your visit! Don't forget to rate your experience.",
+        "dismiss": "Tap anywhere to dismiss"
+      }
     }
   },
   "favorites": {
@@ -163,6 +180,7 @@
       "confirmed": "Confirmed",
       "cancelled": "Cancelled",
       "pending": "Pending",
+      "in-doctor": "In Doctor",
       "completed": "Completed"
     }
   },
