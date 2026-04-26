@@ -106,7 +106,7 @@ class MyApp extends StatelessWidget {
                   debugShowCheckedModeBanner: kDebugMode,
                   initialRoute:            _initialRoute,
                   onGenerateRoute:         AppRouter.onGenerateRoute,
-                 builder: (context, child) => DevToolsOverlay(child:child!),
+                 builder: kDebugMode? (context, child) => DevToolsOverlay(child:child!): null,
                 ),
               );
             },

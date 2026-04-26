@@ -144,6 +144,7 @@ class _DoctorSection extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: availableDoctors.length,
+            padding: EdgeInsets.zero,
             itemBuilder: (context, index) {
               final doctor = availableDoctors[index];
               final isSelected = state.selectedDoctor?.id == doctor.id;

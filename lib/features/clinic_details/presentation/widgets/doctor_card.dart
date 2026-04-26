@@ -46,6 +46,7 @@ class DoctorCard extends StatelessWidget {
         .where((s) =>
     s.day.toLowerCase().trim() == dayName && s.isAvailable)
         .toList();
+    final cardBackGroundColor = Theme.of(context).cardColor;
 
     return GestureDetector(
       onTap: onTap,
@@ -53,7 +54,7 @@ class DoctorCard extends StatelessWidget {
         margin: EdgeInsets.only(bottom: 16.h),
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
-          color: isSelected ? accentColor.withOpacity(0.04) : Colors.white,
+          color: isSelected ? accentColor.withOpacity(0.04) : cardBackGroundColor,
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
             color: isSelected ? accentColor : Colors.grey.shade200,
@@ -102,20 +103,15 @@ class DoctorCard extends StatelessWidget {
                         doctor.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       SizedBox(height: 4.h),
                       Text(
                         doctor.specialty,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            fontSize: 12.sp, color: Colors.grey.shade600),
-                      ),
+                        style:Theme.of(context).textTheme.bodySmall,
+                          ),
                       SizedBox(height: 8.h),
                       Row(
                         children: [
@@ -124,11 +120,7 @@ class DoctorCard extends StatelessWidget {
                           SizedBox(width: 4.w),
                           Text(
                             doctor.rating.toStringAsFixed(1),
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
+                            style: Theme.of(context).textTheme.bodySmall,
                           ),
                           SizedBox(width: 12.w),
                           Icon(Icons.work_outline,
@@ -139,9 +131,7 @@ class DoctorCard extends StatelessWidget {
                             'clinic.years_exp'.tr(namedArgs: {
                               'count': '${doctor.experienceYears}'
                             }),
-                            style: TextStyle(
-                                fontSize: 12.sp,
-                                color: Colors.grey.shade600),
+                            style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
                       ),
@@ -245,7 +235,7 @@ class _TimeSlotRow extends StatelessWidget {
                 'clinic.choose_time'.tr(),
                 style: theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: ColorsManager.defaultTextSecondary,
+                //  color: ColorsManager.defaultTextSecondary,
                 ),
               ),
               SizedBox(height: 8.h), // مساحة أقل
@@ -298,21 +288,17 @@ class _TimeSlotRow extends StatelessWidget {
                               horizontal: 14.w,
                               vertical: 6.h,
                             ),
-                            // استخدام Row بدلاً من Column لتوفير الطول
+                            /// استخدام Row بدلاً من Column لتوفير الطول
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
+                                ///
                                 Text(
                                   slot.timeSlot,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    fontWeight: isSlotSelected
-                                        ? FontWeight.w600
-                                        : FontWeight.w500,
-                                    color: isSlotSelected
-                                        ? Colors.white
-                                        : ColorsManager.defaultText,
-                                    height: 1.2,
+                                  style: theme.textTheme.bodySmall!.copyWith(
+                                    fontWeight: isSlotSelected?FontWeight.w600:FontWeight.w500,
+                                    color: isSlotSelected?Colors.white:ColorsManager.primaryColor,
                                   ),
                                 ),
                                 // إظهار المتبقي بجانب الوقت بشكل احترافي وصغير
@@ -337,14 +323,21 @@ class _TimeSlotRow extends StatelessWidget {
                                     'clinic.remaining'.tr(
                                       namedArgs: {'count': '$remaining'},
                                     ),
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      fontSize: 10.sp, // خط صغير جداً
-                                      color: isSlotSelected
-                                          ? Colors.white.withOpacity(0.9)
-                                          : remaining <= 2
-                                          ? ColorsManager.warningText
-                                          : ColorsManager.miscellaneous,
+                                    // style: theme.textTheme.labelSmall?.copyWith(
+                                    //   fontSize: 10.sp, // خط صغير جداً
+                                    //   // color: isSlotSelected
+                                    //   //     ? Colors.white.withOpacity(0.9)
+                                    //   //     : remaining <= 2
+                                    //   //     ? ColorsManager.warningText
+                                    //   //     : ColorsManager.miscellaneous,
+                                    //
+                                    //   height: 1.2,
+                                    // ),
+                                    style: theme.textTheme.bodySmall!.copyWith(
+                                      fontSize: 10.sp,
                                       height: 1.2,
+                                      fontWeight: isSlotSelected?FontWeight.w600:FontWeight.w500,
+                                      color: isSlotSelected?Colors.white:ColorsManager.primaryColor,
                                     ),
                                   ),
                                 ],
