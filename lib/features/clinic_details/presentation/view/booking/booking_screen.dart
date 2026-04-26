@@ -75,7 +75,7 @@ class _BookingScreenBody extends StatelessWidget {
               surfaceTintColor: Colors.transparent,
               elevation: 0,
               leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: ColorsManager.defaultText),
+                icon: Icon(Icons.arrow_back, color: Theme.of(context).primaryColor),
                 onPressed: () {
                   if (currentStep > 0) {
                     context.read<ClinicDetailsCubit>().previousBookingStep();
@@ -89,18 +89,14 @@ class _BookingScreenBody extends StatelessWidget {
                 children: [
                   Text(
                     clinicName,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: ColorsManager.defaultText,
-                    ),
+                    style: theme.textTheme.titleMedium,
                   ),
                   SizedBox(height: 2.h),
                   Text(
                     doctorName,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: ColorsManager.defaultTextSecondary,
-                    ),
+                    style: theme.textTheme.bodySmall,
                   ),
+                  SizedBox(height: 8.h),
                 ],
               ),
             ),

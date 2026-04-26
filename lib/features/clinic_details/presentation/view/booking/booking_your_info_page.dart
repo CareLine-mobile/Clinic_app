@@ -1,3 +1,4 @@
+import 'package:clinic_app/features/user_data/user_repo.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,11 +22,14 @@ class _BookingYourInfoPageState extends State<BookingYourInfoPage> {
   @override
   void initState() {
     super.initState();
-    final state = context.read<ClinicDetailsCubit>().state;
-    final loaded = state is ClinicDetailsLoaded ? state : null;
-    _nameController = TextEditingController(text: loaded?.patientName ?? '');
-    _phoneController = TextEditingController(text: loaded?.patientPhone ?? '');
-    _notesController = TextEditingController(text: loaded?.bookingNotes ?? '');
+    //final state = context.read<ClinicDetailsCubit>().state;
+  //  final loaded = state is ClinicDetailsLoaded ? state : null;
+    final user = UserRepository().currentUser;
+    _nameController = TextEditingController(text: user?.name ?? '');
+    _phoneController = TextEditingController(text: user?.phone ?? '');
+    context.read<ClinicDetailsCubit>().updatePatientName(_nameController.text);
+    context.read<ClinicDetailsCubit>().updatePatientPhone(_phoneController.text);
+    _notesController = TextEditingController(text: '');
   }
 
   @override

@@ -64,7 +64,7 @@ class BookingDateTimePage extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: isSelected
                               ? ColorsManager.primaryColor.withOpacity(0.1)
-                              : Colors.white,
+                              : Theme.of(context).cardColor,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: isSelected
@@ -75,11 +75,12 @@ class BookingDateTimePage extends StatelessWidget {
                         ),
                         child: Center(
                           child: Text(
-                            DateFormat('EEE, MMM d').format(date),
+                            DateFormat('EEE, MMM d', Localizations.localeOf(context).languageCode)
+                                .format(date),
                             style: TextStyle(
                               color: isSelected
                                   ? ColorsManager.primaryColor
-                                  : Colors.black87,
+                                  : Theme.of(context).hintColor,
                               fontWeight: isSelected
                                   ? FontWeight.bold
                                   : FontWeight.normal,
@@ -135,6 +136,7 @@ class BookingDateTimePage extends StatelessWidget {
                 itemCount: state.slotsForSelectedDay.length,
                 itemBuilder: (context, index) {
                   final slot = state.slotsForSelectedDay[index];
+
                   // Compare against state.selectedTime — not cubit getter
                   final isSelected =
                       state.selectedTime == slot.timeSlot &&
@@ -150,7 +152,7 @@ class BookingDateTimePage extends StatelessWidget {
                             ? ColorsManager.primaryColor.withOpacity(0.1)
                             : slot.isAvailable
                             ? Colors.white
-                            : Colors.grey.shade100,
+                            : Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: isSelected
@@ -187,6 +189,7 @@ class BookingDateTimePage extends StatelessWidget {
               // ── Continue button ─────────────────────────────
               AppButton(
                 text: 'booking.continue'.tr(),
+                textColor: Colors.white,
                 // canProceedStep1 is a computed getter on the STATE
                 onPressed: state.canProceedStep1
                     ? () => cubit.nextBookingStep()
