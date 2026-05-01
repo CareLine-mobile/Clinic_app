@@ -131,11 +131,10 @@ class _ClinicListSliver extends StatelessWidget {
   }
 
   void _openDetails(BuildContext context, ClinicSummary clinic) {
-    Navigator.push(
+    Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-        builder: (_) => ClinicDetailsScreen(clinicId: clinic.id),
-      ),
+      Routes.clinicDetails,
+      arguments: clinic.id,
     );
   }
 }

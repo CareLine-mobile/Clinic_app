@@ -1,4 +1,6 @@
 
+import 'dart:developer';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../../../../core/api/base_api_services.dart';
@@ -19,6 +21,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
 
   @override
   Future<void> registerFcmToken(String token) async {
+    log('messagesss: $token');
     await _api.request(
       method: HttpMethod.post,
       url: Endpoints.generateFcmToken,   // add this to your Endpoints class

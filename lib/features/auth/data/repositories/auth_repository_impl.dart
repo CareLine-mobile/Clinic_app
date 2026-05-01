@@ -61,7 +61,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (googleUser == null) {
         return Left(ServerFailure(
-          'errors.auth.cancelled'.tr(),
+          'errors.network.cancelled'.tr(),
           'CANCELLED',
         ));
       }
@@ -97,7 +97,7 @@ class AuthRepositoryImpl implements AuthRepository {
       // لو المستخدم كنسل من غير ما يختار حساب
       if (e is PlatformException && e.code == 'CANCELLED') {
         return Left(ServerFailure(
-          'errors.auth.cancelled'.tr(),
+          'errors.network.cancelled'.tr(),
           'CANCELLED',
         ));
       }
