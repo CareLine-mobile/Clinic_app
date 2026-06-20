@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
 
   String get _initialRoute {
     if (!isConfigurationDone) return Routes.configuration;
-    if (!isOnBoarding)        return Routes.onboarding;
+    // if (!isOnBoarding)        return Routes.onboarding;
     return UserRepository().isLoggedIn ? Routes.dashBoard : Routes.auth;
   }
 

@@ -16,9 +16,9 @@
     "continueAsGuest": "Continue as Guest",
     "createAccount": "Create Account",
     "welcomeBack": "Welcome Back",
-    "loginSubtitle": "Login to continue your health journey",
+    "loginSubtitle": "Login to continue your booking journey",
     "createAccountTitle": "Create Account",
-    "signupSubtitle": "Join us for better healthcare",
+    "signupSubtitle": "Join us for better service experiences",
     "signInWithGoogle": "Sign in with Google",
     "or": "OR",
     "googleSignInFailed": "Failed Sign in with Google",
@@ -53,23 +53,23 @@
   "onboarding": {
    "page1": {
      "title": "Track Your Turn Live",
-     "subtitle": "No more waiting in crowded rooms. Monitor exactly how many patients are ahead of you from home."
+     "subtitle": "No more waiting in crowded rooms. Monitor exactly how many clients are ahead of you from home."
 
    },
     "page2": {
       "title": "Arrive Just in Time",
-      "subtitle": "Receive smart notifications telling you exactly when to head to the clinic based on the current live queue"
+      "subtitle": "Receive smart notifications telling you exactly when to head to the branch based on the current live queue"
 
     },
     "page3": {
-      "title": "Discover Top Clinics",
-      "subtitle": "Find specialist doctors near you with verified patient ratings and real-time availability."
+      "title": "Discover Top Locations",
+      "subtitle": "Find specialist experts near you with verified client ratings and real-time availability."
 
 
     },
     "page4": {
       "title": " Track Your Turn Live",
-      "subtitle": "No more waiting in crowded rooms. Monitor exactly how many patients are ahead of you from home."
+      "subtitle": "No more waiting in crowded rooms. Monitor exactly how many clients are ahead of you from home."
 
     },
     "skip": "Skip",
@@ -77,8 +77,8 @@
     "start": "Get Started"
   },
   "medication": {
-    "title": "Medications",
-    "count": "{count} medications",
+    "title": "Service Add-ons",
+    "count": "{count} items",
     "filter_all": "All",
     "filter_daily": "Daily",
     "filter_weekly": "Weekly",
@@ -91,24 +91,24 @@
     "group_daily": "Daily",
     "group_weekly": "Weekly",
     "group_as_needed": "As Needed",
-    "delete_title": "Delete Medication",
+    "delete_title": "Delete Item",
     "delete_confirm": "Are you sure you want to delete {name}?",
     "delete": "Delete",
     "cancel": "Cancel"
   },
   "home": {
     "header": {
-      "title": "Book at your clinic easily",
+      "title": "Book at your branch easily",
       "subtitle": "Track your turn without waiting"
     },
     "no_notifications": "No new notifications",
     "sections": {
-      "nearby": "Nearby Clinics",
-      "all_clinics": "All Clinics",
-      "featured": "Featured Clinics",
+      "nearby": "Nearby Locations",
+      "all_clinics": "All Locations",
+      "featured": "Featured Locations",
       "no_more": "No more available",
-      "empty_title": "No Clinics",
-      "empty_subtitle": "No clinics are currently available, please try again later"
+      "empty_title": "No Locations",
+      "empty_subtitle": "No locations are currently available, please try again later"
     },
     "last_booking": {
       "badge": "Last Booking",
@@ -119,17 +119,17 @@
       "no_bookings_subtitle": "You currently have no confirmed bookings",
       "tip": {
         "pending_title": "Waiting for Approval",
-        "pending_body": "Your booking is under review by the clinic. You'll be notified once confirmed.",
+        "pending_body": "Your booking is under review by the branch. You'll be notified once confirmed.",
         "confirmed_title": "Booking Confirmed ✓",
         "confirmed_body": "You're in the queue. {count} people ahead of you.",
         "almost_title": "Almost Your Turn!",
         "almost_body": "Only {count} people ahead of you. Get ready.",
         "your_turn_title": "It's Your Turn!",
-        "your_turn_body": "Head to the clinic now. Don't be late or your booking may be cancelled.",
+        "your_turn_body": "Head to the branch now. Don't be late or your booking may be cancelled.",
         "cancelled_title": "Booking Cancelled",
         "cancelled_body": "This booking was cancelled. You can make a new appointment anytime.",
-        "in_doctor_title": "You are with the doctor",
-        "in_doctor_body": "You are currently being examined. We wish you a speedy recovery.",
+        "in_doctor_title": "You are with the expert",
+        "in_doctor_body": "You are currently being served. We wish you a great experience.",
         "completed_title": "Visit Completed",
         "completed_body": "Thanks for your visit! Don't forget to rate your experience.",
         "dismiss": "Tap anywhere to dismiss"
@@ -139,8 +139,8 @@
   "favorites": {
     "title": "My Favorites",
     "empty_title": "No Favorites",
-    "empty_subtitle": "You haven't added any clinics to your favorites yet",
-    "find_clinic": "Find a Clinic",
+    "empty_subtitle": "You haven't added any locations to your favorites yet",
+    "find_clinic": "Find a Location",
     "retry": "Try Again",
     "remove": "Remove from Favorites"
   },
@@ -150,9 +150,9 @@
     "auth_required_subtitle": "Sign in to view and manage your bookings",
     "empty_title": "No Bookings",
     "empty_subtitle": "You haven't made any appointments yet",
-    "find_clinic": "Find a Clinic",
+    "find_clinic": "Find a Location",
     "retry": "Try Again",
-    "doctor": "Doctor",
+    "doctor": "Specialist",
     "date": "Date",
     "time": "Time",
     "turn_number": "Turn Number",
@@ -165,7 +165,7 @@
     "detail": {
       "title": "Booking Details",
       "appointment_info": "Appointment Info",
-      "patient_info": "Patient Info",
+      "patient_info": "Client Info",
       "patient_name": "Name",
       "patient_phone": "Phone",
       "specialty": "Specialty",
@@ -180,7 +180,7 @@
       "confirmed": "Confirmed",
       "cancelled": "Cancelled",
       "pending": "Pending",
-      "in-doctor": "In Doctor",
+      "in-doctor": "In Session",
       "completed": "Completed"
     }
   },
@@ -189,7 +189,7 @@
       "title": "Add Your Review",
       "ratingLabel": "Your Rating",
       "commentLabel": "Your Comment",
-      "commentHint": "Share your experience with this clinic...",
+      "commentHint": "Share your experience with this location...",
       "submit": "Submit Review",
       "success": "Your review was submitted successfully, thank you!"
     }
@@ -205,26 +205,26 @@
     "confirmed_title": "Booking Confirmed!",
     "confirmed_body": "Your appointment has been booked successfully",
     "confirmed_done": "Done",
-    "payment_note": "The clinic will contact you for payment instructions once approved",
+    "payment_note": "The branch will contact you for payment instructions once approved",
     "your_info": "Your Information",
     "full_name": "Full Name",
     "full_name_hint": "Enter your full name",
     "phone": "Phone Number",
     "phone_hint": "Enter your phone number",
     "notes_optional": "Notes (Optional)",
-    "notes_hint": "Any symptoms or notes for the doctor...",
+    "notes_hint": "Any requests or notes for the specialist...",
     "reviewed": "Reviewed",
     "summary": {
-      "clinic": "Clinic",
-      "doctor": "Doctor",
-      "patient": "Patient",
+      "clinic": "Branch",
+      "doctor": "Specialist",
+      "patient": "Client",
       "phone": "Phone",
       "date": "Date",
       "time": "Time",
       "notes": "Notes"
     },
     "bottom_bar": {
-      "fee_label": "Consultation Fee",
+      "fee_label": "Service Fee",
       "book_now": "Book Now"
     },
     "stepper": {
@@ -240,8 +240,8 @@
       "open": "Open",
       "closed": "Closed"
     },
-    "available_doctors": "Available Doctors ({count})",
-    "no_doctors": "No doctors available on this date",
+    "available_doctors": "Available Experts ({count})",
+    "no_doctors": "No experts available on this date",
     "no_slots_today": "No available slots today",
     "choose_time": "Choose Time",
     "remaining": "{count} remaining",
@@ -269,24 +269,31 @@
       "title": "Services",
       "services": "Available Services",
       "facilities": "Facilities",
-      "insurance": "Accepted Insurance",
+      "insurance": "Accepted Memberships",
       "empty_title": "No Services",
       "empty_subtitle": "No service information has been added yet"
     },
+    "statistics": {
+      "title": "Branch Statistics",
+      "visits": "Visits",
+      "specialists": "Specialists",
+      "bookings": "Bookings",
+      "satisfaction": "Satisfaction"
+    },
     "reviews": {
       "title": "Reviews",
-      "patients_reviews": "Patient Reviews",
+      "patients_reviews": "Client Reviews",
       "empty": "No reviews yet",
       "with_doctor": "With: {name}",
       "total": "{count} reviews"
     }
   },
   "search": {
-    "hint": "Search for a clinic or doctor...",
-    "initial_title": "Search Clinics",
-    "initial_hint": "Start typing to find a clinic or doctor",
+    "hint": "Search for a location or expert...",
+    "initial_title": "Search Locations",
+    "initial_hint": "Start typing to find a location or expert",
     "empty_title": "No Results",
-    "no_results": "We couldn't find any clinic matching your search",
+    "no_results": "We couldn't find any location matching your search",
     "filter": {
       "label": "Filter",
       "title": "Filter Results",
@@ -415,11 +422,11 @@
       "action": "Try Again"
     },
     "clinics": {
-      "featured": "Failed to load featured clinics",
-      "nearby": "Failed to load nearby clinics",
-      "all": "Failed to load clinics list",
-      "details": "Failed to load clinic details",
-      "doctors": "Failed to load doctors list",
+      "featured": "Failed to load featured locations",
+      "nearby": "Failed to load nearby locations",
+      "all": "Failed to load locations list",
+      "details": "Failed to load location details",
+      "doctors": "Failed to load experts list",
       "booking": "Failed to book appointment",
       "bookingFailed": "Booking failed. Please try again",
       "toggleFavorite": "Failed to toggle favorite"
@@ -429,10 +436,10 @@
       "create": "Failed to create appointment"
     },
     "doctor": {
-      "slots": "Failed to load doctor slots"
+      "slots": "Failed to load expert slots"
     },
     "clinic": {
-      "details": "Failed to load clinic details"
+      "details": "Failed to load location details"
     }
   },
   "common": {
@@ -457,16 +464,16 @@
     },
     "sections": {
       "personal": "Personal Information",
-      "medical": "Medical Information",
+      "medical": "Additional Details",
       "emergency": "Emergency Contact"
     },
     "fields": {
       "fullName": "Full Name",
       "dateOfBirth": "Date of Birth",
       "gender": "Gender",
-      "bloodType": "Blood Type (Optional)",
-      "chronicDiseases": "Chronic Diseases (Optional)",
-      "chronicHint": "e.g. Diabetes, Hypertension…",
+      "bloodType": "Membership Tier (Optional)",
+      "chronicDiseases": "Special Requests (Optional)",
+      "chronicHint": "e.g. VIP, Priority Access…",
       "emergencyContact": "Emergency contact number"
     },
     "gender": {
@@ -491,7 +498,7 @@
   "location": {
     "access_needed": "Location access needed",
     "enable_manually": "Enable it manually in Settings",
-    "why_we_use": "We use your location only to show nearby clinics.",
+    "why_we_use": "We use your location only to show nearby locations.",
     "open_settings": "Open Settings",
     "enter_manually": "Enter location manually instead",
     "steps_title_android": "Android steps",

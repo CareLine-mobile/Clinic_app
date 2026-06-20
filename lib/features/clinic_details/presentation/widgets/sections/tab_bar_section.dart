@@ -2,6 +2,7 @@
 import 'package:clinic_app/features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../domain/entites/clinic_entities.dart';
 import '../tab_bar_delegate.dart';
 
@@ -42,11 +43,11 @@ class TabBarSection extends StatelessWidget {
       onTap: (index) {
         context.read<ClinicDetailsCubit>().changeTab(index);
       },
-      tabs: const [
-        Tab(text: 'الحجز'),
-        Tab(text: 'الخدمات'),
-        Tab(text: 'التقييمات'),
-        Tab(text: 'عن العيادة'),
+      tabs: [
+        Tab(text: 'clinic.tabs.booking'.tr()),
+        Tab(text: 'clinic.services.title'.tr()),
+        Tab(text: 'clinic.tabs.reviews'.tr()),
+        Tab(text: 'clinic.info.about'.tr()),
       ],
     );
   }

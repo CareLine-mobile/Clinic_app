@@ -35,13 +35,7 @@ class AccountSection extends StatelessWidget {
                 Navigator.pushNamed(context, Routes.forgotPassword,arguments: UserRepository().currentUser!.email);
               },
             ),
-            _divider(),
-            SettingsItem(
-              icon: Icons.calendar_today_outlined,
-              title: 'settings.account.bookings'.tr(),
-              subtitle: 'settings.account.bookings_sub'.tr(),
-              onTap: () {},
-            ),
+
           ],
         ),
       ],

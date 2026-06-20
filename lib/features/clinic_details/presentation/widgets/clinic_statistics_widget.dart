@@ -1,5 +1,6 @@
 import 'package:clinic_app/core/utils/app_size.dart';
 import 'package:clinic_app/features/clinic_details/domain/entites/clinic_statistics_entity.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -25,7 +26,7 @@ class ClinicStatisticsWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'إحصائيات العيادة',
+            'clinic.statistics.title'.tr(),
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -46,7 +47,7 @@ class ClinicStatisticsWidget extends StatelessWidget {
                         flex: 3,
                         child: _StatCard(
                           icon: Icons.people_outline,
-                          label: 'الزيارات',
+                          label: 'clinic.statistics.visits'.tr(),
                           value: statistics.totalVisits,
                           color: accentColor,
                           isBig: true,
@@ -58,7 +59,7 @@ class ClinicStatisticsWidget extends StatelessWidget {
                         flex: 2,
                         child: _StatCard(
                           icon: Icons.medical_services_outlined,
-                          label: 'الأطباء',
+                          label: 'clinic.statistics.specialists'.tr(),
                           value: statistics.totalDoctors,
                           color: Colors.green,
                         ),
@@ -78,7 +79,7 @@ class ClinicStatisticsWidget extends StatelessWidget {
                         flex: 2,
                         child: _StatCard(
                           icon: Icons.event_available,
-                          label: 'الحجوزات',
+                          label: 'clinic.statistics.bookings'.tr(),
                           value: statistics.totalBookings,
                           color: Colors.blue,
                         ),
@@ -89,7 +90,7 @@ class ClinicStatisticsWidget extends StatelessWidget {
                         flex: 3,
                         child: _StatCard(
                           icon: Icons.thumb_up_outlined,
-                          label: 'الرضا',
+                          label: 'clinic.statistics.satisfaction'.tr(),
                           value: statistics.satisfactionRate,
                           color: Colors.orange,
                           isBig: true,

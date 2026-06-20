@@ -222,7 +222,7 @@ class _TimelineItem extends StatelessWidget {
                         ),
                         SizedBox(width: 4.w),
                         Text(
-                          _formatDate(followUp.date),
+                          _formatDate(context, followUp.date),
                           style: theme.textTheme.bodySmall?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
@@ -275,9 +275,9 @@ class _TimelineItem extends StatelessWidget {
     );
   }
 
-  String _formatDate(String date) {
+  String _formatDate(BuildContext context, String date) {
     try {
-      return DateFormat('d MMM yyyy', 'ar').format(DateTime.parse(date));
+      return DateFormat('d MMM yyyy', context.locale.languageCode).format(DateTime.parse(date));
     } catch (_) {
       return date;
     }

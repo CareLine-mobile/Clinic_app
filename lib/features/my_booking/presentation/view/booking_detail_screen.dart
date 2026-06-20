@@ -223,7 +223,7 @@ class _AppointmentInfoSection extends StatelessWidget {
         BookingDetailRow(
           icon: Icons.calendar_today_outlined,
           label: 'bookings.date'.tr(),
-          value: _formatDate(booking.date),
+          value: _formatDate(context, booking.date),
         ),
 
         if (showQueueInfo && booking.waitTurns != null && booking.turnNumber != null) ...[
@@ -239,7 +239,7 @@ class _AppointmentInfoSection extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).hintColor),
                   ),
                   Text(
-                    _formatTime(booking.time),
+                    _formatTime(context, booking.time),
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
                   ),
                 ],
@@ -254,28 +254,29 @@ class _AppointmentInfoSection extends StatelessWidget {
           BookingDetailRow(
             icon: Icons.access_time_rounded,
             label: 'bookings.time'.tr(),
-            value: _formatTime(booking.time),
+            value: _formatTime(context, booking.time),
           ),
         ],
       ],
     );
   }
-  String _formatDate(String date) {
+  String _formatDate(BuildContext context, String date) {
     try {
-      return DateFormat('EEEE، d MMMM yyyy', 'ar').format(DateTime.parse(date));
+      final locale = context.locale.languageCode;
+      final pattern = locale == 'ar' ? 'EEEE، d MMMM yyyy' : 'EEEE, d MMMM yyyy';
+      return DateFormat(pattern, locale).format(DateTime.parse(date));
     } catch (_) {
       return date;
     }
   }
 
-  String _formatTime(String time) {
+  String _formatTime(BuildContext context, String time) {
     try {
       final parts = time.split(':');
       final hour = int.parse(parts[0]);
-      final minute = parts[1];
-      final suffix = hour >= 12 ? 'م' : 'ص';
-      final hour12 = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
-      return '$hour12:$minute $suffix';
+      final minute = int.parse(parts[1]);
+      final dt = DateTime(2000, 1, 1, hour, minute);
+      return DateFormat.jm(context.locale.languageCode).format(dt);
     } catch (_) {
       return time;
     }

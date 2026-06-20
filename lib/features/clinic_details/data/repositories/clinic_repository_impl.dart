@@ -4,6 +4,7 @@ import '../../../../core/api/model/endpoints.dart';
 import '../../../../core/api/model/http_method.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/errors/failures.dart';
+import '../../../../core/errors/error_handler.dart';
 import '../../domain/entites/appointment_request_entity.dart';
 import '../../domain/entites/clinic_entities.dart';
 import '../../domain/entites/time_slot_entity.dart';
@@ -34,12 +35,8 @@ class ClinicRepositoryImpl implements ClinicRepository {
       final clinicModel = ClinicModel.fromJson(data);
       await localDataSource.cacheClinic(clinicModel);
       return Right(clinicModel);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
+    } catch (e, st) {
+      return Left(ErrorHandler.handleException(e, st));
     }
   }
 
@@ -54,12 +51,8 @@ class ClinicRepositoryImpl implements ClinicRepository {
       final List<dynamic> slotsData = response['data'] ?? response;
       final slots = slotsData.map((json) => TimeSlotModel.fromJson(json)).toList();
       return Right(slots);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
+    } catch (e, st) {
+      return Left(ErrorHandler.handleException(e, st));
     }
   }
 
@@ -71,12 +64,8 @@ class ClinicRepositoryImpl implements ClinicRepository {
         url: '/clinicals/$clinicId/favorite',
       );
       return const Right(true);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
+    } catch (e, st) {
+      return Left(ErrorHandler.handleException(e, st));
     }
   }
 
@@ -89,12 +78,8 @@ class ClinicRepositoryImpl implements ClinicRepository {
         body: request.toJson(),
       );
       return const Right(null);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
+    } catch (e, st) {
+      return Left(ErrorHandler.handleException(e, st));
     }
   }
 }

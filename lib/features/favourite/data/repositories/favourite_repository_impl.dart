@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:dartz/dartz.dart';
 
+import '../../../../core/errors/error_handler.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../home/domain/entities/clinic_summary.dart';
 import '../../domain/repositories/favourite_repository.dart';
@@ -95,7 +96,7 @@ class FavouriteRepositoryImpl implements FavouriteRepository {
       }
       _emit();
 
-      return Left(_mapError(e));
+      return Left(ErrorHandler.handleException(e, st));
     }
   }
 
@@ -113,7 +114,7 @@ class FavouriteRepositoryImpl implements FavouriteRepository {
 
       return Right(clinics);
     } catch (e, st) {
-      return Left(_mapError(e));
+      return Left(ErrorHandler.handleException(e, st));
     }
   }
 
@@ -125,8 +126,5 @@ class FavouriteRepositoryImpl implements FavouriteRepository {
     }
   }
 
-  Failure _mapError(dynamic e) {
-    // Adjust to your actual Failure subclass hierarchy
-    return ServerFailure(e.toString());
-  }
+
 }
