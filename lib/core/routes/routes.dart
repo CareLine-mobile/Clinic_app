@@ -10,7 +10,7 @@ abstract class Routes {
   static const String verification = '/verification';
   static const String forgotPassword = '/forgotPassword';
   static const String resetPassword = '/resetPassword';
-  // Patient sub-routes
+  // Client sub-routes
   static const String patientHome = '/patient-home';
   static const String medicationDetails = '/medication-details';
   // booking
@@ -22,4 +22,6 @@ abstract class Routes {
   static const String profile = '/profile';
   static const String privacyPolicy = '/privacy-policy';
 
+  // map
+  static const String mapLocations = '/map-locations';
 }

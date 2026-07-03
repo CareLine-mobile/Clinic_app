@@ -13,6 +13,8 @@ class ClinicSummary extends Equatable {
   final bool isOpen;
   final String doctorsCount;
   final bool isFavorite;
+  final double? lat;
+  final double? lng;
 
   const ClinicSummary({
     required this.id,
@@ -25,6 +27,8 @@ class ClinicSummary extends Equatable {
     required this.isOpen,
     required this.doctorsCount,
     this.isFavorite = false,
+    this.lat,
+    this.lng,
   });
 
   // Helper getters for UI
@@ -48,6 +52,8 @@ class ClinicSummary extends Equatable {
     bool? isOpen,
     String? doctorsCount,
     bool? isFavorite,
+    double? lat,
+    double? lng,
   }) {
     return ClinicSummary(
       id: id ?? this.id,
@@ -60,6 +66,8 @@ class ClinicSummary extends Equatable {
       isOpen: isOpen ?? this.isOpen,
       doctorsCount: doctorsCount ?? this.doctorsCount,
       isFavorite: isFavorite ?? this.isFavorite,
+      lat: lat ?? this.lat,
+      lng: lng ?? this.lng,
     );
   }
 
@@ -75,6 +83,8 @@ class ClinicSummary extends Equatable {
     isOpen,
     doctorsCount,
     isFavorite,
+    lat,
+    lng,
   ];
 
   @override

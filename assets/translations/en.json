@@ -518,5 +518,27 @@
       "step3": "Select \"While Using the App\"",
       "step4": "Come back — we'll detect it automatically"
     }
+  },
+  "map": {
+    "title": "Nearby Branches",
+    "view_map": "View Map",
+    "navigate": "Navigate",
+    "retry": "Try Again",
+    "no_results": "No nearby branches found in your area.",
+    "permission_denied": {
+      "title": "Location Access Needed",
+      "subtitle": "Please allow location access to see branches near you.",
+      "permanent_subtitle": "Location permission was denied permanently. Please enable it from Settings.",
+      "allow": "Allow Access",
+      "open_settings": "Open Settings"
+    },
+    "service_disabled": {
+      "title": "GPS is Off",
+      "subtitle": "Please enable your device's GPS to find nearby branches.",
+      "enable": "Enable GPS"
+    },
+    "error": {
+      "title": "Something Went Wrong"
+    }
   }
 }

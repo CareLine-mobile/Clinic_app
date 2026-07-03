@@ -3,6 +3,8 @@ import 'package:clinic_app/core/di/injection_container.dart';
 import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:clinic_app/features/home/presentation/cubit/home_cubit.dart';
+import 'package:clinic_app/features/map_locations/presentation/cubit/map_locations_cubit.dart';
+import 'package:clinic_app/features/map_locations/presentation/view/map_locations_screen.dart';
 import 'package:clinic_app/features/my_booking/domain/entities/booking_entity.dart';
 import 'package:clinic_app/features/my_booking/presentation/cubit/booking_cubit.dart';
 import 'package:clinic_app/features/my_booking/presentation/view/booking_detail_screen.dart';
@@ -156,6 +158,14 @@ class AppRouter {
           builder: (_) => BlocProvider(
             create: (_) => di.sl<ClinicDetailsCubit>(),
             child: ClinicDetailsScreen(clinicId: clinicId),
+          ),
+        );
+
+      case Routes.mapLocations:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider<MapLocationsCubit>(
+            create: (_) => di.sl<MapLocationsCubit>(),
+            child: const MapLocationsScreen(),
           ),
         );
 

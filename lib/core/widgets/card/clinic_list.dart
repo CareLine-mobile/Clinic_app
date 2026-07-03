@@ -115,6 +115,7 @@ class HorizontalClinicsCarousel extends StatefulWidget {
   final Function(ClinicSummary)? onFavorite;
   final Function(ClinicSummary)? onBook;
   final String? title;
+  final Widget? trailing;
 
   const HorizontalClinicsCarousel({
     Key? key,
@@ -123,6 +124,7 @@ class HorizontalClinicsCarousel extends StatefulWidget {
     this.onFavorite,
     this.onBook,
     this.title,
+    this.trailing,
   }) : super(key: key);
 
   @override
@@ -165,9 +167,15 @@ class _HorizontalClinicsCarouselState extends State<HorizontalClinicsCarousel> {
         if (widget.title != null)
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: Text(
-              widget.title!,
-              style: Theme.of(context).textTheme.titleLarge,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.title!,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                if (widget.trailing != null) widget.trailing!,
+              ],
             ),
           ),
         if (widget.title != null) SizedBox(height: 16.h),

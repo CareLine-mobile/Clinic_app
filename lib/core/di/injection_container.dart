@@ -63,6 +63,7 @@ import '../../features/home/domain/usecases/get_latest_clinics_usecase.dart';
 import '../../features/home/domain/usecases/location/get_current_location_usecase.dart';
 import '../../features/home/presentation/cubit/home_cubit.dart';
 import '../../features/home/presentation/cubit/home_ui_cubit.dart';
+import '../../features/map_locations/presentation/cubit/map_locations_cubit.dart';
 import '../../features/profile/data/profile_remote_data_source.dart';
 import '../../features/profile/data/profile_repository.dart';
 import '../../features/profile/presentation/cubit/profile_cubit.dart';
@@ -175,6 +176,11 @@ void setUpHomeModule() {
   );
 
   sl.registerFactory<HomeUiCubit>(() => HomeUiCubit());
+
+  // ── Map Locations Cubit ─────────────────────────────────────────────
+  sl.registerFactory<MapLocationsCubit>(
+    () => MapLocationsCubit(getNearByClinicsUseCase: sl()),
+  );
 }
 
 void setUpMyBookingModule() {

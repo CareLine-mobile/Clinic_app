@@ -14,6 +14,8 @@ class ClinicsHomeModel extends ClinicSummary {
     required super.isOpen,
     required super.doctorsCount,
     super.isFavorite,
+    super.lat,
+    super.lng,
   });
 
   // From JSON - matches API response exactly
@@ -32,7 +34,8 @@ class ClinicsHomeModel extends ClinicSummary {
       isOpen: json['is_open'] as bool? ?? true,
       doctorsCount: json['doctors_count']?.toString() ?? '0',
       isFavorite: json['is_favourite'] as bool? ?? false,
-      //is_favourite
+      lat: (json['lat'] as num?)?.toDouble(),
+      lng: (json['lng'] as num?)?.toDouble(),
     );
   }
 
@@ -49,6 +52,8 @@ class ClinicsHomeModel extends ClinicSummary {
       'is_open': isOpen,
       'doctors_count': doctorsCount,
       'is_favorite': isFavorite,
+      'lat': lat,
+      'lng': lng,
     };
   }
 
@@ -65,6 +70,8 @@ class ClinicsHomeModel extends ClinicSummary {
     bool? isOpen,
     String? doctorsCount,
     bool? isFavorite,
+    double? lat,
+    double? lng,
   }) {
     return ClinicsHomeModel(
       id: id ?? this.id,
@@ -77,6 +84,8 @@ class ClinicsHomeModel extends ClinicSummary {
       isOpen: isOpen ?? this.isOpen,
       doctorsCount: doctorsCount ?? this.doctorsCount,
       isFavorite: isFavorite ?? this.isFavorite,
+      lat: lat ?? this.lat,
+      lng: lng ?? this.lng,
     );
   }
 
@@ -93,6 +102,8 @@ class ClinicsHomeModel extends ClinicSummary {
       isOpen: isOpen,
       doctorsCount: doctorsCount,
       isFavorite: isFavorite,
+      lat: lat,
+      lng: lng,
     );
   }
 
@@ -109,6 +120,8 @@ class ClinicsHomeModel extends ClinicSummary {
       isOpen: entity.isOpen,
       doctorsCount: entity.doctorsCount,
       isFavorite: entity.isFavorite,
+      lat: entity.lat,
+      lng: entity.lng,
     );
   }
 }

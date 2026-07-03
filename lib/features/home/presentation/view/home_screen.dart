@@ -10,6 +10,7 @@ import 'package:clinic_app/core/widgets/card/clinic_list.dart';
 import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/utils/app_size.dart';
 import '../../../../core/utils/location/location_utils.dart';
 import '../../../../core/widgets/error_state_widget.dart';
@@ -189,6 +190,39 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: _navigateToClinicDetails,
             onFavorite: _toggleFavorite,
             onBook: _bookAppointment,
+            trailing: InkWell(
+              onTap: () => Navigator.of(context).pushNamed(Routes.mapLocations),
+              borderRadius: BorderRadius.circular(100.r),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'map.view_map'.tr(),
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(width: 6.w),
+                    Container(
+                      padding: EdgeInsets.all(6.w),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.map_outlined,
+                        size: 14.sp,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
 
