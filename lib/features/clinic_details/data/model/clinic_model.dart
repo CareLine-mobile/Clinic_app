@@ -39,15 +39,51 @@ class ClinicModel extends ClinicEntity {
       description: json['description'] ?? '',
       location: json['location'] ?? '',
       fullAddress: json['full_address'] ?? '',
-      latitude: (json['latitude'] ?? 0).toDouble(),
-      longitude: (json['longitude'] ?? 0).toDouble(),
+      latitude: double.tryParse(json['lat']?.toString() ?? json['latitude']?.toString() ?? '0') ?? 0.0,
+      longitude: double.tryParse(json['lng']?.toString() ?? json['longitude']?.toString() ?? '0') ?? 0.0,
       imageUrls: List<String>.from(json['image_urls'] ?? []),
-      rating: (json['rating'] ?? 0).toDouble(),
-      reviewsCount: json['reviews_count'] ?? 0,
-      price: (json['price'] ?? 0).toDouble(),
+      rating: double.tryParse(json['rating']?.toString() ?? '0') ?? 0.0,
+      reviewsCount: int.tryParse(json['reviews_count']?.toString() ?? '0') ?? 0,
+      price: double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
       isOpen: json['is_open'] ?? false,
       isFavorite: json['is_favourite'] ?? false,
-      openingHours: json['opening_hours'] ?? '',
+      openingHours: json['opening_hours'] is List
+          ? (json['opening_hours'] as List).map((e) {
+              final day = e['day']?.toString().toLowerCase() ?? '';
+              final timeFrom = e['time_from']?.toString() ?? '';
+              final timeTo = e['time_to']?.toString() ?? '';
+              
+              String translateDay(String d) {
+                switch (d) {
+                  case 'saturday': return 'السبت';
+                  case 'sunday': return 'الأحد';
+                  case 'monday': return 'الاثنين';
+                  case 'tuesday': return 'الثلاثاء';
+                  case 'wednesday': return 'الأربعاء';
+                  case 'thursday': return 'الخميس';
+                  case 'friday': return 'الجمعة';
+                  default: return d;
+                }
+              }
+
+              String formatTime(String t) {
+                if (t.isEmpty) return '';
+                try {
+                  final parts = t.split(':');
+                  if (parts.length >= 2) {
+                    int h = int.parse(parts[0]);
+                    int m = int.parse(parts[1]);
+                    String p = h >= 12 ? 'م' : 'ص';
+                    h = h > 12 ? h - 12 : (h == 0 ? 12 : h);
+                    return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')} $p';
+                  }
+                } catch (_) {}
+                return t;
+              }
+
+              return '${translateDay(day)}: ${formatTime(timeFrom)} - ${formatTime(timeTo)}';
+            }).join('\n')
+          : json['opening_hours']?.toString() ?? '',
       services: List<String>.from(json['services'] ?? []),
       facilities: List<String>.from(json['facilities'] ?? []),
       insuranceAccepted: List<String>.from(json['insurance_accepted'] ?? []),

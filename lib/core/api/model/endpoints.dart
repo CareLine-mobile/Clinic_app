@@ -1,8 +1,8 @@
 // ==================== endpoints.dart ====================
 class Endpoints {
   // Base URL
-  static const String baseUrl = 'https://careline-001-site1.dtempurl.com/api';
-  static const String policyLink = 'https://careline-001-site1.dtempurl.com/policy';
+  static const String baseUrl = 'https://api.careline.pw/api';
+  static const String policyLink = 'https://api.careline.pw/policy';
 
   // Auth
   static const String login = '/auth/login';

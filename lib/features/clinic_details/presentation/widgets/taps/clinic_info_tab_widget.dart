@@ -66,9 +66,8 @@ class ClinicInfoTabWidget extends StatelessWidget {
             accentColor: accentColor,
           ),
           SizedBox(height: _v.s8),
-          _InfoTile(
-            icon: Icons.access_time_filled_rounded,
-            value: openingHours,
+          _OpeningHoursTile(
+            openingHours: openingHours,
             accentColor: accentColor,
             theme: theme,
           ),
@@ -207,8 +206,8 @@ class _ExpandableDescriptionState extends State<_ExpandableDescription> {
           onTap: () => setState(() => _expanded = !_expanded),
           child: Text(
             _expanded
-                ? 'clinic.info.show_less'.tr()
-                : 'clinic.info.show_more'.tr(),
+                ? 'clinic.info.show_more'.tr()
+                : 'clinic.info.show_less'.tr(),
             // labelLarge → primaryColor, w600 ✓
             style: theme.textTheme.labelLarge?.copyWith(
               fontSize: TextSizeApp.instance.s12,
@@ -220,43 +219,101 @@ class _ExpandableDescriptionState extends State<_ExpandableDescription> {
   }
 }
 
-class _InfoTile extends StatelessWidget {
-  final IconData icon;
-  final String value;
+class _OpeningHoursTile extends StatelessWidget {
+  final String openingHours;
   final Color accentColor;
   final ThemeData theme;
 
-  const _InfoTile({
-    required this.icon,
-    required this.value,
+  const _OpeningHoursTile({
+    required this.openingHours,
     required this.accentColor,
     required this.theme,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (openingHours.isEmpty) return const SizedBox();
+    
+    final lines = openingHours.split('\n').where((e) => e.isNotEmpty).toList();
+
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: AppSizeHorizontal.instance.s16,
-        vertical: AppSizeVertical.instance.s12,
-      ),
+      padding: EdgeInsets.all(AppSizeHorizontal.instance.s16),
       decoration: BoxDecoration(
-        color: accentColor.withOpacity(0.06),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: accentColor.withOpacity(0.15)),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: accentColor, size: 18.sp),
-          SizedBox(width: AppSizeHorizontal.instance.s10),
-          Text(
-            value,
-            // bodyMedium + bold ✓
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: theme.dividerColor.withOpacity(0.1)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
         ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: lines.map((line) {
+          final parts = line.split(': ');
+          if (parts.length < 2) {
+             return Padding(
+               padding: EdgeInsets.only(bottom: line == lines.last ? 0 : 8.h),
+               child: Row(
+                 children: [
+                   Icon(Icons.access_time_rounded, size: 16.sp, color: accentColor),
+                   SizedBox(width: 8.w),
+                   Expanded(
+                     child: Text(
+                       line,
+                       style: theme.textTheme.bodyMedium?.copyWith(
+                         fontWeight: FontWeight.w600,
+                       ),
+                     ),
+                   ),
+                 ],
+               ),
+             );
+          }
+
+          final day = parts[0];
+          final time = parts[1];
+          
+          return Padding(
+            padding: EdgeInsets.only(bottom: line == lines.last ? 0 : 12.h),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.calendar_today_rounded, size: 16.sp, color: theme.hintColor),
+                    SizedBox(width: 8.w),
+                    Text(
+                      day,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.textTheme.bodyMedium?.color?.withOpacity(0.8),
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: accentColor.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Text(
+                    time,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: accentColor,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
       ),
     );
   }

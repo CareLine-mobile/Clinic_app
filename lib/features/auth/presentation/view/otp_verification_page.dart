@@ -360,6 +360,7 @@ class _OtpDigitFieldState extends State<_OtpDigitField> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isFocused = widget.focusNode.hasFocus;
+    final isDark = theme.brightness == Brightness.dark;
 
     return KeyboardListener(
       focusNode: FocusNode(),
@@ -379,13 +380,17 @@ class _OtpDigitFieldState extends State<_OtpDigitField> {
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
             fontSize: widget.fontSize,
+            color: isDark ? Colors.white : Colors.black87,
           ),
           decoration: InputDecoration(
             counterText: '',
             contentPadding: EdgeInsets.zero,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
+              borderSide: BorderSide(
+                color: isDark ? Colors.grey.shade800 : Colors.grey.shade300, 
+                width: 1.5,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
@@ -394,8 +399,8 @@ class _OtpDigitFieldState extends State<_OtpDigitField> {
             ),
             filled: true,
             fillColor: isFocused
-                ? theme.colorScheme.primary.withValues(alpha: 0.05)
-                : Colors.grey.shade50,
+                ? theme.colorScheme.primary.withValues(alpha: 0.1)
+                : (isDark ? Colors.grey.shade900 : Colors.grey.shade50),
           ),
         ),
       ),

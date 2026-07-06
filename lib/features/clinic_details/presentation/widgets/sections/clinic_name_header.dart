@@ -32,49 +32,90 @@ class ClinicNameHeader extends StatelessWidget {
             if (clinic.specialty.isNotEmpty) ...[
               Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: _h.s10,
-                  vertical: _v.s4,
+                  horizontal: _h.s12,
+                  vertical: _v.s6,
                 ),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8.r),
+                  borderRadius: BorderRadius.circular(20.r), // More rounded (pill shape)
                 ),
                 child: Text(
                   clinic.specialty,
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
                   ),
                 ),
               ),
-              SizedBox(height: _v.s10),
+              SizedBox(height: _v.s12),
             ],
 
-            // ─── Clinic name ──────────────────────────────────────────
-            Text(
-              clinic.name,
-              style: theme.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                height: 1.2,
-              ),
+            // ─── Clinic name & Rating ─────────────────────────────────
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    clinic.name,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      height: 1.2,
+                    ),
+                  ),
+                ),
+                if (clinic.rating > 0) ...[
+                  SizedBox(width: _h.s10),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: _h.s8, vertical: _v.s6),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.star_rounded, color: Colors.amber, size: _t.s18),
+                        SizedBox(width: 4.w),
+                        Text(
+                          clinic.rating.toStringAsFixed(1),
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: Colors.amber.shade800,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
             ),
 
             // ─── Location ─────────────────────────────────────────────
             if (clinic.location.isNotEmpty) ...[
-              SizedBox(height: _v.s10),
+              SizedBox(height: _v.s16),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  CustomIcon(
-                    assetPath: Assets.locationIcon,
-                    size: _t.s16,
-                    color: theme.hintColor,
+                  Container(
+                    padding: EdgeInsets.all(_h.s8),
+                    decoration: BoxDecoration(
+                      color: theme.hintColor.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: CustomIcon(
+                      assetPath: Assets.locationIcon,
+                      size: _t.s16,
+                      color: theme.hintColor,
+                    ),
                   ),
-                  SizedBox(width: _h.s6),
+                  SizedBox(width: _h.s12),
                   Expanded(
                     child: Text(
                       clinic.location,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.hintColor,
+                        fontWeight: FontWeight.w500,
+                        height: 1.4,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -84,8 +125,7 @@ class ClinicNameHeader extends StatelessWidget {
               ),
             ],
 
-            SizedBox(height: _v.s16),
-            Divider(height: 1, color: theme.dividerColor.withValues(alpha:0.4)),
+            SizedBox(height: _v.s24),
           ],
         ),
       ),

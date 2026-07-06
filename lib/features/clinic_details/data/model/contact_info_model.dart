@@ -15,7 +15,11 @@ class ContactInfoModel extends ContactInfoEntity {
       phone: json['phone'] ?? '',
       email: json['email'] ?? '',
       website: json['website'] ?? '',
-      socialMedia: SocialMediaModel.fromJson(json['social_media'] ?? {}),
+      socialMedia: SocialMediaModel.fromJson(
+        json['social_media'] is Map<String, dynamic>
+            ? json['social_media'] as Map<String, dynamic>
+            : {},
+      ),
     );
   }
 
