@@ -14,6 +14,7 @@ import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:clinic_app/core/utils/app_size.dart';
 import '../../cubit/auth_cubit.dart';
 import '../../cubit/auth_state.dart';
+import 'package:clinic_app/features/settings/presentation/cubit/settings_cubit.dart';
 
 class LoginTab extends StatefulWidget {
   const LoginTab({Key? key}) : super(key: key);
@@ -104,6 +105,7 @@ class _LoginTabState extends State<LoginTab> {
         if (state is AuthFailure) {
           _showErrorSnackBar(state.message);
         } else if (state is LoginSuccess) {
+          context.read<SettingsCubit>().syncFcmToken();
           Navigator.pushNamedAndRemoveUntil(
               context, Routes.dashBoard, (_) => false);
         } else if (state is AccountNotVerified) {
@@ -138,6 +140,7 @@ class _LoginTabState extends State<LoginTab> {
         if (state is AuthFailure) {
           _showErrorSnackBar(state.message);
         } else if (state is LoginSuccess) {
+          context.read<SettingsCubit>().syncFcmToken();
           Navigator.pushNamedAndRemoveUntil(
               context, Routes.dashBoard, (_) => false);
         }

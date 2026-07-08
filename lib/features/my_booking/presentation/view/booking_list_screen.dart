@@ -113,13 +113,25 @@ class _BookingList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (state.bookings.isEmpty) {
-      return EmptyStateWidget(
-        icon: Icons.calendar_today_outlined,
-        title: 'bookings.empty_title'.tr(),
-        subtitle: 'bookings.empty_subtitle'.tr(),
-        enableBackButton: false,
-        actionLabel: 'bookings.find_clinic'.tr(),
-        onActionPressed: () => Navigator.pushNamed(context, Routes.dashBoard),
+      return RefreshIndicator(
+        color: ColorsManager.primaryColor,
+        onRefresh: () => context.read<BookingCubit>().loadBookings(),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: EmptyStateWidget(
+                icon: Icons.calendar_today_outlined,
+                title: 'bookings.empty_title'.tr(),
+                subtitle: 'bookings.empty_subtitle'.tr(),
+                enableBackButton: false,
+                actionLabel: 'bookings.find_clinic'.tr(),
+                onActionPressed: () => Navigator.pushNamed(context, Routes.dashBoard),
+              ),
+            ),
+          ],
+        ),
       );
     }
 
@@ -128,6 +140,7 @@ class _BookingList extends StatelessWidget {
       onRefresh: () => context.read<BookingCubit>().loadBookings(),
       child: ListView.builder(
         controller: scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.symmetric(
           horizontal: SizeApp.s16,
           vertical: SizeApp.s12,

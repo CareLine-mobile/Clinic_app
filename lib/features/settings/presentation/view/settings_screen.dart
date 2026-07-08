@@ -8,6 +8,7 @@ import '../../../auth/domain/entities/user.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
 import '../../../user_data/user_repo.dart';
+import '../cubit/settings_cubit.dart';
 import '../widgets/account_section.dart';
 import '../widgets/guest_banner.dart';
 import '../widgets/legal_section.dart';
@@ -23,9 +24,12 @@ class SettingsTabScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<AuthCubit, AuthState>(
       listenWhen: (_, curr) => curr is AuthUnauthenticated,
-      listener: (_, __) => Navigator.pushNamedAndRemoveUntil(
-        context, Routes.auth, (_) => false,
-      ),
+      listener: (context, _) {
+        context.read<SettingsCubit>().clearNotifications();
+        Navigator.pushNamedAndRemoveUntil(
+          context, Routes.auth, (_) => false,
+        );
+      },
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: _SettingsScrollView(user: UserRepository().currentUser),

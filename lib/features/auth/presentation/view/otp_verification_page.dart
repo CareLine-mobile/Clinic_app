@@ -14,6 +14,7 @@ import '../../../../core/utils/app_size.dart';
 import '../../../../core/utils/assets.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
+import 'package:clinic_app/features/settings/presentation/cubit/settings_cubit.dart';
 
 class OtpVerificationPage extends StatefulWidget {
   final String email;
@@ -128,6 +129,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
             type: SnackBarType.success,
           );
         } else if (state is AuthAuthenticated || state is LoginSuccess) {
+          context.read<SettingsCubit>().syncFcmToken();
           Navigator.pushNamedAndRemoveUntil(
             context,
             Routes.dashBoard,

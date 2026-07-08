@@ -5,8 +5,10 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/db/shared_pref_helper.dart';
+import '../../../../core/errors/error_handler.dart';
 import '../../../../core/utils/app_constans.dart';
 import '../../data/setting_repo_impl.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 part 'settings_state.dart';
 
@@ -37,6 +39,12 @@ class SettingsCubit extends Cubit<SettingsState> {
       notificationsEnabled: savedNotifs ?? false,
       clearError: true,
     ));
+
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+      if (state.notificationsEnabled) {
+        _settingsRepo.registerFcmToken(newToken).ignore();
+      }
+    });
   }
 
   // ── Theme ─────────────────────────────────────────────────────────────────
@@ -63,6 +71,19 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   // ── Notifications ─────────────────────────────────────────────────────────
+
+  Future<void> syncFcmToken() async {
+    if (state.notificationsEnabled) {
+      final token = await _settingsRepo.requestPermissionAndGetToken();
+      if (token != null) {
+        try {
+          await _settingsRepo.registerFcmToken(token);
+        } catch (_) {
+          // Ignore background sync errors
+        }
+      }
+    }
+  }
 
   /// Toggles notifications.
   ///
@@ -109,13 +130,21 @@ class SettingsCubit extends Cubit<SettingsState> {
         notificationsLoading: false,
         clearError: true,
       ));
-    } catch (_) {
+    } catch (e) {
       // ✗ API failure — revert
+      final failure = ErrorHandler.handleException(e);
       emit(state.copyWith(
         notificationsEnabled: false,
         notificationsLoading: false,
-        notificationsError: 'settings.notifications.registration_failed',
+        notificationsError: failure.message,
       ));
+    }
+  }
+
+  Future<void> clearNotifications() async {
+    if (state.notificationsEnabled) {
+      await _persistNotifications(false);
+      emit(state.copyWith(notificationsEnabled: false));
     }
   }
 

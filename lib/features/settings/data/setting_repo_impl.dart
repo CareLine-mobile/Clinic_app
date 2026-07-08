@@ -21,10 +21,10 @@ class SettingsRepositoryImpl implements SettingsRepository {
 
   @override
   Future<void> registerFcmToken(String token) async {
-    log('messagesss: $token');
+    log('messagesss fcm_token: $token');
     await _api.request(
       method: HttpMethod.post,
-      url: Endpoints.generateFcmToken,   // add this to your Endpoints class
+      url: Endpoints.generateFcmToken,
       body: {'fcm_token': token},
     );
   }
