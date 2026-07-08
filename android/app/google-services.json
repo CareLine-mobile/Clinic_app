@@ -30,6 +30,14 @@
           }
         },
         {
+          "client_id": "1051363714209-rctk826g5eovoob9mq0gqbim97kqa0hj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.careLine.app",
+            "certificate_hash": "8afb2f02c7d9ab52d4abeb515408c98ad2249e61"
+          }
+        },
+        {
           "client_id": "1051363714209-kuqsn9psu5bhsj0dut8shp9nbblpndlg.apps.googleusercontent.com",
           "client_type": 3
         }
