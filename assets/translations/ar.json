@@ -535,5 +535,40 @@
     "error": {
       "title": "حدث خطأ ما"
     }
+  },
+  "doctorProfile": {
+    "loadErrorTitle": "تعذر تحميل الملف الشخصي للأخصائي",
+    "ratingSuccess": "تم إرسال تقييمك بنجاح! شكراً لملاحظاتك.",
+    "reviewsCount": "{count} تقييم",
+    "noReviewsShort": "لا توجد تقييمات بعد",
+    "aggregatedRating": "مجمّعة من جميع الفروع",
+    "yearsExp": "سنوات الخبرة",
+    "rate": "تقييم",
+    "share": "مشاركة",
+    "save": "حفظ",
+    "about": "نبذة",
+    "professionalInfo": "المعلومات المهنية",
+    "experience": "الخبرة",
+    "yearsValue": "{count} سنوات",
+    "languages": "اللغات",
+    "consultationFee": "رسوم الكشف",
+    "egp": "جنيه مصري",
+    "specialtiesTags": "التخصصات والوسوم",
+    "languageTag": "لغة {language}",
+    "availableAt": "متاح في",
+    "bookHere": "احجز هنا",
+    "availableSlots": "المواعيد المتاحة",
+    "noReviewsTitle": "لا توجد تقييمات بعد",
+    "noReviewsSubtitle": "كن أول من يقيّم هذا الأخصائي",
+    "reviewsTitle": "التقييمات",
+    "rateYourExperience": "قيّم تجربتك",
+    "howWasVisit": "كيف كانت زيارتك لـ {name}؟",
+    "tapToRate": "اضغط على نجمة للتقييم",
+    "ratingPoor": "ضعيف",
+    "ratingFair": "مقبول",
+    "ratingGood": "جيد",
+    "ratingVeryGood": "جيد جدًا",
+    "ratingExcellent": "ممتاز!",
+    "submitRating": "إرسال التقييم"
   }
 }

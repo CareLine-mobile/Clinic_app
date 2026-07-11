@@ -25,6 +25,8 @@ import '../../features/clinic_details/presentation/view/clinic_details_screen.da
 import '../../features/onboarding/presentation/pages/onboarding_screen.dart';
 import '../../features/profile/presentation/cubit/profile_cubit.dart';
 import '../../features/profile/presentation/view/profile_screen.dart';
+import '../../features/doctor_details/presentation/cubit/doctor_profile_cubit.dart';
+import '../../features/doctor_details/presentation/view/doctor_profile_screen.dart';
 import '../di/injection_container.dart' as di;
 
 class AppRouter {
@@ -166,6 +168,17 @@ class AppRouter {
           builder: (_) => BlocProvider<MapLocationsCubit>(
             create: (_) => di.sl<MapLocationsCubit>(),
             child: const MapLocationsScreen(),
+          ),
+        );
+
+      // ── Doctor Profile ──────────────────────────────────────────────────
+      case Routes.doctorProfile:
+        final doctorId = settings.arguments as int?;
+        if (doctorId == null) return _errorRoute();
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider<DoctorProfileCubit>(
+            create: (_) => di.sl<DoctorProfileCubit>(),
+            child: DoctorProfileScreen(doctorId: doctorId),
           ),
         );
 

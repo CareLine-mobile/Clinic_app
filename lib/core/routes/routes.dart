@@ -24,4 +24,7 @@ abstract class Routes {
 
   // map
   static const String mapLocations = '/map-locations';
+
+  // Doctor profile
+  static const String doctorProfile = '/doctor-profile';
 }

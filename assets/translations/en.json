@@ -51,26 +51,21 @@
     }
   },
   "onboarding": {
-   "page1": {
-     "title": "Track Your Turn Live",
-     "subtitle": "No more waiting in crowded rooms. Monitor exactly how many clients are ahead of you from home."
-
-   },
+    "page1": {
+      "title": "Track Your Turn Live",
+      "subtitle": "No more waiting in crowded rooms. Monitor exactly how many clients are ahead of you from home."
+    },
     "page2": {
       "title": "Arrive Just in Time",
       "subtitle": "Receive smart notifications telling you exactly when to head to the branch based on the current live queue"
-
     },
     "page3": {
       "title": "Discover Top Locations",
       "subtitle": "Find specialist experts near you with verified client ratings and real-time availability."
-
-
     },
     "page4": {
       "title": " Track Your Turn Live",
       "subtitle": "No more waiting in crowded rooms. Monitor exactly how many clients are ahead of you from home."
-
     },
     "skip": "Skip",
     "next": "Next",
@@ -540,5 +535,40 @@
     "error": {
       "title": "Something Went Wrong"
     }
+  },
+  "doctorProfile": {
+    "loadErrorTitle": "Could not load the specialist profile",
+    "ratingSuccess": "Rating submitted successfully! Thank you for your feedback.",
+    "reviewsCount": "{count} Reviews",
+    "noReviewsShort": "No reviews yet",
+    "aggregatedRating": "Aggregated from all clinics",
+    "yearsExp": "Years Exp.",
+    "rate": "Rate",
+    "share": "Share",
+    "save": "Save",
+    "about": "About",
+    "professionalInfo": "Professional Info",
+    "experience": "Experience",
+    "yearsValue": "{count} Years",
+    "languages": "Languages",
+    "consultationFee": "Consultation Fee",
+    "egp": "EGP",
+    "specialtiesTags": "Specialties & Tags",
+    "languageTag": "{language} Language",
+    "availableAt": "Available At",
+    "bookHere": "Book Here",
+    "availableSlots": "Available Slots",
+    "noReviewsTitle": "No reviews yet",
+    "noReviewsSubtitle": "Be the first to review this specialist",
+    "reviewsTitle": "Reviews",
+    "rateYourExperience": "Rate Your Experience",
+    "howWasVisit": "How was your visit with {name}?",
+    "tapToRate": "Tap a star to rate",
+    "ratingPoor": "Poor",
+    "ratingFair": "Fair",
+    "ratingGood": "Good",
+    "ratingVeryGood": "Very Good",
+    "ratingExcellent": "Excellent!",
+    "submitRating": "Submit Rating"
   }
 }

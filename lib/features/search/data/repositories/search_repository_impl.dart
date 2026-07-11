@@ -1,5 +1,3 @@
-// lib/features/search/data/repositories/search_repository_impl.dart
-
 import 'package:dartz/dartz.dart';
 import '../../../../../core/errors/failures.dart';
 import '../../../../../core/errors/result_handler.dart';
@@ -17,4 +15,6 @@ class SearchRepositoryImpl implements SearchRepository {
     required String query,
   }) =>
       ResultHandler.handle(() => remoteDataSource.searchClinics(query: query));
+
+
 }

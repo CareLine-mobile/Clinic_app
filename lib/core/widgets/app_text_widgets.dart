@@ -50,12 +50,14 @@ class HeadlineText extends StatelessWidget {
 /// Renders as: "Available Doctors  [3]"
 class SectionTitle extends StatelessWidget {
   final String title;
+  final IconData? icon;
   final int? count;
   final Color? accentColor;
 
   const SectionTitle(
       this.title, {
         Key? key,
+        this.icon,
         this.count,
         this.accentColor,
       }) : super(key: key);
@@ -66,21 +68,32 @@ class SectionTitle extends StatelessWidget {
     final accent = accentColor ?? theme.primaryColor;
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Colored left accent bar (matches SectionHeader widget behavior)
-        Container(
-          width: 3.w,
-          height: 18.h,
-          decoration: BoxDecoration(
-            color: accent,
-            borderRadius: BorderRadius.circular(2.r),
+        // Icon badge if provided, otherwise the colored left accent bar
+        if (icon != null)
+          Container(
+            padding: EdgeInsets.all(6.r),
+            decoration: BoxDecoration(
+              color: accent.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            child: Icon(icon, size: 16.sp, color: accent),
+          )
+        else
+          Container(
+            width: 3.w,
+            height: 18.h,
+            decoration: BoxDecoration(
+              color: accent,
+              borderRadius: BorderRadius.circular(2.r),
+            ),
           ),
-        ),
-        SizedBox(width: 8.w),
+        SizedBox(width: icon != null ? 10.w : 8.w),
 
         // Title text
-        Expanded(
+        Flexible(
           child: Text(
             title,
             style: AppTextStyles.sectionHeader,

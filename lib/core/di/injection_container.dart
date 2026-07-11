@@ -1,6 +1,12 @@
 import 'package:clinic_app/core/api/base_api_services.dart';
 import 'package:clinic_app/core/api/dio_client.dart';
 import 'package:clinic_app/features/auth/domain/usecases/google_login_usecase.dart';
+import 'package:clinic_app/features/doctor_details/data/datasources/doctor_remote_data_source.dart';
+import 'package:clinic_app/features/doctor_details/data/repositories/doctor_repository_impl.dart';
+import 'package:clinic_app/features/doctor_details/domain/repositories/doctor_repository.dart';
+import 'package:clinic_app/features/doctor_details/domain/usecases/get_doctor_details_usecase.dart';
+import 'package:clinic_app/features/doctor_details/domain/usecases/rate_doctor_usecase.dart';
+import 'package:clinic_app/features/doctor_details/presentation/cubit/doctor_profile_cubit.dart';
 import 'package:clinic_app/features/my_booking/data/data_sources/review_local_data_source.dart';
 import 'package:clinic_app/features/my_booking/domain/usecase/review_local_data_source.dart';
 import 'package:clinic_app/features/search/data/datasources/search_remote_data_source.dart';
@@ -87,6 +93,7 @@ Future<void> init() async {
   setUpSearchModule();
   setUpFavouriteModule();
   setUpProfileModule();
+  setUpDoctorModule();
   sl.registerLazySingleton(() => UserRepository());
   // In setUpAuthModule or a new setUpSettingsModule:
   sl.registerLazySingleton<SettingsRepositoryImpl>(
@@ -252,10 +259,16 @@ void setUpClinicModule() {
 void setUpSearchModule() {
 // Search feature
 // 1. Cubit
-  sl.registerFactory(() => SearchCubit(searchClinicsUseCase: sl(),favouriteRepository: sl(),toggleFavouriteUseCase: sl()));
+  sl.registerFactory(() => SearchCubit(
+        searchClinicsUseCase: sl(),
+   //     searchDoctorsUseCase: sl(),
+        favouriteRepository: sl(),
+        toggleFavouriteUseCase: sl(),
+      ));
 
   // 2. UseCase
   sl.registerLazySingleton(() => SearchClinicsUseCase(sl()));
+
 
   // 3. Repository
   sl.registerLazySingleton<SearchRepository>(
@@ -306,4 +319,28 @@ void setUpProfileModule() {
     repository: sl(),
     userRepository: sl(),
   ));
+}
+
+void setUpDoctorModule() {
+  // Data sources
+  sl.registerLazySingleton<DoctorRemoteDataSource>(
+    () => DoctorRemoteDataSourceImpl(apiServices: sl()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<DoctorRepository>(
+    () => DoctorRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // Use cases
+  sl.registerLazySingleton(() => GetDoctorDetailsUseCase(sl()));
+  sl.registerLazySingleton(() => RateDoctorUseCase(sl()));
+
+  // Cubit
+  sl.registerFactory(
+    () => DoctorProfileCubit(
+      getDoctorDetailsUseCase: sl(),
+      rateDoctorUseCase: sl(),
+    ),
+  );
 }

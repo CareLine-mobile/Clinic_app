@@ -5,6 +5,7 @@
 //  ✅ _TimeSlotRow has its own BlocBuilder only for the time selection part
 // ══════════════════════════════════════════════════════════════════════════════
 
+import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/core/theme/colors.dart';
 import 'package:clinic_app/features/clinic_details/domain/entites/time_slot_entity.dart';
 import 'package:clinic_app/features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
@@ -139,7 +140,7 @@ class DoctorCard extends StatelessWidget {
                   ),
                 ),
 
-                // Consultation fee
+                // Consultation fee + View Profile
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -155,6 +156,46 @@ class DoctorCard extends StatelessWidget {
                       'clinic.currency'.tr(),
                       style: TextStyle(
                           fontSize: 11.sp, color: Colors.grey.shade500),
+                    ),
+                    SizedBox(height: 6.h),
+                    // ── View Profile button ───────────────────
+                    GestureDetector(
+                      onTap: () {
+                        final id = int.tryParse(doctor.id);
+                        if (id != null) {
+                          Navigator.pushNamed(
+                            context,
+                            Routes.doctorProfile,
+                            arguments: id,
+                          );
+                        }
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 8.w, vertical: 4.h),
+                        decoration: BoxDecoration(
+                          color: accentColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8.r),
+                          border: Border.all(
+                              color: accentColor.withOpacity(0.3)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.person_outline_rounded,
+                                size: 11.sp, color: accentColor),
+                            SizedBox(width: 3.w),
+                            Text(
+                              'settings.account.profile'.tr(),
+                              style: TextStyle(
+                                fontSize: 10.sp,
+                                color: accentColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),

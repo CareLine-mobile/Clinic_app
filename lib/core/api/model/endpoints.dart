@@ -22,7 +22,10 @@ class Endpoints {
   static const String featuredClinics = '/clinicals';
   static const String nearbyClinics = '/clinicals';
   static const String clinicDetails = '/clinicals'; // + /{id}
+  // doctor
 
+  static const String doctorDetails = '/doctors'; // + /{id}    /doctors/573
+  static  String rateDoctor(int id) => '/doctors/$id/rate'; // /doctors/3/rate
   // Favorites
   static String toggleFavorite(int id) => '/clinicals/$id/favourite';
   static const String getFavorites = '/clinicals/favourites';
@@ -37,5 +40,7 @@ class Endpoints {
   static const String profile = '/auth/patient/profile';
   //setting
   static const String generateFcmToken = '/auth/generate-fcm-token';
+
+
 
 }
