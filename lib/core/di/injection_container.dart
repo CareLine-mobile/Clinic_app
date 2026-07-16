@@ -79,6 +79,15 @@ import '../../features/settings/data/setting_repo_impl.dart';
 import '../../features/settings/presentation/cubit/settings_cubit.dart';
 import '../../features/user_data/user_repo.dart';
 import '../api/model/endpoints.dart';
+import '../../core/network/network_info.dart';
+
+// Features - Notifications
+import '../../features/notifications/data/data_sources/notification_local_data_source.dart';
+import '../../features/notifications/data/data_sources/notification_remote_data_source.dart';
+import '../../features/notifications/data/repositories/notification_repository_impl.dart';
+import '../../features/notifications/domain/repositories/notification_repository.dart';
+import '../../features/notifications/domain/usecases/get_notifications_usecase.dart';
+import '../../features/notifications/presentation/cubit/notification_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -96,6 +105,7 @@ Future<void> init() async {
   setUpFavouriteModule();
   setUpProfileModule();
   setUpDoctorModule();
+  setUpNotificationsModule();
   sl.registerLazySingleton(() => UserRepository());
   // In setUpAuthModule or a new setUpSettingsModule:
   sl.registerLazySingleton<SettingsRepositoryImpl>(
@@ -351,4 +361,29 @@ void setUpDoctorModule() {
       rateDoctorUseCase: sl(),
     ),
   );
+}
+
+void setUpNotificationsModule() {
+  // Data Sources
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(dioClient: sl()),
+  );
+  sl.registerLazySingleton<NotificationLocalDataSource>(
+    () => NotificationLocalDataSourceImpl(),
+  );
+
+  // Repository
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+
+  // Use Case
+  sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
+
+  // Cubit
+  sl.registerFactory(() => NotificationCubit(getNotificationsUseCase: sl()));
 }

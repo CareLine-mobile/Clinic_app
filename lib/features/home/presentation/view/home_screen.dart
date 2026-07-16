@@ -304,11 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _navigateToClinicDetails(clinic);
 
   void _handleNotificationTap() {
-    CustomSnackBar.show(
-      context,
-      message: 'home.no_notifications'.tr(),
-      type: SnackBarType.info,
-    );
+    Navigator.pushNamed(context, Routes.notifications);
   }
 }
 

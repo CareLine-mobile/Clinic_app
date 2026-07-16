@@ -13,6 +13,8 @@ import 'package:clinic_app/features/search/presentation/view/search_screen.dart'
 import 'package:clinic_app/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:clinic_app/features/settings/presentation/view/privacy_view.dart';
 import 'package:clinic_app/features/settings/presentation/view/settings_screen.dart';
+import 'package:clinic_app/features/notifications/presentation/cubit/notification_cubit.dart';
+import 'package:clinic_app/features/notifications/presentation/view/notification_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -104,6 +106,13 @@ class AppRouter {
           builder: (_) => BlocProvider<AuthCubit>(
             create: (_) => di.sl<AuthCubit>(),
             child: const SettingsTabScreen(),
+          ),
+        );
+      case Routes.notifications:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider<NotificationCubit>(
+            create: (_) => di.sl<NotificationCubit>(),
+            child: const NotificationScreen(),
           ),
         );
     // OTP — always shares the same cubit that started the signup/login flow.

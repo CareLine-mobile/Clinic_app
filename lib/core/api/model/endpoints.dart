@@ -15,6 +15,9 @@ class Endpoints {
   static const String sendForgetPassword = '/auth/forgot-password';
   static const String deleteAccount = '/auth/delete-account';
 
+  // Notifications
+  static const String notifications = '/notifications';
+
 
   // Clinics
   static const String allClinics = '/clinicals';

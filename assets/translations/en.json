@@ -4,6 +4,11 @@
     "message": "This feature requires you to be logged in.\nWould you like to log in now?",
     "later": "Later"
   },
+  "notifications": {
+    "title": "Notifications",
+    "empty_title": "No Notifications Yet",
+    "empty_subtitle": "You will receive notifications here for your bookings and updates."
+  },
   "auth": {
     "user": "User",
     "login": "Login",

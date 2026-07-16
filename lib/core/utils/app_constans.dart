@@ -84,6 +84,8 @@ class ErrorMessages {
   static const String unexpectedError = 'errors.server.unexpected';
 
   // ==================== Auth Error Messages ====================
+  static const String currentLocale = 'current_locale';
+  static const String notificationsCache = 'notifications_cache';
   static const String authTitle = 'errors.auth.title';
   static const String authSubtitle = 'errors.auth.subtitle';
   static const String authAction = 'errors.auth.action';
