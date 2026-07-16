@@ -21,7 +21,8 @@ import '../../../../core/routes/routes.dart';
 import 'package:clinic_app/features/map_locations/presentation/widgets/map_clinic_summary_sheet.dart';
 
 class MapLocationsScreen extends StatefulWidget {
-  const MapLocationsScreen({super.key});
+  final bool isTab;
+  const MapLocationsScreen({super.key, this.isTab = false});
 
   @override
   State<MapLocationsScreen> createState() => _MapLocationsScreenState();
@@ -140,10 +141,12 @@ class _MapLocationsScreenState extends State<MapLocationsScreen>
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.dark,
       ),
-      leading: _GlassIconButton(
-        icon: Icons.arrow_back_ios_new_rounded,
-        onTap: () => Navigator.of(context).pop(),
-      ),
+      leading: widget.isTab
+          ? null
+          : _GlassIconButton(
+              icon: Icons.arrow_back_ios_new_rounded,
+              onTap: () => Navigator.of(context).pop(),
+            ),
       actions: [
         Padding(
           padding: EdgeInsets.only(right: 12.w),
@@ -193,7 +196,7 @@ class _MapLocationsScreenState extends State<MapLocationsScreen>
 
         // ── Floating bottom PageView cards ───────────────────────────
         Positioned(
-          bottom: 24.h,
+          bottom: widget.isTab ? 110.h : 24.h,
           left: 0,
           right: 0,
           child: SizedBox(
@@ -235,7 +238,7 @@ class _MapLocationsScreenState extends State<MapLocationsScreen>
         // ── Page indicator dots ──────────────────────────────────────
         if (state.clinics.isNotEmpty)
           Positioned(
-            bottom: 8.h,
+            bottom: widget.isTab ? 94.h : 8.h,
             left: 0,
             right: 0,
             child: _PageIndicator(
