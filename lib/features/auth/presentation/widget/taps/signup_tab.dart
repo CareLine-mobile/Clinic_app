@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:clinic_app/core/utils/assets.dart';
+import 'package:clinic_app/core/widgets/CustomIcon.dart';
 import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -118,7 +120,10 @@ class _SignupTabState extends State<SignupTab> {
                 const SizedBox(height: 16),
                 AppOutlinedButton(
                   text: 'auth.continueAsGuest'.tr(),
-                  leadingIcon: Icons.person_outline,
+                  leadingWidget: CustomIcon(
+                    assetPath: Assets.personIcon,
+                    size: _h.s20,
+                  ),
                   onPressed: () => Navigator.pushNamedAndRemoveUntil(context, Routes.dashBoard, (_) => false),
                   horizontalPadding: 0,
                   verticalPadding: 0,

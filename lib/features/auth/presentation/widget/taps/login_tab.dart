@@ -88,7 +88,16 @@ class _LoginTabState extends State<LoginTab> {
             SizedBox(height: _v.s20),
             _buildGoogleSignInButton(),
             SizedBox(height: _v.s12),
-            _buildGuestButton(),
+            AppOutlinedButton(
+              text: 'auth.continueAsGuest'.tr(),
+              leadingWidget: CustomIcon(
+                assetPath: Assets.personIcon,
+                size: _h.s20,
+              ),
+              onPressed: () => Navigator.pushNamedAndRemoveUntil(context, Routes.dashBoard, (_) => false),
+              horizontalPadding: 0,
+              verticalPadding: 0,
+            ),
           ],
         ),
       ),
@@ -183,20 +192,6 @@ class _LoginTabState extends State<LoginTab> {
         ),
         Expanded(child: Divider(color: Colors.grey.shade300)),
       ],
-    );
-  }
-
-  Widget _buildGuestButton() {
-    return AppOutlinedButton(
-      text: 'auth.continueAsGuest'.tr(),
-      onPressed: () => Navigator.pushNamedAndRemoveUntil(
-          context, Routes.dashBoard, (_) => false),
-      horizontalPadding: 0,
-      verticalPadding: 0,
-      leadingWidget: CustomIcon(
-        assetPath: Assets.personIcon,
-        size: _h.s20,
-      ),
     );
   }
 
