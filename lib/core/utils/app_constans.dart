@@ -14,6 +14,7 @@ class AppConstants {
   static const String themeMode       = 'settings_theme_mode';
   static const String languageCode    = 'settings_language_code';
   static const String notifications   = 'settings_notifications';
+  static const String notificationsCache = 'notifications_cache';
    //----------------- App Location Permission -----------
   static const int locationPermissionDinedForEver = 35;
   static const int locationPermissionDenied = 34;
@@ -84,8 +85,6 @@ class ErrorMessages {
   static const String unexpectedError = 'errors.server.unexpected';
 
   // ==================== Auth Error Messages ====================
-  static const String currentLocale = 'current_locale';
-  static const String notificationsCache = 'notifications_cache';
   static const String authTitle = 'errors.auth.title';
   static const String authSubtitle = 'errors.auth.subtitle';
   static const String authAction = 'errors.auth.action';

@@ -17,6 +17,8 @@ class Endpoints {
 
   // Notifications
   static const String notifications = '/notifications';
+  static const String markNotificationAsRead = '/notifications/{id}/read';
+  static const String markAllNotificationsAsRead = '/notifications/read-all';
 
 
   // Clinics

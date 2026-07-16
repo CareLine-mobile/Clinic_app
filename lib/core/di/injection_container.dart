@@ -55,13 +55,9 @@ import '../../features/clinic_details/domain/repositories/clinic_repository.dart
 import '../../features/clinic_details/domain/usecases/get_clinic_details_usecase.dart';
 import '../../features/clinic_details/domain/usecases/make_appointment_usecase.dart';
 import '../../features/clinic_details/domain/usecases/apply_coupon_usecase.dart';
-import '../../features/clinic_details/domain/usecases/toggle_favorite_usecase.dart'
-    as clinic_details;
 import '../../features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
 
 // Features - Home
-import '../../features/home/data/datasources/localdatasource/location_data_source.dart';
-import '../../features/home/data/datasources/localdatasource/location_data_source_impl.dart';
 import '../../features/home/data/repositories/home_repository_impl.dart';
 import '../../features/home/data/repositories/location_repository_impl.dart';
 import '../../features/home/domain/repositories/home_repository.dart';
@@ -79,14 +75,16 @@ import '../../features/settings/data/setting_repo_impl.dart';
 import '../../features/settings/presentation/cubit/settings_cubit.dart';
 import '../../features/user_data/user_repo.dart';
 import '../api/model/endpoints.dart';
-import '../../core/network/network_info.dart';
 
 // Features - Notifications
 import '../../features/notifications/data/data_sources/notification_local_data_source.dart';
 import '../../features/notifications/data/data_sources/notification_remote_data_source.dart';
 import '../../features/notifications/data/repositories/notification_repository_impl.dart';
 import '../../features/notifications/domain/repositories/notification_repository.dart';
+import '../../features/notifications/domain/usecases/get_cached_notifications_usecase.dart';
 import '../../features/notifications/domain/usecases/get_notifications_usecase.dart';
+import '../../features/notifications/domain/usecases/mark_notification_as_read_usecase.dart';
+import '../../features/notifications/domain/usecases/mark_all_notifications_as_read_usecase.dart';
 import '../../features/notifications/presentation/cubit/notification_cubit.dart';
 
 final sl = GetIt.instance;
@@ -366,7 +364,7 @@ void setUpDoctorModule() {
 void setUpNotificationsModule() {
   // Data Sources
   sl.registerLazySingleton<NotificationRemoteDataSource>(
-    () => NotificationRemoteDataSourceImpl(dioClient: sl()),
+    () => NotificationRemoteDataSourceImpl(apiServices: sl()),
   );
   sl.registerLazySingleton<NotificationLocalDataSource>(
     () => NotificationLocalDataSourceImpl(),
@@ -377,13 +375,20 @@ void setUpNotificationsModule() {
     () => NotificationRepositoryImpl(
       remoteDataSource: sl(),
       localDataSource: sl(),
-      networkInfo: sl(),
     ),
   );
 
   // Use Case
+  sl.registerLazySingleton(() => GetCachedNotificationsUseCase(sl()));
   sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
+  sl.registerLazySingleton(() => MarkNotificationAsReadUseCase(sl()));
+  sl.registerLazySingleton(() => MarkAllNotificationsAsReadUseCase(sl()));
 
   // Cubit
-  sl.registerFactory(() => NotificationCubit(getNotificationsUseCase: sl()));
+  sl.registerFactory(() => NotificationCubit(
+        getCachedNotificationsUseCase: sl(),
+        getNotificationsUseCase: sl(),
+        markNotificationAsReadUseCase: sl(),
+        markAllNotificationsAsReadUseCase: sl(),
+      ));
 }
