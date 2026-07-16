@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import '../../../../../../core/routes/routes.dart';
 import '../../../../../../core/utils/app_size.dart';
 import '../../../../../../core/widgets/custom_app_bar.dart';
 import '../cubit/booking_cubit.dart';
@@ -112,21 +113,30 @@ class _ClinicCard extends StatelessWidget {
     final theme = Theme.of(context);
     final clinical = booking.clinical;
 
-    return Container(
-      padding: EdgeInsets.all(SizeApp.s16),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
+    return InkWell(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          Routes.clinicDetails,
+          arguments: clinical.id,
+        );
+      },
+      borderRadius: BorderRadius.circular(16.r),
+      child: Container(
+        padding: EdgeInsets.all(SizeApp.s16),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
           ClinicAvatar(thumbnailUrl: clinical.thumbnailUrl, size: 64, radius: 14),
           SizedBox(width: SizeApp.s12),
           Expanded(
@@ -136,32 +146,38 @@ class _ClinicCard extends StatelessWidget {
                 Text(clinical.name,
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.bold)),
-                SizedBox(height: 4.h),
-                Text(clinical.specialty,
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(color: theme.hintColor)),
+                if (clinical.specialty != null) ...[
+                  SizedBox(height: 4.h),
+                  Text(clinical.specialty!,
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: theme.hintColor)),
+                ],
                 SizedBox(height: 6.h),
-                Row(
-                  children: [
-                    Icon(Icons.location_on_outlined,
-                        size: 14.sp, color: theme.hintColor),
-                    SizedBox(width: 4.w),
-                    Expanded(
-                      child: Text(
-                        clinical.location,
-                        style: theme.textTheme.bodySmall
-                            ?.copyWith(color: theme.hintColor),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                if (clinical.location != null)
+                  Row(
+                    children: [
+                      Icon(Icons.location_on_outlined,
+                          size: 14.sp, color: theme.hintColor),
+                      SizedBox(width: 4.w),
+                      Expanded(
+                        child: Text(
+                          clinical.location!,
+                          style: theme.textTheme.bodySmall
+                              ?.copyWith(color: theme.hintColor),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                    RatingChip(rating: clinical.rating),
-                  ],
-                ),
+                      RatingChip(rating: clinical.rating),
+                    ],
+                  )
+                else
+                  RatingChip(rating: clinical.rating),
               ],
             ),
           ),
         ],
+      ),
       ),
     );
   }

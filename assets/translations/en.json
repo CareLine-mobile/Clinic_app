@@ -112,6 +112,7 @@
       "people_ahead": "{count} people ahead of you",
       "no_bookings_title": "No Bookings",
       "no_bookings_subtitle": "You currently have no confirmed bookings",
+      "no_location": "Location not specified",
       "tip": {
         "pending_title": "Waiting for Approval",
         "pending_body": "Your booking is under review by the branch. You'll be notified once confirmed.",

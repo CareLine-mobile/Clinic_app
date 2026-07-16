@@ -47,8 +47,8 @@ class BookingEntity extends Equatable {
 class ClinicalEntity extends Equatable {
   final int id;
   final String name;
-  final String specialty;
-  final String location;
+  final String? specialty;
+  final String? location;
   final String? thumbnailUrl;
   final double rating;
   final int reviewsCount;
@@ -56,8 +56,8 @@ class ClinicalEntity extends Equatable {
   const ClinicalEntity({
     required this.id,
     required this.name,
-    required this.specialty,
-    required this.location,
+    this.specialty,
+    this.location,
     this.thumbnailUrl,
     required this.rating,
     required this.reviewsCount,

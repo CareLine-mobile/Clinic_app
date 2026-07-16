@@ -6,8 +6,8 @@ class ClinicalModel extends ClinicalEntity {
   const ClinicalModel({
     required super.id,
     required super.name,
-    required super.specialty,
-    required super.location,
+    super.specialty,
+    super.location,
     super.thumbnailUrl,
     required super.rating,
     required super.reviewsCount,
@@ -20,9 +20,9 @@ class ClinicalModel extends ClinicalEntity {
 
     return ClinicalModel(
       id: int.parse(json['id'].toString()),
-      name: json['name'] as String,
-      specialty: json['specialty'] as String,
-      location: json['location'] as String,
+      name: json['name'] as String? ?? '',
+      specialty: json['specialty'] as String?,
+      location: json['location'] as String?,
       thumbnailUrl: imageUrls?.isNotEmpty == true ? imageUrls!.first : null,
       rating: double.parse(json['rating'].toString()),
       reviewsCount: int.parse(json['reviews_count'].toString()),

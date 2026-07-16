@@ -276,11 +276,12 @@ class _CardHeaderState extends State<_CardHeader> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 2.h),
-                Text(
-                  widget.booking.clinical.specialty,
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: theme.hintColor),
-                ),
+                if (widget.booking.clinical.specialty != null)
+                  Text(
+                    widget.booking.clinical.specialty!,
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: theme.hintColor),
+                  ),
               ],
             ),
           ),

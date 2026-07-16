@@ -44,8 +44,10 @@ class _BookingConfirmationPageState extends State<BookingConfirmationPage> {
 
         return AbsorbPointer(
           absorbing: isSubmitting,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(16.w),
+          child: GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(16.w),
             physics: const BouncingScrollPhysics(),
             child: Column(
               children: [
@@ -128,14 +130,16 @@ class _BookingConfirmationPageState extends State<BookingConfirmationPage> {
                   children: [
                     Expanded(
                       child: AppTextField(
+                        height: 46.h,
                         controller: _couponController,
                         hintText: 'booking.enter_promo_code'.tr(),
-                        prefixIcon: const Icon(Icons.local_offer_outlined, color: ColorsManager.primaryColor)
+                        prefixIcon: const Icon(Icons.local_offer_outlined, color: ColorsManager.primaryColor),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
                       ),
                     ),
                     SizedBox(width: 12.w),
                     SizedBox(
-                      height: 56.h,
+                      height: 46.h,
                       child: ElevatedButton(
                         onPressed: isCouponLoading
                             ? null
@@ -243,6 +247,7 @@ class _BookingConfirmationPageState extends State<BookingConfirmationPage> {
               ],
             ),
           ),
+         ),
         );
       },
     );

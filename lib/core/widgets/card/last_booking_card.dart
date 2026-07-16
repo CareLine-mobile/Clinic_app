@@ -549,7 +549,7 @@ class _ClinicInfo extends StatelessWidget {
             SizedBox(width: h.s4),
             Expanded(
               child: Text(
-                booking.clinical.location,
+                booking.clinical.location ?? 'home.last_booking.no_location'.tr(),
                 style: theme.textTheme.bodySmall
                     ?.copyWith(color: theme.hintColor),
                 maxLines: 1,
