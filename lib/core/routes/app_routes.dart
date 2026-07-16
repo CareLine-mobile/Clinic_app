@@ -101,11 +101,8 @@ class AppRouter {
         );
       case Routes.settings:
         return MaterialPageRoute(
-          builder: (_) => MultiBlocProvider(
-            providers: [
-              BlocProvider<AuthCubit>(create: (_) => di.sl<AuthCubit>()),
-              BlocProvider<SettingsCubit>(create: (_) => di.sl<SettingsCubit>()),
-            ],
+          builder: (_) => BlocProvider<AuthCubit>(
+            create: (_) => di.sl<AuthCubit>(),
             child: const SettingsTabScreen(),
           ),
         );

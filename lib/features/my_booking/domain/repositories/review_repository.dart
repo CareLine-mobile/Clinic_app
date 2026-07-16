@@ -16,4 +16,7 @@ abstract class MyBookingRepository {
     required String comment,
     int? doctorId,
   });
+
+  /// Fetch follow-up bookings for a given booking ID
+  ResultFuture<List<BookingEntity>> getFollowUps(int bookingId);
 }

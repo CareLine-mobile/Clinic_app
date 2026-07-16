@@ -44,6 +44,7 @@ import 'package:clinic_app/features/my_booking/data/data_sources/my_booking_remo
 import 'package:clinic_app/features/my_booking/domain/repositories/review_repository.dart';
 import 'package:clinic_app/features/my_booking/domain/usecase/CreateReviewUseCase.dart';
 import 'package:clinic_app/features/my_booking/domain/usecase/cancel_booking_usecase.dart';
+import 'package:clinic_app/features/my_booking/domain/usecase/get_follow_ups_usecase.dart';
 import 'package:clinic_app/features/my_booking/domain/usecase/get_user_bookings_usecase.dart';
 import 'package:clinic_app/features/my_booking/data/repositories/my_booking_repository_impl.dart';
 
@@ -212,6 +213,7 @@ void setUpMyBookingModule() {
   sl.registerLazySingleton(() => CreateReviewUseCase(sl()));
   sl.registerLazySingleton(() => IsClinicReviewedUseCase(sl()));
   sl.registerLazySingleton(() => MarkClinicReviewedUseCase(sl()));
+  sl.registerLazySingleton(() => GetFollowUpsUseCase(sl()));
 
   // ─── Cubit ──────────────────────────────────────────────
   sl.registerFactory(
@@ -221,6 +223,7 @@ void setUpMyBookingModule() {
       createReview: sl(),
       isClinicReviewed: sl(),
       markClinicReviewed: sl(),
+      getFollowUps: sl(),
     ),
   );
 }

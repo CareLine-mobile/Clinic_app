@@ -1,11 +1,12 @@
+import 'package:clinic_app/core/theme/colors.dart';
+import 'package:clinic_app/core/widgets/app_buton.dart';
 import 'package:clinic_app/core/widgets/app_text_feild.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import '../../../../../core/theme/colors.dart';
-import '../../../../../core/widgets/app_buton.dart';
+import '../../../../../../core/widgets/app_error_box.dart';
 import '../../cubit/clinic_details_cubit.dart';
 
 class BookingConfirmationPage extends StatefulWidget {
@@ -177,21 +178,127 @@ class _BookingConfirmationPageState extends State<BookingConfirmationPage> {
                   ),
 
                 if (couponData != null) ...[
-                  SizedBox(height: 24.h),
+                  SizedBox(height: 16.h),
                   Container(
                     padding: EdgeInsets.all(16.w),
                     decoration: BoxDecoration(
-                      color: ColorsManager.successSurface.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(12.r),
+                      color: ColorsManager.successSurface.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(16.r),
                       border: Border.all(color: ColorsManager.successFill.withOpacity(0.2)),
                     ),
                     child: Column(
                       children: [
-                        _buildRow(theme, 'booking.original_price'.tr(), '${couponData.originalPrice} ${'doctorProfile.egp'.tr()}'),
-                        SizedBox(height: 12.h),
-                        _buildRow(theme, 'booking.discount'.tr(), '-${couponData.discountValue} ${'doctorProfile.egp'.tr()}', valueColor: ColorsManager.successFill),
-                        Divider(height: 24.h, color: ColorsManager.successFill.withOpacity(0.2)),
-                        _buildRow(theme, 'booking.final_price'.tr(), '${couponData.finalPrice} ${'doctorProfile.egp'.tr()}', isBold: true),
+                        // Top Part: Success Message & Badge
+                        Row(
+                          children: [
+                            Icon(Icons.verified_rounded, color: ColorsManager.successFill, size: 24.sp),
+                            SizedBox(width: 8.w),
+                            Text(
+                              'booking.coupon_applied'.tr(),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: ColorsManager.successFill,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const Spacer(),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                              decoration: BoxDecoration(
+                                color: ColorsManager.successFill.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                              child: Text(
+                                '-${(couponData.discountValue / couponData.originalPrice * 100).toStringAsFixed(0)}%',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: ColorsManager.successFill,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16.h),
+                        // Dotted Divider
+                        Row(
+                          children: List.generate(
+                            30,
+                            (index) => Expanded(
+                              child: Container(
+                                color: index % 2 == 0 ? ColorsManager.successFill.withOpacity(0.3) : Colors.transparent,
+                                height: 1.5.h,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 16.h),
+                        // Bottom Part: Prices & Saved Amount
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'booking.final_price'.tr(),
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: ColorsManager.miscellaneous,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(height: 4.h),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      '${couponData.finalPrice} ${'doctorProfile.egp'.tr()}',
+                                      style: theme.textTheme.titleLarge?.copyWith(
+                                        color: ColorsManager.successFill,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                    SizedBox(width: 8.w),
+                                    Text(
+                                      '${couponData.originalPrice}',
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        color: Colors.grey,
+                                        decoration: TextDecoration.lineThrough,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                              decoration: BoxDecoration(
+                                color: ColorsManager.successFill,
+                                borderRadius: BorderRadius.circular(20.r),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: ColorsManager.successFill.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.local_offer_rounded, color: Colors.white, size: 14.sp),
+                                  SizedBox(width: 4.w),
+                                  Text(
+                                    '${'booking.you_saved'.tr()} ${couponData.discountValue}',
+                                    style: theme.textTheme.labelMedium?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -201,31 +308,7 @@ class _BookingConfirmationPageState extends State<BookingConfirmationPage> {
 
                 // ── Inline Error Widget ──────────────────
                 if (bookingError != null)
-                  Container(
-                    margin: EdgeInsets.only(bottom: 24.h),
-                    padding: EdgeInsets.all(12.w),
-                    decoration: BoxDecoration(
-                      color: ColorsManager.errorSurface.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: ColorsManager.errorFill.withOpacity(0.3)),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(Icons.error_outline_rounded, color: ColorsManager.errorFill, size: 20.sp),
-                        SizedBox(width: 10.w),
-                        Expanded(
-                          child: Text(
-                            bookingError,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: ColorsManager.errorFill,
-                              height: 1.4,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  AppErrorBox(errorMessage: bookingError),
 
                 Text(
                   'booking.payment_note'.tr(),

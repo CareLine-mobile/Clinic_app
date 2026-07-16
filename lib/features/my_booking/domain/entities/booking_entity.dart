@@ -10,6 +10,8 @@ class BookingEntity extends Equatable {
   final int? waitTurns;
   final String status; // 'pending' | 'confirmed' | 'cancelled' | 'completed'
   final String? notes;
+  final bool hasFollowUp;
+  final bool isFollowUp;
   final ClinicalEntity clinical;
   final DoctorEntity doctor;
 
@@ -23,6 +25,8 @@ class BookingEntity extends Equatable {
     this.waitTurns,
     required this.status,
     this.notes,
+    this.hasFollowUp = false,
+    this.isFollowUp = false,
     required this.clinical,
     required this.doctor,
   });
@@ -40,7 +44,8 @@ class BookingEntity extends Equatable {
   @override
   List<Object?> get props => [
     id, patientName, patientPhone, date, time,
-    turnNumber, status, notes, clinical, doctor, waitTurns
+    turnNumber, status, notes, hasFollowUp, isFollowUp,
+    clinical, doctor, waitTurns
   ];
 }
 

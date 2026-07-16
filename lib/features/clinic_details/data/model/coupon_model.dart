@@ -7,10 +7,16 @@ class CouponModel extends CouponEntity {
   });
 
   factory CouponModel.fromJson(Map<String, dynamic> json) {
+    num parseNum(dynamic value) {
+      if (value is num) return value;
+      if (value is String) return num.tryParse(value) ?? 0;
+      return 0;
+    }
+
     return CouponModel(
-      originalPrice: json['original_price'] ?? 0,
-      discountValue: json['discount_value'] ?? 0,
-      finalPrice: json['final_price'] ?? 0,
+      originalPrice: parseNum(json['original_price']),
+      discountValue: parseNum(json['discount_value']),
+      finalPrice: parseNum(json['final_price']),
     );
   }
 }

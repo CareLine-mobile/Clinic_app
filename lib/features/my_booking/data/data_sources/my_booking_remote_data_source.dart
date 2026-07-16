@@ -13,6 +13,7 @@ abstract class MyBookingRemoteDataSource {
     required int clinicId,
     required ReviewRequestModel request,
   });
+  Future<List<BookingModel>> getFollowUps(int bookingId);
 }
 
 class MyBookingRemoteDataSourceImpl implements MyBookingRemoteDataSource {
@@ -51,5 +52,15 @@ class MyBookingRemoteDataSourceImpl implements MyBookingRemoteDataSource {
       url: Endpoints.createReview(clinicId),
       body: request.toJson(),
     );
+  }
+
+  @override
+  Future<List<BookingModel>> getFollowUps(int bookingId) async {
+    final response = await _apiServices.request(
+      method: HttpMethod.get,
+      url: '/auth/follow-ups/$bookingId',
+    );
+    final data = response['data'] as List<dynamic>? ?? [];
+    return data.map((e) => BookingModel.fromJson(e as Map<String, dynamic>)).toList();
   }
 }

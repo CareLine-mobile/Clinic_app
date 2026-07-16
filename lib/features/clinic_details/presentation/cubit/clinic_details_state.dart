@@ -163,6 +163,11 @@ class ClinicDetailsLoaded extends ClinicDetailsState {
     isSubmittingReview,
     reviewErrorMessage,
     reviewSuccessMessage,
+    couponCode,
+    isCouponLoading,
+    appliedCoupon,
+    couponError,
+    bookingErrorMessage,
   ];
 }
 

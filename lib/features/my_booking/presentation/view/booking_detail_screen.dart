@@ -16,10 +16,23 @@ import '../../../../../../core/widgets/custom_app_bar.dart';
 import '../cubit/booking_cubit.dart';
 import '../widgets/review_form_widget.dart';
 
-class BookingDetailScreen extends StatelessWidget {
+class BookingDetailScreen extends StatefulWidget {
   final BookingEntity booking;
 
   const BookingDetailScreen({super.key, required this.booking});
+
+  @override
+  State<BookingDetailScreen> createState() => _BookingDetailScreenState();
+}
+
+class _BookingDetailScreenState extends State<BookingDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.booking.hasFollowUp) {
+      context.read<BookingCubit>().getFollowUps(widget.booking.id);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,34 +58,39 @@ class BookingDetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _ClinicCard(booking: booking),
+              _ClinicCard(booking: widget.booking),
               SizedBox(height: SizeApp.s16),
 
-              _StatusBanner(status: booking.status),
+              _StatusBanner(status: widget.booking.status),
               SizedBox(height: SizeApp.s16),
 
-              _AppointmentInfoSection(booking: booking),
+              _AppointmentInfoSection(booking: widget.booking),
 
-              if (booking.patientName != null || booking.patientPhone != null) ...[
+              if (widget.booking.patientName != null || widget.booking.patientPhone != null) ...[
                 SizedBox(height: SizeApp.s16),
-                _PatientSection(booking: booking),
+                _PatientSection(booking: widget.booking),
               ],
 
-              if (booking.notes?.isNotEmpty == true) ...[
+              if (widget.booking.notes?.isNotEmpty == true) ...[
                 SizedBox(height: SizeApp.s16),
-                _NotesSection(notes: booking.notes!),
+                _NotesSection(notes: widget.booking.notes!),
               ],
 
               // Cancel — only for pending bookings
-              if (booking.canCancel) ...[
+              if (widget.booking.canCancel) ...[
                 SizedBox(height: SizeApp.s24),
-                _CancelButton(bookingId: booking.id),
+                _CancelButton(bookingId: widget.booking.id),
               ],
 
               // Review form — only for completed bookings
-              if (booking.canReview) ...[
+              if (widget.booking.canReview) ...[
                 SizedBox(height: SizeApp.s24),
-                ReviewFormWidget(booking: booking),
+                ReviewFormWidget(booking: widget.booking),
+              ],
+              
+              if (widget.booking.hasFollowUp) ...[
+                SizedBox(height: SizeApp.s24),
+                _FollowUpTreeSection(parentBooking: widget.booking),
               ],
 
               SizedBox(height: SizeApp.s40),
@@ -276,26 +294,26 @@ class _AppointmentInfoSection extends StatelessWidget {
       ],
     );
   }
-  String _formatDate(BuildContext context, String date) {
-    try {
-      final locale = context.locale.languageCode;
-      final pattern = locale == 'ar' ? 'EEEE، d MMMM yyyy' : 'EEEE, d MMMM yyyy';
-      return DateFormat(pattern, locale).format(DateTime.parse(date));
-    } catch (_) {
-      return date;
-    }
-  }
+}
 
-  String _formatTime(BuildContext context, String time) {
-    try {
-      final parts = time.split(':');
-      final hour = int.parse(parts[0]);
-      final minute = int.parse(parts[1]);
-      final dt = DateTime(2000, 1, 1, hour, minute);
-      return DateFormat.jm(context.locale.languageCode).format(dt);
-    } catch (_) {
-      return time;
-    }
+String _formatDate(BuildContext context, String date) {
+  try {
+    final locale = context.locale.languageCode;
+    final pattern = locale == 'ar' ? 'EEEE، d MMMM yyyy' : 'EEEE, d MMMM yyyy';
+    return DateFormat(pattern, locale).format(DateTime.parse(date));
+  } catch (_) {
+    return date;
+  }
+}
+
+String _formatTime(BuildContext context, String time) {
+  try {
+    final locale = context.locale.languageCode;
+    final timeParts = time.split(':');
+    final dt = DateTime(2020, 1, 1, int.parse(timeParts[0]), int.parse(timeParts[1]));
+    return DateFormat('hh:mm a', locale).format(dt);
+  } catch (_) {
+    return time;
   }
 }
 
@@ -435,3 +453,187 @@ class _CancelButton extends StatelessWidget {
   }
 }
 
+class _FollowUpTreeSection extends StatelessWidget {
+  final BookingEntity parentBooking;
+
+  const _FollowUpTreeSection({Key? key, required this.parentBooking}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<BookingCubit, BookingState>(
+      buildWhen: (prev, curr) => curr is FollowUpLoading || curr is FollowUpLoaded || curr is FollowUpError,
+      builder: (context, state) {
+        if (state is FollowUpLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is FollowUpError) {
+          return Center(
+            child: Text(
+              state.message,
+              style: TextStyle(color: Colors.red, fontSize: 14.sp),
+            ),
+          );
+        } else if (state is FollowUpLoaded) {
+          final followUps = state.followUps;
+          if (followUps.isEmpty) return const SizedBox.shrink();
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'bookings.follow_up_appointments'.tr(),
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              SizedBox(height: SizeApp.s16),
+              ...followUps.map((followUp) => _buildFollowUpNode(context, followUp)).toList(),
+            ],
+          );
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildFollowUpNode(BuildContext context, BookingEntity followUp) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Tree Line and Node
+          SizedBox(
+            width: 32.w,
+            child: Column(
+              children: [
+                Container(
+                  width: 2.w,
+                  height: 20.h,
+                  color: theme.primaryColor.withOpacity(0.5),
+                ),
+                Container(
+                  width: 12.w,
+                  height: 12.w,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: theme.primaryColor,
+                    border: Border.all(
+                      color: isDark ? Colors.black : Colors.white,
+                      width: 2,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    width: 2.w,
+                    color: theme.primaryColor.withOpacity(0.5),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // FollowUp Card
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: 16.h),
+              child: GestureDetector(
+                onTap: () {
+                  // Navigate to the follow up details if needed
+                  Navigator.pushNamed(
+                    context, 
+                    Routes.bookingDetails,
+                    arguments: {
+                      'booking': followUp,
+                      'cubit': context.read<BookingCubit>(),
+                    },
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.all(12.w),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF0A0E19) : Colors.white,
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      color: isDark ? Colors.white12 : Colors.black12,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _formatDate(context, followUp.date),
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          _buildStatusBadge(followUp.status),
+                        ],
+                      ),
+                      SizedBox(height: 8.h),
+                      Row(
+                        children: [
+                          Icon(Icons.access_time, size: 14.sp, color: Colors.grey),
+                          SizedBox(width: 4.w),
+                          Text(
+                            _formatTime(context, followUp.time),
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge(String status) {
+    final config = BookingStatusConfig.from(status);
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: config.bgColor,
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: config.color.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(config.icon, color: config.color, size: 12.sp),
+          SizedBox(width: 4.w),
+          Text(
+            config.label,
+            style: TextStyle(
+              color: config.color,
+              fontSize: 10.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -43,4 +43,10 @@ class MyBookingRepositoryImpl implements MyBookingRepository {
               ),
         ),
       );
+
+  @override
+  ResultFuture<List<BookingEntity>> getFollowUps(int bookingId) =>
+      ResultHandler.handle(
+        () => _remoteDataSource.getFollowUps(bookingId),
+      );
 }

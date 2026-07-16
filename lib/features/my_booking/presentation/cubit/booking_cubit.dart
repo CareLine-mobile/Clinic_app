@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:clinic_app/features/my_booking/domain/usecase/CreateReviewUseCase.dart';
 import 'package:clinic_app/features/my_booking/domain/usecase/cancel_booking_usecase.dart';
+import 'package:clinic_app/features/my_booking/domain/usecase/get_follow_ups_usecase.dart';
 import 'package:clinic_app/features/my_booking/domain/usecase/get_user_bookings_usecase.dart';
 import 'package:clinic_app/features/my_booking/domain/usecase/review_local_data_source.dart';
 import 'package:equatable/equatable.dart';
@@ -10,6 +11,7 @@ part 'booking_state.dart';
 
 class BookingCubit extends Cubit<BookingState> {
   final GetUserBookingsUseCase _getUserBookings;
+  final GetFollowUpsUseCase _getFollowUps;
   final CancelBookingUseCase _cancelBooking;
   final CreateReviewUseCase _createReview;
   final IsClinicReviewedUseCase _isClinicReviewed;
@@ -17,11 +19,13 @@ class BookingCubit extends Cubit<BookingState> {
 
   BookingCubit({
     required GetUserBookingsUseCase getUserBookings,
+    required GetFollowUpsUseCase getFollowUps,
     required CancelBookingUseCase cancelBooking,
     required CreateReviewUseCase createReview,
     required IsClinicReviewedUseCase isClinicReviewed,
     required MarkClinicReviewedUseCase markClinicReviewed,
   })  : _getUserBookings = getUserBookings,
+        _getFollowUps = getFollowUps,
         _cancelBooking = cancelBooking,
         _createReview = createReview,
         _isClinicReviewed = isClinicReviewed,
@@ -94,6 +98,17 @@ class BookingCubit extends Cubit<BookingState> {
         await _markClinicReviewed(params.clinicId);
         emit(ReviewSuccess());
       },
+    );
+  }
+
+  // ─── Follow-Up ────────────────────────────────────────────────────────────
+  
+  Future<void> getFollowUps(int bookingId) async {
+    emit(FollowUpLoading());
+    final result = await _getFollowUps(bookingId: bookingId);
+    result.fold(
+      (failure) => emit(FollowUpError(failure.message)),
+      (list) => emit(FollowUpLoaded(list)),
     );
   }
 }

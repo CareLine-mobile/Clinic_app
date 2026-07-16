@@ -69,6 +69,8 @@ class BookingModel extends BookingEntity {
     super.waitTurns,
     required super.status,
     super.notes,
+    super.hasFollowUp = false,
+    super.isFollowUp = false,
     required super.clinical,
     required super.doctor,
   });
@@ -88,6 +90,8 @@ class BookingModel extends BookingEntity {
           : null,
       status: json['status'] as String,
       notes: json['notes'] as String?,
+      hasFollowUp: json['has_follow_up'] == true,
+      isFollowUp: json['is_follow_up'] == true,
       clinical: ClinicalModel.fromJson(json['clinical'] as Map<String, dynamic>),
       doctor: DoctorModel.fromJson(json['doctor'] as Map<String, dynamic>),
     );

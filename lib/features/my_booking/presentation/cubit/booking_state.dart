@@ -74,3 +74,23 @@ class ReviewError extends BookingState {
   @override
   List<Object?> get props => [message];
 }
+
+// ─── Follow-Up states ────────────────────────────────────────────────────────
+
+class FollowUpLoading extends BookingState {}
+
+class FollowUpLoaded extends BookingState {
+  final List<BookingEntity> followUps;
+  const FollowUpLoaded(this.followUps);
+
+  @override
+  List<Object?> get props => [followUps];
+}
+
+class FollowUpError extends BookingState {
+  final String message;
+  const FollowUpError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
