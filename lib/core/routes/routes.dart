@@ -21,6 +21,7 @@ abstract class Routes {
 
   static const String profile = '/profile';
   static const String privacyPolicy = '/privacy-policy';
+  static const String settings = '/settings';
 
   // map
   static const String mapLocations = '/map-locations';

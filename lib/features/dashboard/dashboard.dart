@@ -19,7 +19,8 @@ import '../my_booking/presentation/cubit/booking_cubit.dart';
 import '../my_booking/presentation/view/booking_list_screen.dart';
 import '../search/presentation/cubit/search_cubit.dart';
 import '../search/presentation/view/search_screen.dart';
-import '../settings/presentation/view/settings_screen.dart';
+import '../map_locations/presentation/cubit/map_locations_cubit.dart';
+import '../map_locations/presentation/view/map_locations_screen.dart';
 import '../user_data/user_repo.dart';
 import 'widgets/dashboard_body.dart';
 
@@ -46,9 +47,9 @@ class _DashBoardScreenState extends State<DashBoardScreen>
   final List<String> _icons = [
     Assets.homeIcon,
     Assets.searchIcon,
+    Assets.locationIcon, // Map icon
     Assets.favouriteIcon,
     Assets.myBookingIcon,
-    Assets.settingIcon,
   ];
 
   // ── Lifecycle ────────────────────────────────────────────
@@ -63,9 +64,12 @@ class _DashBoardScreenState extends State<DashBoardScreen>
         value: di.sl<SearchCubit>(),
         child: const SearchScreen(),
       ),
+      BlocProvider<MapLocationsCubit>(
+        create: (_) => di.sl<MapLocationsCubit>(),
+        child: const MapLocationsScreen(isTab: true),
+      ),
       const FavouritesScreen(),
       const BookingListScreen(),
-      const SettingsTabScreen(),
     ];
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkLocationService());

@@ -131,6 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
       userName: UserRepository().currentUser?.name,
       userPhotoUrl: UserRepository().currentUser?.avatar,
       onNotificationTap: _handleNotificationTap,
+      onSettingsTap: () => Navigator.of(context).pushNamed(Routes.settings),
       onBookingCardTap: () {},
       onSearchTap: () => widget.onNavigateToSearch?.call(1),
     );
@@ -190,41 +191,9 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: _navigateToClinicDetails,
             onFavorite: _toggleFavorite,
             onBook: _bookAppointment,
-            trailing: InkWell(
-              onTap: () => Navigator.of(context).pushNamed(Routes.mapLocations),
-              borderRadius: BorderRadius.circular(100.r),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'map.view_map'.tr(),
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(width: 6.w),
-                    Container(
-                      padding: EdgeInsets.all(6.w),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.map_outlined,
-                        size: 14.sp,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ),
-        ),
+          ),
+
 
       // ─── All clinics title ─────────────────────────────────────
       SliverToBoxAdapter(

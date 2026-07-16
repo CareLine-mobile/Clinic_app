@@ -17,6 +17,7 @@ class HomeHeaderWidget extends StatelessWidget {
   final String? userName;
   final String? userPhotoUrl;
   final VoidCallback onNotificationTap;
+  final VoidCallback? onSettingsTap;
   final VoidCallback? onBookingCardTap;
   final VoidCallback? onSearchTap;
 
@@ -25,6 +26,7 @@ class HomeHeaderWidget extends StatelessWidget {
     this.userName,
     this.userPhotoUrl,
     required this.onNotificationTap,
+    this.onSettingsTap,
     this.onBookingCardTap,
     this.onSearchTap,
   }) : super(key: key);
@@ -132,9 +134,31 @@ class HomeHeaderWidget extends StatelessWidget {
                 ),
               ),
               const Spacer(),
+              if (onSettingsTap != null) ...[
+                _buildSettingsButton(),
+                SizedBox(width: SizeApp.s8),
+              ],
               _buildNotificationBell(),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingsButton() {
+    return GestureDetector(
+      onTap: onSettingsTap,
+      child: Container(
+        padding: EdgeInsets.all(SizeApp.s10),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(SizeApp.s12),
+        ),
+        child: Icon(
+          Icons.settings_outlined,
+          color: Colors.white,
+          size: SizeApp.s24 + SizeApp.s2,
         ),
       ),
     );

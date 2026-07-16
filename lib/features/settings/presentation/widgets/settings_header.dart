@@ -32,7 +32,10 @@ class SettingsHeader extends StatelessWidget {
       backgroundColor: ColorsManager.primaryColor,
       expandedHeight: SizeApp.expandedHeight,
       pinned: true,
-      automaticallyImplyLeading: false,
+      automaticallyImplyLeading: true,
+      leading: Navigator.of(context).canPop()
+          ? const BackButton(color: Colors.white)
+          : null,
       flexibleSpace: LayoutBuilder(
         builder: (context, constraints) {
           final isExpanded = constraints.maxHeight > 120.h;
