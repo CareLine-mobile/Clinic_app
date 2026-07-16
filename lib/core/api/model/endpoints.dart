@@ -34,6 +34,7 @@ class Endpoints {
   static const String getListBooking = '/auth/bookings'; // GET Method
   static String cancelBooking(int id) => '/auth/bookings/$id/cancel';
   static String createReview(int clinicId) => '/clinicals/$clinicId/reviews';
+  static const String applyCoupon = '/coupon/apply';
 
   // Profile
 

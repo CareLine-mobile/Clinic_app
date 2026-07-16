@@ -227,7 +227,12 @@
       "your_info": "بياناتك",
       "confirm": "التأكيد"
     },
-    "missing_info": "معلومات الحجز غير مكتملة"
+    "missing_info": "معلومات الحجز غير مكتملة",
+    "enter_promo_code": "أدخل كود الخصم",
+    "apply": "تطبيق",
+    "original_price": "السعر الأساسي",
+    "discount": "الخصم",
+    "final_price": "السعر النهائي"
   },
   "clinic": {
     "choose_date": "اختر التاريخ",

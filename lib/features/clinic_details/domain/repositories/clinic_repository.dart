@@ -3,6 +3,7 @@ import 'package:clinic_app/features/clinic_details/domain/entites/appointment_re
 import 'package:clinic_app/features/clinic_details/domain/entites/clinic_entities.dart';
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
+import '../entites/coupon_entity.dart';
 import '../entites/time_slot_entity.dart';
 
 abstract class ClinicRepository {
@@ -13,4 +14,6 @@ abstract class ClinicRepository {
   Future<Either<Failure, void>> makeAppointment(AppointmentRequestEntity request);
 
   Future<Either<Failure, bool>> toggleFavorite(String clinicId);
+
+  Future<Either<Failure, CouponEntity>> applyCoupon(String coupon, String clinicId);
 }

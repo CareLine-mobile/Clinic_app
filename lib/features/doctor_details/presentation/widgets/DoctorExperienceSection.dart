@@ -15,70 +15,76 @@ class DoctorExperienceSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SectionTitle(
-              'doctorProfile.professionalInfo'.tr(),
-              icon: Icons.work_outline_rounded),
+          Text(
+            'doctorProfile.professionalInfo'.tr(),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           SizedBox(height: 16.h),
-          Row(
+          Wrap(
+            spacing: 20.w,
+            runSpacing: 12.h,
             children: [
-              InfoTile(
+              _buildSimpleInfo(
                 icon: Icons.calendar_today_rounded,
                 label: 'doctorProfile.experience'.tr(),
                 value: 'doctorProfile.yearsValue'
                     .tr(namedArgs: {'count': '${doctor.experienceYears}'}),
-                color: ColorsManager.primaryColor,
+                theme: theme,
               ),
-              SizedBox(width: 12.w),
-              InfoTile(
+              _buildSimpleInfo(
                 icon: Icons.language_rounded,
                 label: 'doctorProfile.languages'.tr(),
                 value: doctor.languages.join(', '),
-                color: ColorsManager.infoFill,
+                theme: theme,
               ),
             ],
           ),
-          if (doctor.consultationFee > 0) ...[
-            SizedBox(height: 12.h),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-              decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(8.r),
-                border: Border.all(color: theme.dividerColor.withOpacity(0.2)),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.payments_outlined,
-                      color: ColorsManager.successFill, size: 20.sp),
-                  SizedBox(width: 10.w),
-                  Flexible(
-                    child: Text(
-                      'doctorProfile.consultationFee'.tr(),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    '${doctor.consultationFee.toInt()} '
-                        '${'doctorProfile.egp'.tr()}',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                      color: ColorsManager.successFill,
-                    ),
-                  ),
-                ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSimpleInfo({
+    required IconData icon,
+    required String label,
+    required String value,
+    required ThemeData theme,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: EdgeInsets.all(8.r),
+          decoration: BoxDecoration(
+            color: ColorsManager.primaryColor.withOpacity(0.05),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: ColorsManager.primaryColor, size: 16.sp),
+        ),
+        SizedBox(width: 10.w),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: theme.textTheme.labelSmall?.copyWith(color: theme.hintColor),
+            ),
+            SizedBox(height: 2.h),
+            Text(
+              value,
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

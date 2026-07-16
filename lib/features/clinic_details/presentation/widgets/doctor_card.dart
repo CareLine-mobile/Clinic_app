@@ -55,47 +55,65 @@ class DoctorCard extends StatelessWidget {
         margin: EdgeInsets.only(bottom: 16.h),
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
-          color: isSelected ? accentColor.withOpacity(0.04) : cardBackGroundColor,
+          color: isSelected ? accentColor.withOpacity(0.04) : Colors.transparent,
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
-            color: isSelected ? accentColor : Colors.grey.shade200,
-            width: isSelected ? 1.5 : 1,
+            color: isSelected ? accentColor.withOpacity(0.5) : Colors.grey.shade200,
+            width: 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── Doctor info row ──────────────────────────────
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Avatar
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12.r),
-                  child: Image.network(
-                    doctor.imageUrl,
-                    width: 65.w,
-                    height: 65.w,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      width: 65.w,
-                      height: 65.w,
-                      color: Colors.grey.shade100,
-                      child:
-                      Icon(Icons.person, color: Colors.grey.shade400),
+                // ── Tappable Avatar with gradient ring ───────
+                GestureDetector(
+                  onTap: () {
+                    final id = int.tryParse(doctor.id);
+                    if (id != null) {
+                      Navigator.pushNamed(
+                        context,
+                        Routes.doctorProfile,
+                        arguments: id,
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(2.5.r),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          accentColor,
+                          accentColor.withOpacity(0.4),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.all(2.r),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      child: CircleAvatar(
+                        radius: 26.r,
+                        backgroundColor: Colors.grey.shade100,
+                        backgroundImage: NetworkImage(doctor.imageUrl),
+                        onBackgroundImageError: (_, __) {},
+                        child: doctor.imageUrl.isEmpty
+                            ? Icon(Icons.person, color: Colors.grey.shade400, size: 24.sp)
+                            : null,
+                      ),
                     ),
                   ),
                 ),
                 SizedBox(width: 12.w),
 
-                // Name / specialty / rating
+                // ── Name + Specialty ─────────────────────────
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,102 +122,65 @@ class DoctorCard extends StatelessWidget {
                         doctor.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.titleMedium,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                      SizedBox(height: 4.h),
+                      SizedBox(height: 3.h),
                       Text(
                         doctor.specialty,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style:Theme.of(context).textTheme.bodySmall,
-                          ),
-                      SizedBox(height: 8.h),
-                      Row(
-                        children: [
-                          Icon(Icons.star_rounded,
-                              size: 16.sp, color: Colors.amber),
-                          SizedBox(width: 4.w),
-                          Text(
-                            doctor.rating.toStringAsFixed(1),
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          SizedBox(width: 12.w),
-                          Icon(Icons.work_outline,
-                              size: 14.sp, color: Colors.grey.shade400),
-                          SizedBox(width: 4.w),
-                          // ✅ was hardcoded 'سنة'
-                          Text(
-                            'clinic.years_exp'.tr(namedArgs: {
-                              'count': '${doctor.experienceYears}'
-                            }),
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
                   ),
                 ),
 
-                // Consultation fee + View Profile
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '${doctor.consultationFee.toInt()}',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w800,
-                        color: accentColor,
-                      ),
+                // ── Price pill ────────────────────────────────
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                  decoration: BoxDecoration(
+                    color: accentColor.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: Text(
+                    '${doctor.consultationFee.toInt()} ${'clinic.currency'.tr()}',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w700,
+                      color: accentColor,
                     ),
-                    Text(
-                      'clinic.currency'.tr(),
-                      style: TextStyle(
-                          fontSize: 11.sp, color: Colors.grey.shade500),
-                    ),
-                    SizedBox(height: 6.h),
-                    // ── View Profile button ───────────────────
-                    GestureDetector(
-                      onTap: () {
-                        final id = int.tryParse(doctor.id);
-                        if (id != null) {
-                          Navigator.pushNamed(
-                            context,
-                            Routes.doctorProfile,
-                            arguments: id,
-                          );
-                        }
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 8.w, vertical: 4.h),
-                        decoration: BoxDecoration(
-                          color: accentColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8.r),
-                          border: Border.all(
-                              color: accentColor.withOpacity(0.3)),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.person_outline_rounded,
-                                size: 11.sp, color: accentColor),
-                            SizedBox(width: 3.w),
-                            Text(
-                              'settings.account.profile'.tr(),
-                              style: TextStyle(
-                                fontSize: 10.sp,
-                                color: accentColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ],
+            ),
+
+            SizedBox(height: 10.h),
+
+            // ── Stats row (rating + experience) ──────────────
+            Padding(
+              padding: EdgeInsetsDirectional.only(start: 68.w),
+              child: Wrap(
+                spacing: 14.w,
+                runSpacing: 4.h,
+                children: [
+                  _StatChip(
+                    icon: Icons.star_rounded,
+                    iconColor: Colors.amber,
+                    label: doctor.rating.toStringAsFixed(1),
+                    context: context,
+                  ),
+                  _StatChip(
+                    icon: Icons.work_outline_rounded,
+                    iconColor: Colors.grey.shade400,
+                    label: 'clinic.years_exp'.tr(namedArgs: {
+                      'count': '${doctor.experienceYears}',
+                    }),
+                    context: context,
+                  ),
+                ],
+              ),
             ),
 
             SizedBox(height: 16.h),
@@ -395,6 +376,37 @@ class _TimeSlotRow extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+// ─── Stat Chip (rating / experience) ──────────────────────────────────────────
+
+class _StatChip extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final BuildContext context;
+
+  const _StatChip({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.context,
+  });
+
+  @override
+  Widget build(BuildContext _) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14.sp, color: iconColor),
+        SizedBox(width: 4.w),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
     );
   }
 }

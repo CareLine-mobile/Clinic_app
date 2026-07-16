@@ -21,10 +21,9 @@ import '../widgets/DoctorReviewsSection.dart';
 import '../widgets/DoctorSpecialtiesChips.dart';
 import '../widgets/Info_tile.dart';
 import '../widgets/doctor_bio_section.dart';
-import '../widgets/doctor_quick_actions.dart';
+import '../widgets/doctor_bio_section.dart';
 import '../widgets/doctor_rating_section.dart';
 import '../widgets/doctor_sliver_appBar.dart';
-import '../widgets/section_divider.dart';
 
 class DoctorProfileScreen extends StatefulWidget {
   final int doctorId;
@@ -128,21 +127,17 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DoctorRatingSection(doctor: doctor),
-                    DoctorQuickActions(
-                      onShare: () => HapticFeedback.lightImpact(),
-                      onSave: () => HapticFeedback.lightImpact(),
-                    ),
-                    const SectionDivider(),
+                    SizedBox(height: 16.h),
                     DoctorBioSection(doctor: doctor),
-                    const SectionDivider(),
+                    SizedBox(height: 24.h),
                     DoctorExperienceSection(doctor: doctor),
-                    const SectionDivider(),
+                    SizedBox(height: 24.h),
                     DoctorSpecialtiesChips(doctor: doctor),
-                    const SectionDivider(),
+                    SizedBox(height: 24.h),
                     DoctorClinicCard(doctor: doctor),
-                    const SectionDivider(),
+                    SizedBox(height: 24.h),
                     DoctorAvailableSlotsSection(doctor: doctor),
-                    const SectionDivider(),
+                    SizedBox(height: 24.h),
                     DoctorReviewsSection(doctor: doctor),
                     SizedBox(height: 32.h),
                   ],

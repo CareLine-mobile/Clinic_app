@@ -1,6 +1,6 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
 import '../../../favourite/domain/repositories/favourite_repository.dart';
 import '../../../favourite/domain/usecases/toggle_favourite_usecase.dart';
@@ -8,9 +8,10 @@ import '../../domain/entites/clinic_entities.dart';
 import '../../domain/entites/doctor_entity.dart';
 import '../../domain/entites/time_slot_entity.dart';
 import '../../domain/entites/appointment_request_entity.dart';
+import '../../domain/entites/coupon_entity.dart';
 import '../../domain/usecases/get_clinic_details_usecase.dart';
-import '../../domain/usecases/toggle_favorite_usecase.dart';
 import '../../domain/usecases/make_appointment_usecase.dart';
+import '../../domain/usecases/apply_coupon_usecase.dart';
 
 part 'clinic_details_state.dart';
 
@@ -18,12 +19,15 @@ class ClinicDetailsCubit extends Cubit<ClinicDetailsState> {
   final GetClinicDetailsUseCase getClinicDetailsUseCase;
   final ToggleFavouriteUseCase toggleFavoriteUseCase;
   final MakeAppointmentUseCase makeAppointmentUseCase;
+  final ApplyCouponUseCase applyCouponUseCase;
   final FavouriteRepository _favouriteRepository;
   StreamSubscription<Set<int>>? _favStreamSub;
+
   ClinicDetailsCubit({
     required this.getClinicDetailsUseCase,
     required this.toggleFavoriteUseCase,
     required this.makeAppointmentUseCase,
+    required this.applyCouponUseCase,
     required FavouriteRepository favouriteRepository,
   }) :  _favouriteRepository = favouriteRepository ,super(ClinicDetailsInitial()){
     _favStreamSub = _favouriteRepository.favouriteIdsStream.listen(_onFavouriteIdsUpdated);
@@ -145,6 +149,38 @@ class ClinicDetailsCubit extends Cubit<ClinicDetailsState> {
     emit(s.copyWith(isAppBarTransparent: isTransparent));
   }
 
+  // ── Promo Code ──────────────────────────────────────────────
+
+  Future<void> applyCoupon(String code) async {
+    final s = _loaded;
+    if (s == null) return;
+    
+    if (code.trim().isEmpty) {
+      emit(s.copyWith(
+        couponError: 'doctorProfile.couponEmpty'.tr(),
+        appliedCoupon: null,
+      ));
+      return;
+    }
+
+    emit(s.copyWith(isCouponLoading: true, couponError: null, couponCode: code));
+
+    final result = await applyCouponUseCase(code, s.clinic.id);
+    result.fold(
+      (failure) => emit(s.copyWith(
+        isCouponLoading: false,
+        couponError: failure.message,
+        appliedCoupon: null,
+      )),
+      (couponData) => emit(s.copyWith(
+        isCouponLoading: false,
+        appliedCoupon: couponData,
+        couponError: null,
+        couponCode: code,
+      )),
+    );
+  }
+
   // ── Booking flow ──────────────────────────────────────────
 
   void nextBookingStep() {
@@ -153,13 +189,13 @@ class ClinicDetailsCubit extends Cubit<ClinicDetailsState> {
     if (s.bookingStep == 0 && !s.canProceedStep1) return;
     if (s.bookingStep == 1 && !s.canProceedStep2) return;
     if (s.bookingStep >= 2) return;
-    emit(s.copyWith(bookingStep: s.bookingStep + 1));
+    emit(s.copyWith(bookingStep: s.bookingStep + 1, bookingErrorMessage: null));
   }
 
   void previousBookingStep() {
     final s = _loaded;
     if (s == null || s.bookingStep <= 0) return;
-    emit(s.copyWith(bookingStep: s.bookingStep - 1));
+    emit(s.copyWith(bookingStep: s.bookingStep - 1, bookingErrorMessage: null));
   }
 
   void resetBookingFlow() {
@@ -173,6 +209,10 @@ class ClinicDetailsCubit extends Cubit<ClinicDetailsState> {
       patientName: null,
       patientPhone: null,
       bookingNotes: null,
+      couponCode: null,
+      appliedCoupon: null,
+      couponError: null,
+      bookingErrorMessage: null,
     ));
   }
 
@@ -195,15 +235,19 @@ class ClinicDetailsCubit extends Cubit<ClinicDetailsState> {
   }
 
   Future<void> confirmBooking() async {
-    final s = _loaded;
+    var s = _loaded;
     if (s == null) return;
+
+    // Clear previous error
+    emit(s.copyWith(bookingErrorMessage: null));
+    s = _loaded!;
 
     if (s.selectedTimeFrom == null ||
         s.selectedDoctor == null ||
         s.clinic.id.isEmpty ||
         s.patientName == null ||
         s.patientPhone == null) {
-      emit(const BookingError('Missing required booking information'));
+      emit(s.copyWith(bookingErrorMessage: 'Missing required booking information'));
       return;
     }
 
@@ -227,13 +271,14 @@ class ClinicDetailsCubit extends Cubit<ClinicDetailsState> {
         name: s.patientName!,
         phone: s.patientPhone!,
         notes: s.bookingNotes,
+        coupon: s.appliedCoupon != null ? s.couponCode : null,
       ),
     );
 
     result.fold(
-          (failure) => emit(BookingError(failure.message)),
-          (_) {
-        emit(s.copyWith(
+      (failure) => emit(s!.copyWith(bookingErrorMessage: failure.message)),
+      (_) {
+        emit(s!.copyWith(
           bookingStep: 0,
           selectedDoctor: null,
           selectedTime: null,
@@ -241,8 +286,12 @@ class ClinicDetailsCubit extends Cubit<ClinicDetailsState> {
           patientName: null,
           patientPhone: null,
           bookingNotes: null,
+          couponCode: null,
+          appliedCoupon: null,
+          couponError: null,
+          bookingErrorMessage: null,
         ));
-        emit(BookingSuccess('Appointment booked successfully'));
+        emit(const BookingSuccess('Appointment booked successfully'));
       },
     );
   }

@@ -33,13 +33,16 @@ class DoctorSpecialtiesChips extends StatelessWidget {
     if (tags.isEmpty) return const SizedBox.shrink();
 
     return Padding(
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SectionTitle(
-              'doctorProfile.specialtiesTags'.tr(),
-              icon: Icons.tag_rounded),
+          Text(
+            'doctorProfile.specialtiesTags'.tr(),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           SizedBox(height: 12.h),
           Wrap(
             spacing: 8.w,

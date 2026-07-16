@@ -12,17 +12,15 @@ class SpecialtyChip extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
       decoration: BoxDecoration(
-        color: ColorsManager.primaryColor.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(20.r),
-        border:
-        Border.all(color: ColorsManager.primaryColor.withOpacity(0.2)),
+        color: ColorsManager.primaryColor.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(10.r), // Softer pill shape
       ),
       child: Text(
         label,
         style: TextStyle(
           fontSize: 12.sp,
           fontWeight: FontWeight.w500,
-          color: ColorsManager.primaryColor,
+          color: ColorsManager.primaryColor.withOpacity(0.9),
         ),
       ),
     );

@@ -18,21 +18,22 @@ class DoctorClinicCard extends StatelessWidget {
     if (clinic == null) return const SizedBox.shrink();
 
     return Padding(
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SectionTitle(
+          Text(
             'doctorProfile.availableAt'.tr(),
-            icon: Icons.local_hospital_outlined,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           SizedBox(height: 12.h),
           Container(
             padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
-              color: theme.scaffoldBackgroundColor,
+              color: ColorsManager.primaryColor.withOpacity(0.03),
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: theme.dividerColor.withOpacity(0.2)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,10 +41,17 @@ class DoctorClinicCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.business_rounded,
-                      color: theme.iconTheme.color,
-                      size: 24.sp,
+                    Container(
+                      padding: EdgeInsets.all(8.r),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.business_rounded,
+                        color: ColorsManager.primaryColor,
+                        size: 20.sp,
+                      ),
                     ),
                     SizedBox(width: 12.w),
                     Expanded(
@@ -78,46 +86,24 @@ class DoctorClinicCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(width: 8.w),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          '${doctor.consultationFee.toInt()}',
-                          style: TextStyle(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                            color: theme.textTheme.bodyLarge?.color,
-                          ),
-                        ),
-                        Text(
-                          'doctorProfile.egp'.tr(),
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: theme.hintColor,
-                          ),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
-                SizedBox(height: 20.h),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
+                SizedBox(height: 16.h),
+                Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: TextButton.icon(
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    icon: Icon(Icons.calendar_today_rounded, size: 18.sp),
+                    icon: Icon(Icons.calendar_today_rounded, size: 16.sp),
                     label: Text('doctorProfile.bookHere'.tr()),
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 12.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      side: BorderSide(color: ColorsManager.primaryColor),
+                    style: TextButton.styleFrom(
                       foregroundColor: ColorsManager.primaryColor,
+                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100.r),
+                      ),
+                      backgroundColor: ColorsManager.primaryColor.withOpacity(0.1),
                     ),
                   ),
                 ),

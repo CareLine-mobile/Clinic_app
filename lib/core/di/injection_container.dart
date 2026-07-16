@@ -53,6 +53,7 @@ import '../../features/clinic_details/data/repositories/clinic_repository_impl.d
 import '../../features/clinic_details/domain/repositories/clinic_repository.dart';
 import '../../features/clinic_details/domain/usecases/get_clinic_details_usecase.dart';
 import '../../features/clinic_details/domain/usecases/make_appointment_usecase.dart';
+import '../../features/clinic_details/domain/usecases/apply_coupon_usecase.dart';
 import '../../features/clinic_details/domain/usecases/toggle_favorite_usecase.dart'
     as clinic_details;
 import '../../features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
@@ -242,6 +243,9 @@ void setUpClinicModule() {
   sl.registerLazySingleton<MakeAppointmentUseCase>(
     () => MakeAppointmentUseCase(sl()),
   );
+  sl.registerLazySingleton<ApplyCouponUseCase>(
+    () => ApplyCouponUseCase(sl()),
+  );
   // sl.registerLazySingleton<clinic_details.ToggleFavoriteUseCase>(
   //   () => clinic_details.ToggleFavoriteUseCase(sl()),
   // );
@@ -251,6 +255,7 @@ void setUpClinicModule() {
       getClinicDetailsUseCase: sl(),
       toggleFavoriteUseCase: sl(),
       makeAppointmentUseCase: sl(),
+      applyCouponUseCase: sl(),
       favouriteRepository: sl(),
     ),
   );

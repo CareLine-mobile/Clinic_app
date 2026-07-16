@@ -34,66 +34,64 @@ class DoctorAvailableSlotsSection extends StatelessWidget {
     }
 
     return Padding(
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SectionTitle(
-              'doctorProfile.availableSlots'.tr(),
-              icon: Icons.access_time_rounded),
-          SizedBox(height: 12.h),
+          Text(
+            'doctorProfile.availableSlots'.tr(),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 16.h),
           ...slotsByDay.entries.map((entry) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: EdgeInsets.only(bottom: 8.h, top: 4.h),
+                  padding: EdgeInsets.only(bottom: 12.h, top: 4.h),
                   child: Text(
                     entry.key,
                     style: theme.textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: ColorsManager.primaryColor,
+                      color: ColorsManager.primaryColor.withOpacity(0.8),
                     ),
                   ),
                 ),
                 Wrap(
-                  spacing: 8.w,
-                  runSpacing: 8.h,
+                  spacing: 10.w,
+                  runSpacing: 10.h,
                   children: entry.value.map((slot) {
                     return Container(
                       padding: EdgeInsets.symmetric(
-                          horizontal: 14.w, vertical: 7.h),
+                          horizontal: 14.w, vertical: 8.h),
                       decoration: BoxDecoration(
                         color: slot.isAvailable
-                            ? ColorsManager.primaryColor.withOpacity(0.08)
-                            : ColorsManager.backgroundSurface,
-                        borderRadius: BorderRadius.circular(20.r),
-                        border: Border.all(
-                          color: slot.isAvailable
-                              ? ColorsManager.primaryColor.withOpacity(0.3)
-                              : theme.dividerColor,
-                        ),
+                            ? ColorsManager.primaryColor.withOpacity(0.05)
+                            : theme.disabledColor.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(10.r), // Softer shape
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
                             slot.isAvailable
-                                ? Icons.check_circle_rounded
-                                : Icons.cancel_rounded,
-                            size: 12.sp,
+                                ? Icons.access_time_filled_rounded
+                                : Icons.access_time_rounded,
+                            size: 14.sp,
                             color: slot.isAvailable
-                                ? ColorsManager.primaryColor
+                                ? ColorsManager.primaryColor.withOpacity(0.9)
                                 : theme.hintColor,
                           ),
-                          SizedBox(width: 5.w),
+                          SizedBox(width: 6.w),
                           Text(
                             slot.timeSlot,
                             style: TextStyle(
                               fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
                               color: slot.isAvailable
-                                  ? ColorsManager.primaryColor
+                                  ? ColorsManager.primaryColor.withOpacity(0.9)
                                   : theme.hintColor,
                             ),
                           ),
@@ -102,7 +100,7 @@ class DoctorAvailableSlotsSection extends StatelessWidget {
                     );
                   }).toList(),
                 ),
-                SizedBox(height: 12.h),
+                SizedBox(height: 20.h),
               ],
             );
           }),

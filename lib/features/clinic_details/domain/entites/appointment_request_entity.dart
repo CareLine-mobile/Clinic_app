@@ -8,6 +8,7 @@ class AppointmentRequestEntity extends Equatable {
   final String name;
   final String phone;
   final String? notes;
+  final String? coupon;
 
   const AppointmentRequestEntity({
     required this.clinicalId,
@@ -17,6 +18,7 @@ class AppointmentRequestEntity extends Equatable {
     required this.name,
     required this.phone,
     this.notes,
+    this.coupon,
   });
 
   Map<String, dynamic> toJson() => {
@@ -27,8 +29,9 @@ class AppointmentRequestEntity extends Equatable {
     'name': name,
     'phone': phone,
     if (notes != null && notes!.isNotEmpty) 'notes': notes,
+    if (coupon != null && coupon!.isNotEmpty) 'coupon': coupon,
   };
 
   @override
-  List<Object?> get props => [clinicalId, doctorId, date, time, name, phone, notes];
+  List<Object?> get props => [clinicalId, doctorId, date, time, name, phone, notes, coupon];
 }

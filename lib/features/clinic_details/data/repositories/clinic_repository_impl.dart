@@ -8,9 +8,11 @@ import '../../../../core/errors/error_handler.dart';
 import '../../domain/entites/appointment_request_entity.dart';
 import '../../domain/entites/clinic_entities.dart';
 import '../../domain/entites/time_slot_entity.dart';
+import '../../domain/entites/coupon_entity.dart';
 import '../../domain/repositories/clinic_repository.dart';
 import '../datasources/clinic_local_data_source.dart';
 import '../model/clinic_model.dart';
+import '../model/coupon_model.dart';
 import '../model/time_slot_model.dart';
 
 class ClinicRepositoryImpl implements ClinicRepository {
@@ -78,6 +80,24 @@ class ClinicRepositoryImpl implements ClinicRepository {
         body: request.toJson(),
       );
       return const Right(null);
+    } catch (e, st) {
+      return Left(ErrorHandler.handleException(e, st));
+    }
+  }
+
+  @override
+  Future<Either<Failure, CouponEntity>> applyCoupon(String coupon, String clinicId) async {
+    try {
+      final response = await apiServices.request(
+        method: HttpMethod.post,
+        url: Endpoints.applyCoupon,
+        body: {
+          'coupon': coupon,
+          'clinical_id': int.tryParse(clinicId) ?? 0,
+        },
+      );
+      final data = response['data'] ?? response;
+      return Right(CouponModel.fromJson(data));
     } catch (e, st) {
       return Left(ErrorHandler.handleException(e, st));
     }

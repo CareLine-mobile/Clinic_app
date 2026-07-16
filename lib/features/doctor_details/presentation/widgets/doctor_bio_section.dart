@@ -19,47 +19,45 @@ class DoctorBioSection extends StatelessWidget {
     }
 
     return Padding(
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SectionTitle(
-          'doctorProfile.about'.tr(),
-              icon: Icons.person_outline_rounded
-
+          Text(
+            'doctorProfile.about'.tr(),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           SizedBox(height: 12.h),
           if (doctor.bio.isNotEmpty)
             Text(
               doctor.bio,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(height: 1.65, color: theme.hintColor),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                height: 1.8,
+                color: theme.textTheme.bodyMedium?.color?.withOpacity(0.8),
+                letterSpacing: 0.3,
+              ),
             ),
           if (doctor.qualifications.isNotEmpty) ...[
-            SizedBox(height: 12.h),
-            Container(
-              padding: EdgeInsets.all(14.w),
-              decoration: BoxDecoration(
-                color: ColorsManager.primaryColor.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(
-                    color: ColorsManager.primaryColor.withOpacity(0.12)),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.school_outlined,
-                      color: ColorsManager.primaryColor, size: 18.sp),
-                  SizedBox(width: 10.w),
-                  Expanded(
-                    child: Text(
-                      doctor.qualifications,
-                      style: theme.textTheme.bodySmall
-                          ?.copyWith(height: 1.6, color: theme.hintColor),
+            SizedBox(height: 16.h),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.school_outlined,
+                    color: ColorsManager.primaryColor.withOpacity(0.7), size: 18.sp),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    doctor.qualifications,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      height: 1.6,
+                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                      fontStyle: FontStyle.italic,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ],

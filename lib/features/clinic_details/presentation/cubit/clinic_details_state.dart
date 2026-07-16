@@ -44,6 +44,13 @@ class ClinicDetailsLoaded extends ClinicDetailsState {
   final String? reviewErrorMessage;
   final String? reviewSuccessMessage;
 
+  // Promo Code
+  final String? couponCode;
+  final bool isCouponLoading;
+  final CouponEntity? appliedCoupon;
+  final String? couponError;
+  final String? bookingErrorMessage;
+
   const ClinicDetailsLoaded({
     required this.clinic,
     required this.selectedDate,
@@ -60,6 +67,11 @@ class ClinicDetailsLoaded extends ClinicDetailsState {
     this.isSubmittingReview = false,
     this.reviewErrorMessage,
     this.reviewSuccessMessage,
+    this.couponCode,
+    this.isCouponLoading = false,
+    this.appliedCoupon,
+    this.couponError,
+    this.bookingErrorMessage,
   });
 
   ClinicDetailsLoaded copyWith({
@@ -78,6 +90,11 @@ class ClinicDetailsLoaded extends ClinicDetailsState {
     bool? isSubmittingReview,
     Object? reviewErrorMessage = _sentinel,
     Object? reviewSuccessMessage = _sentinel,
+    Object? couponCode = _sentinel,
+    bool? isCouponLoading,
+    Object? appliedCoupon = _sentinel,
+    Object? couponError = _sentinel,
+    Object? bookingErrorMessage = _sentinel,
   }) {
     return ClinicDetailsLoaded(
       clinic: clinic ?? this.clinic,
@@ -105,6 +122,11 @@ class ClinicDetailsLoaded extends ClinicDetailsState {
       reviewSuccessMessage: reviewSuccessMessage == _sentinel
           ? this.reviewSuccessMessage
           : reviewSuccessMessage as String?,
+      couponCode: couponCode == _sentinel ? this.couponCode : couponCode as String?,
+      isCouponLoading: isCouponLoading ?? this.isCouponLoading,
+      appliedCoupon: appliedCoupon == _sentinel ? this.appliedCoupon : appliedCoupon as CouponEntity?,
+      couponError: couponError == _sentinel ? this.couponError : couponError as String?,
+      bookingErrorMessage: bookingErrorMessage == _sentinel ? this.bookingErrorMessage : bookingErrorMessage as String?,
     );
   }
 

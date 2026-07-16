@@ -50,11 +50,6 @@ class _BookingScreenBody extends StatelessWidget {
     final theme = Theme.of(context);
     return BlocListener<ClinicDetailsCubit, ClinicDetailsState>(
       listener: (context, state) {
-        if (state is BookingError) {
-          CustomSnackBar.show(context,
-              message: state.message, type: SnackBarType.error);
-        }
-
         if (state is BookingSuccess) {
           CustomSnackBar.show(context,
               message: state.message, type: SnackBarType.success);

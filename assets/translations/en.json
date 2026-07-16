@@ -227,7 +227,12 @@
       "your_info": "Your Info",
       "confirm": "Confirm"
     },
-    "missing_info": "Missing required booking information"
+    "missing_info": "Missing required booking information",
+    "enter_promo_code": "Enter promo code",
+    "apply": "Apply",
+    "original_price": "Original Price",
+    "discount": "Discount",
+    "final_price": "Final Price"
   },
   "clinic": {
     "choose_date": "Choose Date",
