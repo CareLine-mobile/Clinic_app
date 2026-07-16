@@ -15,101 +15,69 @@ class DoctorRatingSection extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // ── Big star rating ──────────────────────────────────
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  ColorsManager.warningFill.withOpacity(0.15),
-                  ColorsManager.warningFill.withOpacity(0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(14.r),
-              border: Border.all(
-                  color: ColorsManager.warningFill.withOpacity(0.25)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.star_rounded,
-                    color: ColorsManager.warningFill, size: 22.sp),
-                SizedBox(width: 6.w),
-                Text(
-                  doctor.rating > 0
-                      ? doctor.rating.toStringAsFixed(1)
-                      : 'N/A',
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
-                    color: ColorsManager.warningText,
-                  ),
-                ),
-              ],
-            ),
+          _buildStatColumn(
+            context: context,
+            icon: Icons.star_rounded,
+            iconColor: ColorsManager.warningFill,
+            value: doctor.rating > 0 ? doctor.rating.toStringAsFixed(1) : 'N/A',
+            label: doctor.reviewsCount > 0
+                ? 'doctorProfile.reviewsCount'
+                    .tr(namedArgs: {'count': '${doctor.reviewsCount}'})
+                : 'doctorProfile.noReviewsShort'.tr(),
           ),
-          SizedBox(width: 12.w),
-          // Reviews summary — Expanded so long/translated text never
-          // pushes the experience badge off screen.
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  doctor.reviewsCount > 0
-                      ? 'doctorProfile.reviewsCount'
-                      .tr(namedArgs: {'count': '${doctor.reviewsCount}'})
-                      : 'doctorProfile.noReviewsShort'.tr(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.textTheme.bodyLarge?.color,
-                  ),
-                ),
-                Text(
-                  'doctorProfile.aggregatedRating'.tr(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: theme.hintColor),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: 8.w),
-          // Experience badge
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-            decoration: BoxDecoration(
-              color: ColorsManager.primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${doctor.experienceYears}',
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
-                    color: ColorsManager.primaryColor,
-                  ),
-                ),
-                Text(
-                  'doctorProfile.yearsExp'.tr(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      fontSize: 10.sp, color: ColorsManager.primaryColor),
-                ),
-              ],
-            ),
+            height: 40.h,
+            width: 1,
+            color: theme.dividerColor.withOpacity(0.2),
+          ),
+          _buildStatColumn(
+            context: context,
+            icon: Icons.work_outline_rounded,
+            iconColor: ColorsManager.primaryColor,
+            value: '${doctor.experienceYears}',
+            label: 'doctorProfile.yearsExp'.tr(),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildStatColumn({
+    required BuildContext context,
+    required IconData icon,
+    required Color iconColor,
+    required String value,
+    required String label,
+  }) {
+    final theme = Theme.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: iconColor, size: 20.sp),
+            SizedBox(width: 6.w),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: theme.textTheme.bodyLarge?.color,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 4.h),
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.hintColor,
+          ),
+        ),
+      ],
     );
   }
 }

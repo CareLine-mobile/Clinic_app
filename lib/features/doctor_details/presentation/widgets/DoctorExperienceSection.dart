@@ -44,18 +44,11 @@ class DoctorExperienceSection extends StatelessWidget {
           if (doctor.consultationFee > 0) ...[
             SizedBox(height: 12.h),
             Container(
-              padding:
-              EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    ColorsManager.successFill.withOpacity(0.12),
-                    ColorsManager.successFill.withOpacity(0.04),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(
-                    color: ColorsManager.successFill.withOpacity(0.2)),
+                color: theme.scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(8.r),
+                border: Border.all(color: theme.dividerColor.withOpacity(0.2)),
               ),
               child: Row(
                 children: [

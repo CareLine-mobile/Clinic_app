@@ -129,7 +129,6 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                   children: [
                     DoctorRatingSection(doctor: doctor),
                     DoctorQuickActions(
-                      onRate: () => _showRatingDialog(doctor),
                       onShare: () => HapticFeedback.lightImpact(),
                       onSave: () => HapticFeedback.lightImpact(),
                     ),

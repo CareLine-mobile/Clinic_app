@@ -198,13 +198,7 @@ class _ConfigurationScreenState extends State<ConfigurationScreen>
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24.r),
             color: _cardColor,
-            boxShadow: [
-              BoxShadow(
-                color: ColorsManager.primaryColor.withOpacity(0.25),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
           ),
           padding: EdgeInsets.all(14.r),
           child: Image.asset(
@@ -283,187 +277,153 @@ class _ConfigurationScreenState extends State<ConfigurationScreen>
   // ── Language selector ─────────────────────────────────────────────────────
 
   Widget _buildLanguageSelector(AppSizeVertical v, AppSizeHorizontal h) {
-    return Row(
-      children: [
-        Expanded(
-          child: _SelectionTile(
-            isSelected: _selectedLang == 'ar',
-            isDark: _selectedDark,
-            cardColor: _cardColor,
-            onTap: () => setState(() => _selectedLang = 'ar'),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('🇸🇦', style: TextStyle(fontSize: 30.sp)),
-                SizedBox(height: v.s8),
-                Text(
-                  'العربية',
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
-                    color: _selectedLang == 'ar'
-                        ? ColorsManager.primaryColor
-                        : _textPrimary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        SizedBox(width: h.s12),
-        Expanded(
-          child: _SelectionTile(
-            isSelected: _selectedLang == 'en',
-            isDark: _selectedDark,
-            cardColor: _cardColor,
-            onTap: () => setState(() => _selectedLang = 'en'),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('🇺🇸', style: TextStyle(fontSize: 30.sp)),
-                SizedBox(height: v.s8),
-                Text(
-                  'English',
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
-                    color: _selectedLang == 'en'
-                        ? ColorsManager.primaryColor
-                        : _textPrimary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
+    return _buildSegmentedControl(
+      isLeftSelected: _selectedLang == 'ar',
+      leftLabel: 'العربية',
+      rightLabel: 'English',
+      leftEmoji: '🇸🇦',
+      rightEmoji: '🇺🇸',
+      onLeftTap: () => setState(() => _selectedLang = 'ar'),
+      onRightTap: () => setState(() => _selectedLang = 'en'),
     );
   }
 
   // ── Theme selector ────────────────────────────────────────────────────────
 
   Widget _buildThemeSelector(AppSizeVertical v, AppSizeHorizontal h) {
-    return Row(
-      children: [
-        Expanded(
-          child: _SelectionTile(
-            isSelected: !_selectedDark,
-            isDark: _selectedDark,
-            cardColor: _cardColor,
-            onTap: () => setState(() => _selectedDark = false),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.light_mode_rounded,
-                  size: 30.sp,
-                  color: !_selectedDark
-                      ? ColorsManager.primaryColor
-                      : _textSecondary,
-                ),
-                SizedBox(height: v.s8),
-                Text(
-                  _isArabic ? 'فاتح' : 'Light',
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
-                    color: !_selectedDark
-                        ? ColorsManager.primaryColor
-                        : _textPrimary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        SizedBox(width: h.s12),
-        Expanded(
-          child: _SelectionTile(
-            isSelected: _selectedDark,
-            isDark: _selectedDark,
-            cardColor: _cardColor,
-            onTap: () => setState(() => _selectedDark = true),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.dark_mode_rounded,
-                  size: 30.sp,
-                  color: _selectedDark
-                      ? ColorsManager.primaryColor
-                      : _textSecondary,
-                ),
-                SizedBox(height: v.s8),
-                Text(
-                  _isArabic ? 'داكن' : 'Dark',
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
-                    color: _selectedDark
-                        ? ColorsManager.primaryColor
-                        : _textPrimary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
+    return _buildSegmentedControl(
+      isLeftSelected: !_selectedDark,
+      leftLabel: _isArabic ? 'فاتح' : 'Light',
+      rightLabel: _isArabic ? 'داكن' : 'Dark',
+      leftIcon: Icons.light_mode_rounded,
+      rightIcon: Icons.dark_mode_rounded,
+      onLeftTap: () => setState(() => _selectedDark = false),
+      onRightTap: () => setState(() => _selectedDark = true),
     );
   }
-}
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Reusable animated selection tile
-// ─────────────────────────────────────────────────────────────────────────────
+  // ── Reusable Segmented Control ────────────────────────────────────────────
 
-class _SelectionTile extends StatelessWidget {
-  const _SelectionTile({
-    required this.isSelected,
-    required this.isDark,
-    required this.cardColor,
-    required this.onTap,
-    required this.child,
-  });
-
-  final bool isSelected;
-  final bool isDark;
-  final Color cardColor;
-  final VoidCallback onTap;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        padding: EdgeInsets.symmetric(vertical: 20.h),
+  Widget _buildSegmentedControl({
+    required bool isLeftSelected,
+    required String leftLabel,
+    required String rightLabel,
+    IconData? leftIcon,
+    IconData? rightIcon,
+    String? leftEmoji,
+    String? rightEmoji,
+    required VoidCallback onLeftTap,
+    required VoidCallback onRightTap,
+  }) {
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Container(
+        height: 52.h,
+        padding: EdgeInsets.all(4.r),
         decoration: BoxDecoration(
-          color: isSelected
-              ? ColorsManager.primaryColor.withOpacity(isDark ? 0.15 : 0.08)
-              : cardColor,
-          borderRadius: BorderRadius.circular(14.r),
+          color: _cardColor,
+          borderRadius: BorderRadius.circular(26.r),
           border: Border.all(
-            color: isSelected
-                ? ColorsManager.primaryColor
-                : (isDark
-                ? Colors.white.withOpacity(0.08)
-                : const Color(0xFFE5EAF2)),
-            width: isSelected ? 1.8 : 1.0,
-          ),
-          boxShadow: isSelected
-              ? [
-            BoxShadow(
-              color: ColorsManager.primaryColor.withOpacity(0.15),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            )
-          ]
-              : [],
+              color: Theme.of(context).dividerColor.withOpacity(0.08)),
         ),
-        child: Center(child: child),
+        child: Stack(
+          children: [
+            // ── The Sliding Pill (Indicator) ──
+            AnimatedAlign(
+              alignment: isLeftSelected
+                  ? Alignment.centerLeft
+                  : Alignment.centerRight,
+              duration: const Duration(milliseconds: 300),
+            curve: Curves.fastEaseInToSlowEaseOut, // Smooth spring-like curve
+            child: FractionallySizedBox(
+              widthFactor: 0.5, // Takes exactly half the width
+              heightFactor: 1.0,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: ColorsManager.primaryColor,
+                  borderRadius: BorderRadius.circular(22.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: ColorsManager.primaryColor.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // ── The Buttons ──
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: onLeftTap,
+                  behavior: HitTestBehavior.opaque,
+                  child: Center(
+                    child: AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 200),
+                      style: TextStyle(
+                        fontFamily: 'Cairo', // Assuming the app uses Cairo/Tajawal or similar
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        color: isLeftSelected ? Colors.white : _textSecondary,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (leftIcon != null)
+                            Icon(leftIcon,
+                                size: 18.sp,
+                                color: isLeftSelected
+                                    ? Colors.white
+                                    : _textSecondary)
+                          else if (leftEmoji != null)
+                            Text(leftEmoji, style: TextStyle(fontSize: 16.sp)),
+                          SizedBox(width: 8.w),
+                          Text(leftLabel),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: GestureDetector(
+                  onTap: onRightTap,
+                  behavior: HitTestBehavior.opaque,
+                  child: Center(
+                    child: AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 200),
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        color: !isLeftSelected ? Colors.white : _textSecondary,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (rightIcon != null)
+                            Icon(rightIcon,
+                                size: 18.sp,
+                                color: !isLeftSelected
+                                    ? Colors.white
+                                    : _textSecondary)
+                          else if (rightEmoji != null)
+                            Text(rightEmoji, style: TextStyle(fontSize: 16.sp)),
+                          SizedBox(width: 8.w),
+                          Text(rightLabel),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
       ),
     );
   }
