@@ -7,7 +7,8 @@ import 'package:clinic_app/core/theme/colors.dart';
 
 /// A shimmer loading overlay shown while map/location data is fetching
 class MapLoadingView extends StatelessWidget {
-  const MapLoadingView({super.key});
+  final bool isTab;
+  const MapLoadingView({super.key, this.isTab = false});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,7 @@ class MapLoadingView extends StatelessWidget {
 
         // Floating shimmer card at the bottom
         Positioned(
-          bottom: 20.h,
+          bottom: isTab ? 110.h : 20.h,
           left: 16.w,
           right: 16.w,
           child: Shimmer.fromColors(

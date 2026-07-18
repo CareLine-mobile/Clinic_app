@@ -59,7 +59,10 @@ class _DashBoardScreenState extends State<DashBoardScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _screens = [
-      HomeScreen(onNavigateToSearch: (i) => setState(() => _currentIndex = i)),
+      HomeScreen(onNavigateToSearch: (i) => setState(() {
+        _currentIndex = i;
+        _isNavBarVisible = true;
+      })),
       BlocProvider<SearchCubit>.value(
         value: di.sl<SearchCubit>(),
         child: const SearchScreen(),
@@ -115,6 +118,7 @@ class _DashBoardScreenState extends State<DashBoardScreen>
   // ── Scroll hide/show nav bar ─────────────────────────────
 
   bool _onScroll(ScrollNotification notification) {
+    if (_currentIndex == 4) return true;
     if (notification.metrics.axis != Axis.vertical) return true;
     if (notification is ScrollUpdateNotification) {
       final current = notification.metrics.pixels;
@@ -154,7 +158,10 @@ class _DashBoardScreenState extends State<DashBoardScreen>
           onScroll: _onScroll,
           onTabTap: (index) {
             FocusManager.instance.primaryFocus?.unfocus();
-            setState(() => _currentIndex = index);
+            setState(() {
+              _currentIndex = index;
+              _isNavBarVisible = true;
+            });
           },
           showLocationBanner: _showLocationBanner,
           onOpenLocationSettings: _openLocationSettings,

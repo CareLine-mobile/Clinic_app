@@ -85,7 +85,7 @@ class _MapLocationsScreenState extends State<MapLocationsScreen>
         },
         builder: (context, state) {
           if (state is MapLocationsLoading || state is MapLocationsInitial) {
-            return const MapLoadingView();
+            return MapLoadingView(isTab: widget.isTab);
           }
 
           if (state is MapLocationsPermissionDenied) {
