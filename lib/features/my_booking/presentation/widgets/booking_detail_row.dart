@@ -9,6 +9,7 @@ class BookingDetailRow extends StatelessWidget {
   final String label;
   final String value;
   final bool isHighlighted;
+  final VoidCallback? onTap;
 
   const BookingDetailRow({
     super.key,
@@ -16,12 +17,13 @@ class BookingDetailRow extends StatelessWidget {
     required this.label,
     required this.value,
     this.isHighlighted = false,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
+    Widget rowContent = Row(
       children: [
         Icon(icon, size: 16.sp, color: theme.primaryColor),
         SizedBox(width: SizeApp.s8),
@@ -45,7 +47,20 @@ class BookingDetailRow extends StatelessWidget {
             textAlign: TextAlign.end,
           ),
         ),
+        if (onTap != null) ...[
+          SizedBox(width: 4.w),
+          Icon(Icons.arrow_forward_ios, size: 10.sp, color: theme.primaryColor),
+        ],
       ],
     );
+
+    if (onTap != null) {
+      return GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: rowContent,
+      );
+    }
+    return rowContent;
   }
 }

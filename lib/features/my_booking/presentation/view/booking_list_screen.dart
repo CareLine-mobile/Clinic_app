@@ -141,9 +141,11 @@ class _BookingList extends StatelessWidget {
       child: ListView.builder(
         controller: scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.symmetric(
-          horizontal: SizeApp.s16,
-          vertical: SizeApp.s12,
+        padding: EdgeInsets.fromLTRB(
+          SizeApp.s16,
+          SizeApp.s12,
+          SizeApp.s16,
+          120.h,
         ),
         itemCount: state.bookings.length + (state.isPaginating ? 1 : 0),
         itemBuilder: (context, index) {

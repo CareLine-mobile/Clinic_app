@@ -242,8 +242,7 @@
     "enter_promo_code": "Enter promo code",
     "apply": "Apply",
     "original_price": "Original Price",
-    "discount": "Discount",
-    "final_price": "Final Price"
+    "discount": "Discount"
   },
   "clinic": {
     "choose_date": "Choose Date",
@@ -586,5 +585,6 @@
     "ratingVeryGood": "Very Good",
     "ratingExcellent": "Excellent!",
     "submitRating": "Submit Rating"
-  }
+  },
+  "view_profile": "View Profile"
 }

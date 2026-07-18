@@ -242,8 +242,7 @@
     "enter_promo_code": "أدخل كود الخصم",
     "apply": "تطبيق",
     "original_price": "السعر الأساسي",
-    "discount": "الخصم",
-    "final_price": "السعر النهائي"
+    "discount": "الخصم"
   },
   "clinic": {
     "choose_date": "اختر التاريخ",
@@ -586,5 +585,6 @@
     "ratingVeryGood": "جيد جدًا",
     "ratingExcellent": "ممتاز!",
     "submitRating": "إرسال التقييم"
-  }
+  },
+  "view_profile": "عرض الملف الشخصي"
 }

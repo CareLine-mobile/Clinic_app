@@ -193,14 +193,16 @@ class _BookingConfirmationPageState extends State<BookingConfirmationPage> {
                           children: [
                             Icon(Icons.verified_rounded, color: ColorsManager.successFill, size: 24.sp),
                             SizedBox(width: 8.w),
-                            Text(
-                              'booking.coupon_applied'.tr(),
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: ColorsManager.successFill,
-                                fontWeight: FontWeight.bold,
+                            Expanded(
+                              child: Text(
+                                'booking.coupon_applied'.tr(),
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: ColorsManager.successFill,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                            const Spacer(),
+                            SizedBox(width: 8.w),
                             Container(
                               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                               decoration: BoxDecoration(
@@ -273,25 +275,18 @@ class _BookingConfirmationPageState extends State<BookingConfirmationPage> {
                             Container(
                               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
                               decoration: BoxDecoration(
-                                color: ColorsManager.successFill,
+                                color: ColorsManager.successFill.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(20.r),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: ColorsManager.successFill.withOpacity(0.3),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
                               ),
                               child: Row(
                                 children: [
-                                  Icon(Icons.local_offer_rounded, color: Colors.white, size: 14.sp),
+                                  Icon(Icons.local_offer_rounded, color: ColorsManager.successFill, size: 14.sp),
                                   SizedBox(width: 4.w),
                                   Text(
                                     '${'booking.you_saved'.tr()} ${couponData.discountValue}',
                                     style: theme.textTheme.labelMedium?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
+                                      color: ColorsManager.successFill,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ],

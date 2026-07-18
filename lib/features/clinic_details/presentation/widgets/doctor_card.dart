@@ -133,6 +133,38 @@ class DoctorCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
+                      SizedBox(height: 4.h),
+                      GestureDetector(
+                        onTap: () {
+                          final id = int.tryParse(doctor.id);
+                          if (id != null) {
+                            Navigator.pushNamed(
+                              context,
+                              Routes.doctorProfile,
+                              arguments: id,
+                            );
+                          }
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'view_profile'.tr(),
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                fontWeight: FontWeight.w600,
+                                color: accentColor,
+                              ),
+                            ),
+                            SizedBox(width: 4.w),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              size: 10.sp,
+                              color: accentColor,
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),

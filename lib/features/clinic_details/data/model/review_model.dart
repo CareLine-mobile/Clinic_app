@@ -37,7 +37,7 @@ class ReviewModel extends ReviewEntity {
       id: json['id']?.toString() ?? '',
       patientName: json['patient_name'] as String? ?? '',
       patientImageUrl: json['patient_image_url'] as String? ?? '',
-      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+      rating: double.tryParse(json['rating']?.toString() ?? '0') ?? 0.0,
       comment: json['comment'] as String? ?? '',
       date: parsedDate,
       doctorName: doctorName,

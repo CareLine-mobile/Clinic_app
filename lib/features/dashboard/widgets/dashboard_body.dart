@@ -85,7 +85,7 @@ class DashBoardBody extends StatelessWidget {
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
             bottom: isNavBarVisible
-                ? (SizeApp.s16 + bottomSafeArea)
+                ? (bottomSafeArea > 0 ? bottomSafeArea + 12.h : 24.h)
                 : -(100.h + bottomSafeArea),
             left: SizeApp.s12,
             right: SizeApp.s12,

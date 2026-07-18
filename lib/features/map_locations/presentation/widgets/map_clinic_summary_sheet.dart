@@ -128,16 +128,18 @@ class _ClinicSummaryPageState extends State<_ClinicSummaryPage> {
           onTap: () {},
           child: SlideTransition(
             position: _slideAnim,
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(32.r)),
-              ),
-              padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, bottomPad + 24.h),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: theme.scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(32.r)),
+                ),
+                padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, bottomPad + 24.h),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                   // ── Drag handle ────────────────────────────────────
                   Container(
                     width: 40.w,
@@ -360,6 +362,7 @@ class _ClinicSummaryPageState extends State<_ClinicSummaryPage> {
           ),
         ),
       ),
+     ),
     );
   }
 }

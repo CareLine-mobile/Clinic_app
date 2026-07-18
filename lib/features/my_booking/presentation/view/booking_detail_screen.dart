@@ -253,6 +253,16 @@ class _AppointmentInfoSection extends StatelessWidget {
           icon: Icons.person_outline_rounded,
           label: 'bookings.doctor'.tr(),
           value: booking.doctor.name,
+          onTap: () {
+            final doctorId = int.tryParse(booking.doctor.id.toString());
+            if (doctorId != null) {
+              Navigator.pushNamed(
+                context,
+                Routes.doctorProfile,
+                arguments: doctorId,
+              );
+            }
+          },
         ),
         BookingDetailRow(
           icon: Icons.calendar_today_outlined,
