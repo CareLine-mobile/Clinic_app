@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -12,7 +13,13 @@ class AppInitializer {
     /// Initialize services
     // await Alarm.init(); /// todo:: phase 2
     await _initLanguages();
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    
+    if (Platform.isIOS) {
+      // On iOS, use the GoogleService-Info.plist that is linked in Xcode
+      await Firebase.initializeApp();
+    } else {
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    }
     /// Initialize dependencies
     await di.init();
 
