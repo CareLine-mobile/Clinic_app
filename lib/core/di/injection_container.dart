@@ -1,6 +1,7 @@
 import 'package:clinic_app/core/api/base_api_services.dart';
 import 'package:clinic_app/core/api/dio_client.dart';
 import 'package:clinic_app/features/auth/domain/usecases/google_login_usecase.dart';
+import 'package:clinic_app/features/auth/domain/usecases/apple_login_usecase.dart';
 import 'package:clinic_app/features/doctor_details/data/datasources/doctor_remote_data_source.dart';
 import 'package:clinic_app/features/doctor_details/data/repositories/doctor_repository_impl.dart';
 import 'package:clinic_app/features/doctor_details/domain/repositories/doctor_repository.dart';
@@ -142,6 +143,7 @@ void setUpAuthModule() {
 
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => GoogleLoginUseCase(sl()));
+  sl.registerLazySingleton(() => AppleLoginUseCase(sl()));
   sl.registerLazySingleton(() => SignupUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
   sl.registerLazySingleton(() => VerifyOtpUseCase(sl()));
@@ -160,6 +162,7 @@ void setUpAuthModule() {
       logoutUseCase: sl(),
       sendForgotPasswordUseCase: sl(),
       googleLoginUseCase: sl(),
+      appleLoginUseCase: sl(),
       resetPasswordUseCase: sl(),
       deleteAccountUseCase: sl()
     ),

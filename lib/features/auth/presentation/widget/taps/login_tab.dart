@@ -1,5 +1,6 @@
 // lib/features/auth/presentation/widgets/login_tab.dart
 
+import 'dart:io';
 import 'package:clinic_app/core/utils/assets.dart';
 import 'package:clinic_app/core/widgets/CustomIcon.dart';
 import 'package:flutter/material.dart';
@@ -87,6 +88,10 @@ class _LoginTabState extends State<LoginTab> {
             _buildDivider(),
             SizedBox(height: _v.s20),
             _buildGoogleSignInButton(),
+            if (Platform.isIOS) ...[
+              SizedBox(height: _v.s12),
+              _buildAppleSignInButton(),
+            ],
             SizedBox(height: _v.s12),
             AppOutlinedButton(
               text: 'auth.continueAsGuest'.tr(),
@@ -133,7 +138,7 @@ class _LoginTabState extends State<LoginTab> {
           text: 'auth.login'.tr(),
           onPressed: state is AuthLoading ? null : _handleLogin,
           isLoading: state is AuthLoading,
-          active: state is! GoogleLoginLoading,
+          active: state is! GoogleLoginLoading && state is! AppleLoginLoading,
           horizontalPadding: 0,
           verticalPadding: 0,
         );
@@ -156,7 +161,7 @@ class _LoginTabState extends State<LoginTab> {
       },
       builder: (context, state) {
         final isGoogleLoading = state is GoogleLoginLoading;
-        final isAnyLoading = state is AuthLoading || isGoogleLoading;
+        final isAnyLoading = state is AuthLoading || isGoogleLoading || state is AppleLoginLoading;
 
         return AppOutlinedButton(
           text: 'auth.signInWithGoogle'.tr(),
@@ -170,6 +175,36 @@ class _LoginTabState extends State<LoginTab> {
             noColor: true,
             size: _h.s20,
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAppleSignInButton() {
+    return BlocConsumer<AuthCubit, AuthState>(
+      listenWhen: (_, current) =>
+      current is AuthFailure || current is LoginSuccess,
+      listener: (context, state) {
+        if (state is AuthFailure) {
+          _showErrorSnackBar(state.message);
+        } else if (state is LoginSuccess) {
+          context.read<SettingsCubit>().syncFcmToken();
+          Navigator.pushNamedAndRemoveUntil(
+              context, Routes.dashBoard, (_) => false);
+        }
+      },
+      builder: (context, state) {
+        final isAppleLoading = state is AppleLoginLoading;
+        final isAnyLoading = state is AuthLoading || state is GoogleLoginLoading || isAppleLoading;
+
+        return AppOutlinedButton(
+          text: 'Sign in with Apple', // Assuming no translation added yet, or could use 'auth.signInWithApple'.tr() if they have it
+          onPressed: isAnyLoading ? null : _handleAppleSignIn,
+          isLoading: isAppleLoading,
+          active: !isAnyLoading,
+          horizontalPadding: 0,
+          verticalPadding: 0,
+          leadingWidget: Icon(Icons.apple, size: _h.s24, color: Colors.black),
         );
       },
     );
@@ -206,6 +241,10 @@ class _LoginTabState extends State<LoginTab> {
 
   void _handleGoogleSignIn() {
     context.read<AuthCubit>().googleLogin();
+  }
+
+  void _handleAppleSignIn() {
+    context.read<AuthCubit>().appleLogin();
   }
 
   void _showErrorSnackBar(String message) {

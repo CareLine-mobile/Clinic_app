@@ -3,6 +3,7 @@ import 'package:dartz/dartz.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../../../core/api/model/endpoints.dart';
 import '../../../../core/api/model/http_method.dart';
 import '../../../../core/errors/error_handler.dart';
@@ -103,6 +104,55 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       // باقي الـ errors يروا على ErrorHandler
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, User>> appleLogin() async {
+    try {
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final String name = credential.givenName != null || credential.familyName != null
+          ? '${credential.givenName ?? ''} ${credential.familyName ?? ''}'.trim()
+          : '';
+
+      final response = await apiServices.request(
+        method: HttpMethod.post,
+        url: Endpoints.appleLogin,
+        body: {
+          'apple_id': credential.userIdentifier,
+          'email': credential.email ?? '', // Apple only provides this on the first sign-in
+          'name': name,
+        },
+      );
+
+      final authResponse = AuthResponseModel.fromJson(response);
+
+      if (authResponse.user != null) {
+        return Right(authResponse.user!.toEntity());
+      }
+
+      return Left(ServerFailure(
+        authResponse.message.isNotEmpty
+            ? authResponse.message
+            : 'errors.server.unexpected'.tr(),
+        'APPLE_LOGIN_FAILED',
+      ));
+    } on SignInWithAppleAuthorizationException catch (e) {
+      if (e.code == AuthorizationErrorCode.canceled) {
+        return Left(ServerFailure(
+          'errors.network.cancelled'.tr(),
+          'CANCELLED',
+        ));
+      }
+      return Left(ErrorHandler.handleException(e));
+    } catch (e) {
       return Left(ErrorHandler.handleException(e));
     }
   }

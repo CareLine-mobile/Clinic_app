@@ -18,6 +18,8 @@ class AuthLoading extends AuthState {}
 
 class GoogleLoginLoading extends AuthState {}
 
+class AppleLoginLoading extends AuthState {}
+
 class AuthAuthenticated extends AuthState {
   final User user;
 

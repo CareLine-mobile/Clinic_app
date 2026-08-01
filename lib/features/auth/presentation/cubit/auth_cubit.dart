@@ -5,6 +5,7 @@ import '../../domain/entities/verify_otp_params.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/delete_acount_usecase.dart';
 import '../../domain/usecases/google_login_usecase.dart' show GoogleLoginUseCase;
+import '../../domain/usecases/apple_login_usecase.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/reset_password_usecase.dart';
 import '../../domain/usecases/send_forgot_password_usecase.dart';
@@ -16,6 +17,7 @@ import 'auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   final LoginUseCase loginUseCase;
   final GoogleLoginUseCase googleLoginUseCase;
+  final AppleLoginUseCase appleLoginUseCase;
   final SignupUseCase signupUseCase;
   final LogoutUseCase logoutUseCase;
   final VerifyOtpUseCase verifyOtpUseCase;
@@ -29,6 +31,7 @@ class AuthCubit extends Cubit<AuthState> {
   AuthCubit({
     required this.loginUseCase,
     required this.googleLoginUseCase,
+    required this.appleLoginUseCase,
     required this.signupUseCase,
     required this.logoutUseCase,
     required this.verifyOtpUseCase,
@@ -75,6 +78,21 @@ class AuthCubit extends Cubit<AuthState> {
     emit(GoogleLoginLoading());
 
     final result = await googleLoginUseCase();
+
+    result.fold(
+          (failure) => emit(AuthFailure(message: failure.message)),
+          (user) async {
+        await userRepository.setUser(user);
+        emit(LoginSuccess());
+        emit(AuthAuthenticated(user: user));
+      },
+    );
+  }
+
+  Future<void> appleLogin() async {
+    emit(AppleLoginLoading());
+
+    final result = await appleLoginUseCase();
 
     result.fold(
           (failure) => emit(AuthFailure(message: failure.message)),

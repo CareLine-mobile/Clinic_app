@@ -9,6 +9,7 @@ abstract class AuthRepository {
   });
 
   Future<Either<Failure, User>> googleLogin();
+  Future<Either<Failure, User>> appleLogin();
 
   Future<Either<Failure, String>> signup({
     required String name,
