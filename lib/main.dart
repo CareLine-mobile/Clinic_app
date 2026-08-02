@@ -29,7 +29,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //debugPaintSizeEnabled = true;
   await AppInitializer.init();
-  NotificationPermissionService.requestPermission().ignore();
   await UserRepository().loadUser();
 
   // Read both flags before showing any UI

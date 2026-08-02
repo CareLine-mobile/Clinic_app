@@ -122,13 +122,19 @@ class AuthRepositoryImpl implements AuthRepository {
           ? '${credential.givenName ?? ''} ${credential.familyName ?? ''}'.trim()
           : '';
 
+      final String finalEmail = (credential.email != null && credential.email!.isNotEmpty)
+          ? credential.email!
+          : '${credential.userIdentifier}@apple.careline.pw';
+          
+      final String finalName = name.isNotEmpty ? name : 'Apple User';
+
       final response = await apiServices.request(
         method: HttpMethod.post,
         url: Endpoints.appleLogin,
         body: {
           'apple_id': credential.userIdentifier,
-          'email': credential.email ?? '', // Apple only provides this on the first sign-in
-          'name': name,
+          'email': finalEmail,
+          'name': finalName,
         },
       );
 

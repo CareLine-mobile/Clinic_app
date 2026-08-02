@@ -134,6 +134,75 @@ class ClinicInfoTabWidget extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
+
+  Future<void> _openMaps() async {
+    if (contactInfo.googleMapUrl != null &&
+        contactInfo.googleMapUrl!.isNotEmpty) {
+      final url = Uri.parse(contactInfo.googleMapUrl!);
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      }
+    }
+  }
+}
+
+class _DelayedMapWidget extends StatefulWidget {
+  final double lat;
+  final double lng;
+
+  const _DelayedMapWidget({Key? key, required this.lat, required this.lng}) : super(key: key);
+
+  @override
+  State<_DelayedMapWidget> createState() => _DelayedMapWidgetState();
+}
+
+class _DelayedMapWidgetState extends State<_DelayedMapWidget> {
+  bool _showMap = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Delay rendering the map to prevent UI stutter during page transition
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        setState(() {
+          _showMap = true;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_showMap) {
+      return Container(
+        color: Colors.grey.shade200,
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    
+    return GoogleMap(
+      liteModeEnabled: true, // Huge performance boost on Android
+      initialCameraPosition: CameraPosition(
+        target: LatLng(widget.lat, widget.lng),
+        zoom: 15,
+      ),
+      zoomControlsEnabled: false,
+      myLocationButtonEnabled: false,
+      scrollGesturesEnabled: false,
+      zoomGesturesEnabled: false,
+      rotateGesturesEnabled: false,
+      tiltGesturesEnabled: false,
+      markers: {
+        Marker(
+          markerId: const MarkerId('clinic'),
+          position: LatLng(widget.lat, widget.lng),
+        ),
+      },
+    );
+  }
 }
 
 
@@ -471,23 +540,9 @@ class ClinicLocationSection extends StatelessWidget {
                   SizedBox(
                     height: 160.h,
                     width: double.infinity,
-                    child: GoogleMap(
-                      initialCameraPosition: CameraPosition(
-                        target: LatLng(lat!, lng!),
-                        zoom: 15,
-                      ),
-                      zoomControlsEnabled: false,
-                      myLocationButtonEnabled: false,
-                      scrollGesturesEnabled: false,
-                      zoomGesturesEnabled: false,
-                      rotateGesturesEnabled: false,
-                      tiltGesturesEnabled: false,
-                      markers: {
-                        Marker(
-                          markerId: const MarkerId('clinic'),
-                          position: LatLng(lat!, lng!),
-                        ),
-                      },
+                    child: _DelayedMapWidget(
+                      lat: lat!,
+                      lng: lng!,
                     ),
                   ),
                   // ─── Open in Maps overlay ──────────────────────

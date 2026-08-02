@@ -25,6 +25,7 @@
     "createAccountTitle": "Create Account",
     "signupSubtitle": "Join us for better service experiences",
     "signInWithGoogle": "Sign in with Google",
+    "signInWithApple": "Sign in with Apple",
     "or": "OR",
     "googleSignInFailed": "Failed Sign in with Google",
     "otp": {

@@ -198,7 +198,7 @@ class _LoginTabState extends State<LoginTab> {
         final isAnyLoading = state is AuthLoading || state is GoogleLoginLoading || isAppleLoading;
 
         return AppOutlinedButton(
-          text: 'Sign in with Apple', // Assuming no translation added yet, or could use 'auth.signInWithApple'.tr() if they have it
+          text: 'auth.signInWithApple'.tr(),
           onPressed: isAnyLoading ? null : _handleAppleSignIn,
           isLoading: isAppleLoading,
           active: !isAnyLoading,

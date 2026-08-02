@@ -14,11 +14,15 @@ class AppInitializer {
     // await Alarm.init(); /// todo:: phase 2
     await _initLanguages();
     
-    if (Platform.isIOS) {
-      // On iOS, use the GoogleService-Info.plist that is linked in Xcode
-      await Firebase.initializeApp();
-    } else {
-      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    try {
+      if (Platform.isIOS) {
+        // On iOS, use the GoogleService-Info.plist that is linked in Xcode
+        await Firebase.initializeApp();
+      } else {
+        await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+      }
+    } catch (e) {
+      debugPrint("Firebase Initialization Error: \$e");
     }
     /// Initialize dependencies
     await di.init();

@@ -26,6 +26,7 @@
     "googleSignInFailed": "فشل تسجيل الدخول باستخدام جوجل",
     "signupSubtitle": "انضم إلينا للحصول على خدمات مميزة",
     "signInWithGoogle": "الدخول باستخدام جوجل",
+    "signInWithApple": "الدخول باستخدام آبل",
     "or": "أو",
     "otp": {
       "title": "التحقق",
