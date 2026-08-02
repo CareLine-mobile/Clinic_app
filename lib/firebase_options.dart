@@ -42,10 +42,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-              'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -75,4 +72,16 @@ class DefaultFirebaseOptions {
     projectId: 'careline-397d7',
     storageBucket: 'careline-397d7.firebasestorage.app',
   );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyCGcfDdCXJnAjXs6A-t6d2Ipo0t--jq2pw',
+    appId: '1:1051363714209:ios:fd77d271fe12f04fbb3ce0',
+    messagingSenderId: '1051363714209',
+    projectId: 'careline-397d7',
+    storageBucket: 'careline-397d7.firebasestorage.app',
+    androidClientId: '1051363714209-mghad9of727bdoq5iph7bdju6alv99uq.apps.googleusercontent.com',
+    iosClientId: '1051363714209-h5c86ic16nc9ihoq0i15nrirg5rvou9p.apps.googleusercontent.com',
+    iosBundleId: 'com.careLine.app',
+  );
+
 }
