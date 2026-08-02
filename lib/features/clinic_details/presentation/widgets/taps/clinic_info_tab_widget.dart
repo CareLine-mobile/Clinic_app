@@ -134,16 +134,6 @@ class ClinicInfoTabWidget extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
-
-  Future<void> _openMaps() async {
-    if (contactInfo.googleMapUrl != null &&
-        contactInfo.googleMapUrl!.isNotEmpty) {
-      final url = Uri.parse(contactInfo.googleMapUrl!);
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      }
-    }
-  }
 }
 
 class _DelayedMapWidget extends StatefulWidget {
