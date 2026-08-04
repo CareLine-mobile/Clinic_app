@@ -146,75 +146,82 @@ class _NotificationCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final date = DateTime.tryParse(notification.createdAt);
     
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: notification.isRead ? Colors.transparent : (isDark ? Colors.white.withOpacity(0.05) : theme.primaryColor.withOpacity(0.05)),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: notification.isRead 
-              ? (isDark ? Colors.white12 : Colors.grey[200]!) 
-              : theme.primaryColor.withOpacity(0.3),
-          width: 0.5,
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      alignment: Alignment.topCenter,
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: notification.isRead ? Colors.transparent : (isDark ? Colors.white.withOpacity(0.05) : theme.primaryColor.withOpacity(0.05)),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(
+            color: notification.isRead 
+                ? (isDark ? Colors.white12 : Colors.grey[200]!) 
+                : theme.primaryColor.withOpacity(0.3),
+            width: 0.5,
+          ),
         ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.all(8.w),
-            decoration: BoxDecoration(
-              color: notification.isRead 
-                  ? (isDark ? Colors.grey[800] : Colors.grey[100])
-                  : theme.primaryColor.withOpacity(0.1),
-              shape: BoxShape.circle,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: notification.isRead 
+                    ? (isDark ? Colors.grey[800] : Colors.grey[100])
+                    : theme.primaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                notification.isRead ? Icons.notifications_none : Icons.notifications_active,
+                color: notification.isRead ? theme.hintColor : theme.primaryColor,
+                size: 20.sp,
+              ),
             ),
-            child: Icon(
-              notification.isRead ? Icons.notifications_none : Icons.notifications_active,
-              color: notification.isRead ? theme.hintColor : theme.primaryColor,
-              size: 20.sp,
-            ),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        notification.title,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: notification.isRead ? FontWeight.normal : FontWeight.w600,
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          notification.title,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: notification.isRead ? FontWeight.normal : FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                    if (date != null) ...[
-                      SizedBox(width: 8.w),
-                      Text(
-                        date.timeAgo(locale: context.locale.languageCode),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.hintColor,
-                          fontSize: 10.sp,
+                      if (date != null) ...[
+                        SizedBox(width: 8.w),
+                        Text(
+                          date.timeAgo(locale: context.locale.languageCode),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.hintColor,
+                            fontSize: 10.sp,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
-                  ],
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  notification.body,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: notification.isRead ? theme.hintColor : theme.textTheme.bodyMedium?.color,
-                    height: 1.3,
                   ),
-                ),
-              ],
+                  SizedBox(height: 4.h),
+                  Text(
+                    notification.body,
+                    maxLines: notification.isRead ? null : 2,
+                    overflow: notification.isRead ? null : TextOverflow.ellipsis,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: notification.isRead ? theme.hintColor : theme.textTheme.bodyMedium?.color,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
