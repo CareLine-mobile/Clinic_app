@@ -87,6 +87,9 @@ class ErrorHandler {
         return NetworkFailure('errors.network.certificate'.tr(), 'CERTIFICATE_ERROR');
       case DioExceptionType.unknown:
         return NetworkFailure('errors.network.serverConnection'.tr(), 'CONNECTION_ERROR');
+      case DioExceptionType.transformTimeout:
+        // TODO: Handle this case.
+        throw UnimplementedError();
     }
   }
 
@@ -163,27 +166,6 @@ class ErrorHandler {
 
     if (data is Map<String, dynamic>) {
 
-      // ─── message field ────────────────────────────────────────────
-      if (data.containsKey('message')) {
-        final msg = data['message'];
-
-        // Normal string message
-        if (msg is String) return msg;
-
-        // 422 case: message is a Map { "email": [...], "phone": [...] }
-        if (msg is Map) {
-          final parts = <String>[];
-          msg.forEach((key, value) {
-            if (value is List && value.isNotEmpty) {
-              parts.add(value.first.toString());
-            } else {
-              parts.add(value.toString());
-            }
-          });
-          return parts.join(' • ');
-        }
-      }
-
       // ─── errors field ─────────────────────────────────────────────
       if (data.containsKey('errors')) {
         final errors = data['errors'];
@@ -197,6 +179,27 @@ class ErrorHandler {
         if (errors is List && errors.isNotEmpty) {
           return errors.first.toString();
         }
+      }
+
+      // ─── message field ────────────────────────────────────────────
+      if (data.containsKey('message')) {
+        final msg = data['message'];
+
+        // 422 case: message is a Map { "email": [...], "phone": [...] }
+        if (msg is Map) {
+          final parts = <String>[];
+          msg.forEach((key, value) {
+            if (value is List && value.isNotEmpty) {
+              parts.add(value.first.toString());
+            } else {
+              parts.add(value.toString());
+            }
+          });
+          return parts.join(' • ');
+        }
+
+        // Normal string message
+        if (msg is String) return msg;
       }
 
       // ─── error field ──────────────────────────────────────────────
