@@ -15,12 +15,7 @@ class AppInitializer {
     await _initLanguages();
     
     try {
-      if (Platform.isIOS) {
-        // On iOS, use the GoogleService-Info.plist that is linked in Xcode
-        await Firebase.initializeApp();
-      } else {
-        await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-      }
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     } catch (e) {
       debugPrint("Firebase Initialization Error: \$e");
     }
