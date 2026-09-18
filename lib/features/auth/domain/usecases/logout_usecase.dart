@@ -14,13 +14,12 @@ class LogoutUseCase {
     try {
       // 1. Logout from API
       await repository.logout();
-
+    } catch (e) {
+      // We ignore API errors during logout because we must clear the local user anyway.
+    } finally {
       // 2. Clear local user
       await UserRepository().clearUser();
-
-      return const Right(null);
-    } catch (e) {
-      return Left(ErrorHandler.handleException(e));
     }
+    return const Right(null);
   }
 }
