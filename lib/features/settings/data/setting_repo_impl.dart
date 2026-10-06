@@ -1,23 +1,25 @@
-
 import 'dart:developer';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../../../core/api/base_api_services.dart';
 import '../../../../core/api/model/endpoints.dart';
 import '../../../../core/api/model/http_method.dart';
 import '../domain/setting_repo.dart';
 
-
 class SettingsRepositoryImpl implements SettingsRepository {
   final BaseApiServices _api;
-  final FirebaseMessaging _messaging;
+  final FirebaseMessaging? _messaging;
 
   SettingsRepositoryImpl({
     required BaseApiServices apiServices,
     FirebaseMessaging? messaging,
-  })  : _api = apiServices,
-        _messaging = messaging ?? FirebaseMessaging.instance;
+  }) : _api = apiServices,
+       _messaging = kIsWeb || Firebase.apps.isEmpty
+           ? null
+           : messaging ?? FirebaseMessaging.instance;
 
   @override
   Future<void> registerFcmToken(String token) async {
@@ -32,7 +34,9 @@ class SettingsRepositoryImpl implements SettingsRepository {
   /// Requests OS permission, then returns the FCM token.
   /// Returns null if the user denied permission.
   Future<String?> requestPermissionAndGetToken() async {
-    final settings = await _messaging.requestPermission(
+    final messaging = _messaging;
+    if (messaging == null) return null;
+    final settings = await messaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
@@ -42,6 +46,6 @@ class SettingsRepositoryImpl implements SettingsRepository {
       return null;
     }
 
-    return _messaging.getToken();
+    return messaging.getToken();
   }
 }

@@ -5,37 +5,36 @@ import 'exceptions.dart';
 import 'failures.dart';
 
 class ErrorHandler {
-
-// lib/core/errors/error_handler.dart
+  // lib/core/errors/error_handler.dart
 
   static const Map<String, String> _serverMessageMap = {
     // ─── مع dot ومن غيره ────────────────────────────────────────────
-    'please verify your email first.':      'errors.server.accountNotVerified',
-    'please verify your email first':       'errors.server.accountNotVerified',
-    'please verify your email.':            'errors.server.accountNotVerified',
-    'please verify your email':             'errors.server.accountNotVerified',
-    'google_id_token_error':                'errors.auth.googleTokenError',
-    'invalid credentials.':                 'errors.server.invalidCredentials',
-    'invalid credentials':                  'errors.server.invalidCredentials',
-    'unauthenticated.':                     'errors.server.unauthorized',
-    'unauthenticated':                      'errors.server.unauthorized',
-    'unauthorized':                         'errors.server.unauthorized',
-    'email already taken':                  'errors.server.emailTaken',
-    'email has already been taken':         'errors.server.emailTaken',
-    'the email has already been taken':     'errors.server.emailTaken',
-    'this email is already registered.':    'errors.server.emailTaken',
-    'this email is already registered':     'errors.server.emailTaken',
+    'please verify your email first.': 'errors.server.accountNotVerified',
+    'please verify your email first': 'errors.server.accountNotVerified',
+    'please verify your email.': 'errors.server.accountNotVerified',
+    'please verify your email': 'errors.server.accountNotVerified',
+    'google_id_token_error': 'errors.auth.googleTokenError',
+    'invalid credentials.': 'errors.server.invalidCredentials',
+    'invalid credentials': 'errors.server.invalidCredentials',
+    'unauthenticated.': 'errors.server.unauthorized',
+    'unauthenticated': 'errors.server.unauthorized',
+    'unauthorized': 'errors.server.unauthorized',
+    'email already taken': 'errors.server.emailTaken',
+    'email has already been taken': 'errors.server.emailTaken',
+    'the email has already been taken': 'errors.server.emailTaken',
+    'this email is already registered.': 'errors.server.emailTaken',
+    'this email is already registered': 'errors.server.emailTaken',
     'this phone number is already registered.': 'errors.server.phoneTaken',
-    'this phone number is already registered':  'errors.server.phoneTaken',
-    'user not found':                       'errors.server.userNotFound',
-    'wrong password':                       'errors.server.invalidCredentials',
-    'token expired':                        'errors.server.tokenExpired',
-    'token is invalid':                     'errors.server.tokenExpired',
-    'server error':                         'errors.server.internal',
-    'too many requests':                    'errors.server.tooManyRequests',
-    'validation error':                     'errors.server.invalidData',
-    'not found':                            'errors.server.notFound',
-    'forbidden':                            'errors.server.forbidden',
+    'this phone number is already registered': 'errors.server.phoneTaken',
+    'user not found': 'errors.server.userNotFound',
+    'wrong password': 'errors.server.invalidCredentials',
+    'token expired': 'errors.server.tokenExpired',
+    'token is invalid': 'errors.server.tokenExpired',
+    'server error': 'errors.server.internal',
+    'too many requests': 'errors.server.tooManyRequests',
+    'validation error': 'errors.server.invalidData',
+    'not found': 'errors.server.notFound',
+    'forbidden': 'errors.server.forbidden',
   };
 
   static String _translateMessage(String raw) {
@@ -51,7 +50,7 @@ class ErrorHandler {
     return key != null ? key.tr() : raw;
   }
 
-  static Failure  handleException(Object error, [StackTrace? stackTrace]) {
+  static Failure handleException(Object error, [StackTrace? stackTrace]) {
     _logError(error, stackTrace);
 
     if (error is ServerException) {
@@ -76,20 +75,37 @@ class ErrorHandler {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return NetworkFailure('errors.network.timeout'.tr(), ErrorMessages.connectionTimeout);
+        return NetworkFailure(
+          'errors.network.timeout'.tr(),
+          ErrorMessages.connectionTimeout,
+        );
       case DioExceptionType.badResponse:
         return _handleResponseError(error.response);
       case DioExceptionType.cancel:
-        return NetworkFailure('errors.network.cancelled'.tr(), ErrorMessages.nearbyClinicsError);
+        return NetworkFailure(
+          'errors.network.cancelled'.tr(),
+          ErrorMessages.nearbyClinicsError,
+        );
       case DioExceptionType.connectionError:
-        return NetworkFailure('errors.network.connection'.tr(), ErrorMessages.networkError);
+        return NetworkFailure(
+          'errors.network.connection'.tr(),
+          ErrorMessages.networkError,
+        );
       case DioExceptionType.badCertificate:
-        return NetworkFailure('errors.network.certificate'.tr(), 'CERTIFICATE_ERROR');
+        return NetworkFailure(
+          'errors.network.certificate'.tr(),
+          'CERTIFICATE_ERROR',
+        );
       case DioExceptionType.unknown:
-        return NetworkFailure('errors.network.serverConnection'.tr(), 'CONNECTION_ERROR');
+        return NetworkFailure(
+          'errors.network.serverConnection'.tr(),
+          'CONNECTION_ERROR',
+        );
       case DioExceptionType.transformTimeout:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return NetworkFailure(
+          'errors.network.timeout'.tr(),
+          'TRANSFORM_TIMEOUT',
+        );
     }
   }
 
@@ -100,12 +116,14 @@ class ErrorHandler {
 
     final statusCode = response.statusCode ?? 0;
     final rawMessage = _extractErrorMessage(response.data);
-    final message    = _translateMessage(rawMessage);
+    final message = _translateMessage(rawMessage);
 
     switch (statusCode) {
       case 400:
-      // ─── Special case: email not verified ──────────────────────
-        final isNotVerified = rawMessage.toLowerCase().contains('verify your email');
+        // ─── Special case: email not verified ──────────────────────
+        final isNotVerified = rawMessage.toLowerCase().contains(
+          'verify your email',
+        );
         if (isNotVerified) {
           // Extract email from request if available
           final email = _extractEmailFromResponse(response.data);
@@ -143,7 +161,10 @@ class ErrorHandler {
       case 500:
       case 502:
       case 503:
-        return ServerFailure('errors.server.internal'.tr(), ErrorMessages.serverError);
+        return ServerFailure(
+          'errors.server.internal'.tr(),
+          ErrorMessages.serverError,
+        );
 
       default:
         return ServerFailure(
@@ -161,11 +182,11 @@ class ErrorHandler {
     }
     return '';
   }
+
   static String _extractErrorMessage(dynamic data) {
     if (data == null) return '';
 
     if (data is Map<String, dynamic>) {
-
       // ─── message field ────────────────────────────────────────────
       if (data.containsKey('message')) {
         final msg = data['message'];

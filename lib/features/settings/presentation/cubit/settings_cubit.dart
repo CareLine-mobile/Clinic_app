@@ -3,6 +3,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/db/shared_pref_helper.dart';
 import '../../../../core/errors/error_handler.dart';
@@ -12,39 +14,48 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 part 'settings_state.dart';
 
-
-
-
 class SettingsCubit extends Cubit<SettingsState> {
   final SettingsRepositoryImpl _settingsRepo;
 
   SettingsCubit({required SettingsRepositoryImpl settingsRepository})
-      : _settingsRepo = settingsRepository,
-        super(const SettingsState(
-        locale: Locale('ar'),
-        themeMode: ThemeMode.light,
-        notificationsEnabled: false,
-      ));
+    : _settingsRepo = settingsRepository,
+      super(
+        const SettingsState(
+          locale: Locale('ar'),
+          themeMode: ThemeMode.light,
+          notificationsEnabled: false,
+        ),
+      );
 
   // ── Init ─────────────────────────────────────────────────────────────────
 
   Future<void> loadSettings() async {
-    final savedTheme  = await SharedPrefHelper.getString(key: AppConstants.themeMode);
-    final savedLang   = await SharedPrefHelper.getString(key: AppConstants.languageCode);
-    final savedNotifs = await SharedPrefHelper.getBool(key: AppConstants.notifications);
+    final savedTheme = await SharedPrefHelper.getString(
+      key: AppConstants.themeMode,
+    );
+    final savedLang = await SharedPrefHelper.getString(
+      key: AppConstants.languageCode,
+    );
+    final savedNotifs = await SharedPrefHelper.getBool(
+      key: AppConstants.notifications,
+    );
 
-    emit(state.copyWith(
-      themeMode: _parseThemeMode(savedTheme),
-      locale: savedLang != null ? Locale(savedLang) : const Locale('ar'),
-      notificationsEnabled: savedNotifs ?? false,
-      clearError: true,
-    ));
+    emit(
+      state.copyWith(
+        themeMode: _parseThemeMode(savedTheme),
+        locale: savedLang != null ? Locale(savedLang) : const Locale('ar'),
+        notificationsEnabled: savedNotifs ?? false,
+        clearError: true,
+      ),
+    );
 
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-      if (state.notificationsEnabled) {
-        _settingsRepo.registerFcmToken(newToken).ignore();
-      }
-    });
+    if (!kIsWeb && Firebase.apps.isNotEmpty) {
+      FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+        if (state.notificationsEnabled) {
+          _settingsRepo.registerFcmToken(newToken).ignore();
+        }
+      });
+    }
   }
 
   // ── Theme ─────────────────────────────────────────────────────────────────
@@ -73,6 +84,7 @@ class SettingsCubit extends Cubit<SettingsState> {
   // ── Notifications ─────────────────────────────────────────────────────────
 
   Future<void> syncFcmToken() async {
+    if (kIsWeb || Firebase.apps.isEmpty) return;
     if (state.notificationsEnabled) {
       final token = await _settingsRepo.requestPermissionAndGetToken();
       if (token != null) {
@@ -113,11 +125,13 @@ class SettingsCubit extends Cubit<SettingsState> {
 
       if (token == null) {
         // User denied OS permission
-        emit(state.copyWith(
-          notificationsLoading: false,
-          notificationsEnabled: false,
-          notificationsError: 'settings.notifications.permission_denied',
-        ));
+        emit(
+          state.copyWith(
+            notificationsLoading: false,
+            notificationsEnabled: false,
+            notificationsError: 'settings.notifications.permission_denied',
+          ),
+        );
         return;
       }
 
@@ -125,19 +139,23 @@ class SettingsCubit extends Cubit<SettingsState> {
 
       // ✓ Success
       await _persistNotifications(true);
-      emit(state.copyWith(
-        notificationsEnabled: true,
-        notificationsLoading: false,
-        clearError: true,
-      ));
+      emit(
+        state.copyWith(
+          notificationsEnabled: true,
+          notificationsLoading: false,
+          clearError: true,
+        ),
+      );
     } catch (e) {
       // ✗ API failure — revert
       final failure = ErrorHandler.handleException(e);
-      emit(state.copyWith(
-        notificationsEnabled: false,
-        notificationsLoading: false,
-        notificationsError: failure.message,
-      ));
+      emit(
+        state.copyWith(
+          notificationsEnabled: false,
+          notificationsLoading: false,
+          notificationsError: failure.message,
+        ),
+      );
     }
   }
 
@@ -159,10 +177,10 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   ThemeMode _parseThemeMode(String? raw) {
     return switch (raw) {
-      'dark'   => ThemeMode.dark,
-      'light'  => ThemeMode.light,
+      'dark' => ThemeMode.dark,
+      'light' => ThemeMode.light,
       'system' => ThemeMode.system,
-      _        => ThemeMode.light,
+      _ => ThemeMode.light,
     };
   }
 }

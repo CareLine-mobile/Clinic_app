@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import '../../firebase_options.dart';
@@ -12,10 +13,22 @@ class AppInitializer {
     /// Initialize services
     // await Alarm.init(); /// todo:: phase 2
     await _initLanguages();
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    // Web configuration is intentionally optional until Firebase web credentials
+    // are supplied. Other platforms keep their existing initialization path.
+    if (kIsWeb && DefaultFirebaseOptions.hasWebConfiguration) {
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.web);
+    } else if (!kIsWeb) {
+      try {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      } on UnsupportedError {
+        // Firebase is not configured for this native platform yet.
+      }
+    }
+
     /// Initialize dependencies
     await di.init();
-
   }
 
   static Future<void> _initLanguages() async {

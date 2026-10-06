@@ -20,6 +20,8 @@ class UserRepository {
   User? _currentUser;
   User? get currentUser => _currentUser;
   bool get isLoggedIn => _currentUser != null;
+  bool _sessionPersistenceFailed = false;
+  bool get sessionPersistenceFailed => _sessionPersistenceFailed;
 
   // ── Lifecycle ────────────────────────────────────────────
 
@@ -27,10 +29,10 @@ class UserRepository {
   Future<void> loadUser() async {
     // getJson returns Map<String, dynamic>? directly — no type casting needed
     final json = await SharedPrefHelper.getJson(key: AppConstants.userKey);
+    _sessionPersistenceFailed =
+        SharedPrefHelper.lastSecureStorageFailure != null;
     if (json != null) {
       _currentUser = UserModel.fromJson(json).toEntity();
-      print('${_currentUser!.token}');
-
     }
   }
 
@@ -40,7 +42,7 @@ class UserRepository {
   Future<void> setUser(User user) async {
     _currentUser = user;
     _controller.add(user);
-    await SharedPrefHelper.saveJson(
+    _sessionPersistenceFailed = !await SharedPrefHelper.saveJson(
       key: AppConstants.userKey,
       value: UserModel.fromEntity(user).toJson(),
     );
@@ -56,7 +58,9 @@ class UserRepository {
   /// Update specific fields (e.g. profile edit)
   Future<void> updateUser({String? name, String? phone, String? avatar}) async {
     if (_currentUser == null) return;
-    await setUser(_currentUser!.copyWith(name: name, phone: phone, avatar: avatar));
+    await setUser(
+      _currentUser!.copyWith(name: name, phone: phone, avatar: avatar),
+    );
   }
 
   void dispose() => _controller.close();

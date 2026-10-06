@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,6 +13,14 @@ import '../utils/app_constans.dart';
 ///  • [_secure]  — FlutterSecureStorage  → sensitive data (token, user JSON)
 ///  • [_prefs]   — SharedPreferences     → non-sensitive settings (theme, lang, notifs)
 class SharedPrefHelper {
+  /// Last secure-storage failure for diagnostics; sensitive values are never logged.
+  static Object? lastSecureStorageFailure;
+
+  static void _recordSecureStorageFailure(String operation, Object error) {
+    lastSecureStorageFailure = error;
+    debugPrint('Secure storage $operation failed: $error');
+  }
+
   // ── Secure storage (encrypted) ────────────────────────────
   static const FlutterSecureStorage _secure = FlutterSecureStorage(
     aOptions: AndroidOptions(),
@@ -25,8 +34,6 @@ class SharedPrefHelper {
   // SECURE — JSON (user data, tokens)
   // ══════════════════════════════════════════════════════════
 
-
-
   // ══════════════════════════════════════════════════════════
   // SECURE — JSON (user data, tokens)
   // ══════════════════════════════════════════════════════════
@@ -37,8 +44,10 @@ class SharedPrefHelper {
   }) async {
     try {
       await _secure.write(key: key, value: jsonEncode(value));
+      lastSecureStorageFailure = null;
       return true;
-    } catch (_) {
+    } catch (error) {
+      _recordSecureStorageFailure('write', error);
       return false;
     }
   }
@@ -46,11 +55,13 @@ class SharedPrefHelper {
   static Future<Map<String, dynamic>?> getJson({required String key}) async {
     try {
       final raw = await _secure.read(key: key);
+      lastSecureStorageFailure = null;
       if (raw != null && raw.isNotEmpty) {
         return jsonDecode(raw) as Map<String, dynamic>;
       }
       return null;
-    } catch (_) {
+    } catch (error) {
+      _recordSecureStorageFailure('read', error);
       return null;
     }
   }
@@ -60,7 +71,8 @@ class SharedPrefHelper {
       final json = await getJson(key: AppConstants.userKey);
       if (json != null) return UserModel.fromJson(json);
       return null;
-    } catch (_) {
+    } catch (error) {
+      _recordSecureStorageFailure('read', error);
       return null;
     }
   }
@@ -69,8 +81,11 @@ class SharedPrefHelper {
 
   static Future<String?> getSecureString({required String key}) async {
     try {
-      return await _secure.read(key: key);
-    } catch (_) {
+      final value = await _secure.read(key: key);
+      lastSecureStorageFailure = null;
+      return value;
+    } catch (error) {
+      _recordSecureStorageFailure('read', error);
       return null;
     }
   }
@@ -81,7 +96,10 @@ class SharedPrefHelper {
   }) async {
     try {
       await _secure.write(key: key, value: value);
-    } catch (_) {}
+      lastSecureStorageFailure = null;
+    } catch (error) {
+      _recordSecureStorageFailure('write', error);
+    }
   }
 
   // ── Secure — Delete ───────────────────────────────────────
@@ -89,7 +107,10 @@ class SharedPrefHelper {
   static Future<void> delete({required String key}) async {
     try {
       await _secure.delete(key: key);
-    } catch (_) {}
+      lastSecureStorageFailure = null;
+    } catch (error) {
+      _recordSecureStorageFailure('delete', error);
+    }
   }
 
   static Future<void> clearAll() async {
@@ -97,13 +118,19 @@ class SharedPrefHelper {
       await _secure.deleteAll();
       final prefs = await _prefs;
       await prefs.clear();
-    } catch (_) {}
+      lastSecureStorageFailure = null;
+    } catch (error) {
+      _recordSecureStorageFailure('clear', error);
+    }
   }
 
   static Future<bool> containsKey({required String key}) async {
     try {
-      return await _secure.containsKey(key: key);
-    } catch (_) {
+      final exists = await _secure.containsKey(key: key);
+      lastSecureStorageFailure = null;
+      return exists;
+    } catch (error) {
+      _recordSecureStorageFailure('containsKey', error);
       return false;
     }
   }
@@ -158,10 +185,7 @@ class SharedPrefHelper {
   // PLAIN — Int  (future use)
   // ══════════════════════════════════════════════════════════
 
-  static Future<void> saveInt({
-    required String key,
-    required int value,
-  }) async {
+  static Future<void> saveInt({required String key, required int value}) async {
     try {
       final prefs = await _prefs;
       await prefs.setInt(key, value);
