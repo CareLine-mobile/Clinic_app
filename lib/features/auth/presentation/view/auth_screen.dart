@@ -3,33 +3,55 @@
 // lib/features/auth/presentation/screens/auth_screen.dart
 // ============================================
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/utils/app_size.dart';
 import '../../../../core/utils/assets.dart';
 import '../../../../core/widgets/CustomIcon.dart';
+import '../../../../core/routes/routes.dart';
+import '../widget/auth_responsive_shell.dart';
 import '../widget/auth_tab_selector.dart';
 import '../widget/auth_title.dart';
 import '../widget/taps/login_tab.dart';
 import '../widget/taps/signup_tab.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({Key? key}) : super(key: key);
+  final String? initialMessage;
+  final bool redirectToAuth;
+  const AuthScreen({Key? key, this.initialMessage, this.redirectToAuth = false})
+    : super(key: key);
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateMixin {
+class _AuthScreenState extends State<AuthScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final ValueNotifier<bool> _isLoginNotifier = ValueNotifier(true);
   AppSizeHorizontal appSizeHorizontal = AppSizeHorizontal.instance;
   AppSizeVertical appSizeVertical = AppSizeVertical.instance;
-
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabChange);
+    if (widget.initialMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(widget.initialMessage!.tr())));
+          if (widget.redirectToAuth) {
+            Navigator.of(context).pushReplacementNamed(Routes.auth);
+          }
+        }
+      });
+    } else if (widget.redirectToAuth) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) Navigator.of(context).pushReplacementNamed(Routes.auth);
+      });
+    }
   }
 
   void _handleTabChange() {
@@ -48,53 +70,42 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: appSizeHorizontal.s24),
-              child: ConstrainedBox(
-                constraints:  BoxConstraints(maxWidth: appSizeHorizontal.s400),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                     SizedBox(height: appSizeVertical.s24),
-                    CustomIcon(assetPath: Assets.logoApp,isImage: true,size: appSizeVertical.logoSize,),
-                    SizedBox(height: appSizeVertical.s24),
-                    ValueListenableBuilder<bool>(
-                      valueListenable: _isLoginNotifier,
-                      builder: (context, isLogin, child) {
-                        return AuthTitle(isLogin: isLogin);
-                      },
-                    ),
-                     SizedBox(height: appSizeVertical.s32),
-                    AuthTabSelector(controller: _tabController),
-                    SizedBox(height: appSizeVertical.s24),
-                    SizedBox(
-                      height: 480, // Fixed height for better performance
-                      child: TabBarView(
-                        controller: _tabController,
-                        physics: const NeverScrollableScrollPhysics(), // Disable swipe for better UX
-                        children: const [
-                          LoginTab(),
-                          SignupTab(),
-                        ],
-                      ),
-                    ),
-                  ],
+        child: AuthResponsiveShell(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(height: appSizeVertical.s24),
+              CustomIcon(
+                assetPath: Assets.logoApp,
+                isImage: true,
+                size: appSizeVertical.logoSize,
+              ),
+              SizedBox(height: appSizeVertical.s24),
+              ValueListenableBuilder<bool>(
+                valueListenable: _isLoginNotifier,
+                builder: (context, isLogin, child) =>
+                    AuthTitle(isLogin: isLogin),
+              ),
+              SizedBox(height: appSizeVertical.s32),
+              AuthTabSelector(controller: _tabController),
+              SizedBox(height: appSizeVertical.s24),
+              ValueListenableBuilder<bool>(
+                valueListenable: _isLoginNotifier,
+                builder: (context, isLogin, _) => AnimatedSize(
+                  duration: const Duration(milliseconds: 220),
+                  alignment: Alignment.topCenter,
+                  child: KeyedSubtree(
+                    key: ValueKey(isLogin),
+                    child: isLogin ? const LoginTab() : const SignupTab(),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
+      ),
     );
   }
 }
-
-
-
-
-
-
-

@@ -1,5 +1,6 @@
 // lib/features/auth/presentation/pages/reset_password_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:clinic_app/core/widgets/app_buton.dart';
@@ -8,6 +9,7 @@ import 'package:clinic_app/core/widgets/custom_app_bar.dart';
 import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/core/utils/validators.dart';
+import '../widget/auth_responsive_shell.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 
@@ -24,18 +26,23 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final _otpController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
+  final _otpFocus = FocusNode();
+  final _passwordFocus = FocusNode();
+  final _confirmFocus = FocusNode();
 
   @override
   void dispose() {
-
     _otpController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
+    _otpFocus.dispose();
+    _passwordFocus.dispose();
+    _confirmFocus.dispose();
     super.dispose();
   }
 
-
   void _handleReset() {
+    if (context.read<AuthCubit>().state is ResetPasswordLoading) return;
     if (!_formKey.currentState!.validate()) return;
     context.read<AuthCubit>().resetPassword(
       email: widget.email,
@@ -48,7 +55,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     return BlocListener<AuthCubit, AuthState>(
       listenWhen: (_, current) =>
-      current is ResetPasswordSuccess ||
+          current is ResetPasswordSuccess ||
           current is ResetPasswordFailure ||
           current is ForgotPasswordSuccess ||
           current is ForgotPasswordFailure,
@@ -59,8 +66,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             message: 'auth.resetPassword.success'.tr(),
             type: SnackBarType.success,
           );
-          Navigator.pushNamedAndRemoveUntil(
-              context, Routes.auth, (_) => false);
+          Navigator.pushNamedAndRemoveUntil(context, Routes.auth, (_) => false);
         } else if (state is ResetPasswordFailure) {
           CustomSnackBar.show(
             context,
@@ -85,74 +91,83 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       child: Scaffold(
         appBar: CustomAppBar(title: 'auth.resetPassword.title'.tr()),
         body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 400),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _ResetHeader(email: widget.email),
-                      const SizedBox(height: 32),
+          child: AuthResponsiveShell(
+            child: AutofillGroup(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _ResetHeader(email: widget.email),
+                    const SizedBox(height: 32),
 
-                      // ─── OTP text field ──────────────────────────────
-                      AppTextField(
-                        controller: _otpController,
-                        hintText: 'auth.resetPassword.subtitle'.tr(),
-                        keyboardType: TextInputType.number,
-                        prefixIcon: Icon(
-                          Icons.pin_outlined,
-                          color: Colors.grey.shade500,
-                          size: 20,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'auth.resetPassword.otpRequired'.tr();
-                          }
-                          if (value.length != 6) {
-                            return 'auth.resetPassword.otpInvalid'.tr();
-                          }
-                          return null;
-                        },
+                    // ─── OTP text field ──────────────────────────────
+                    AppTextField(
+                      controller: _otpController,
+                      focusNode: _otpFocus,
+                      autofillHints: const [AutofillHints.oneTimeCode],
+                      textInputAction: TextInputAction.next,
+                      onSubmitted: (_) => _passwordFocus.requestFocus(),
+                      hintText: 'auth.resetPassword.subtitle'.tr(),
+                      keyboardType: TextInputType.number,
+                      maxLength: 6,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      prefixIcon: Icon(
+                        Icons.pin_outlined,
+                        color: Colors.grey.shade500,
+                        size: 20,
                       ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'auth.resetPassword.otpRequired'.tr();
+                        }
+                        if (value.length != 6) {
+                          return 'auth.resetPassword.otpInvalid'.tr();
+                        }
+                        return null;
+                      },
+                    ),
 
-                      const SizedBox(height: 16),
-                      // ─── New password ────────────────────────────────
-                      AppTextFieldFactory.password(
-                        controller: _passwordController,
-                        hintText: 'auth.resetPassword.newPassword'.tr(),
-                        validator: Validators.validatePassword,
-                      ),
-                      const SizedBox(height: 16),
+                    const SizedBox(height: 16),
+                    // ─── New password ────────────────────────────────
+                    AppTextFieldFactory.password(
+                      controller: _passwordController,
+                      focusNode: _passwordFocus,
+                      autofillHints: const [AutofillHints.newPassword],
+                      textInputAction: TextInputAction.next,
+                      onSubmitted: (_) => _confirmFocus.requestFocus(),
+                      hintText: 'auth.resetPassword.newPassword'.tr(),
+                      validator: Validators.validatePassword,
+                    ),
+                    const SizedBox(height: 16),
 
-                      // ─── Confirm password ────────────────────────────
-                      AppTextFieldFactory.password(
-                        controller: _confirmController,
-                        hintText: 'auth.confirmPassword'.tr(),
-                        validator: Validators.validateConfirmPassword(
-                              () => _passwordController.text,
-                        ),
+                    // ─── Confirm password ────────────────────────────
+                    AppTextFieldFactory.password(
+                      controller: _confirmController,
+                      focusNode: _confirmFocus,
+                      autofillHints: const [AutofillHints.newPassword],
+                      onSubmitted: (_) => _handleReset(),
+                      hintText: 'auth.confirmPassword'.tr(),
+                      validator: Validators.validateConfirmPassword(
+                        () => _passwordController.text,
                       ),
-                      const SizedBox(height: 28),
+                    ),
+                    const SizedBox(height: 28),
 
-                      // ─── Submit ──────────────────────────────────────
-                      BlocBuilder<AuthCubit, AuthState>(
-                        builder: (context, state) {
-                          final isLoading = state is ResetPasswordLoading;
-                          return AppButton(
-                            text: 'auth.resetPassword.submit'.tr(),
-                            onPressed: isLoading ? null : _handleReset,
-                            isLoading: isLoading,
-                            horizontalPadding: 0,
-                            verticalPadding: 0,
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                    // ─── Submit ──────────────────────────────────────
+                    BlocBuilder<AuthCubit, AuthState>(
+                      builder: (context, state) {
+                        final isLoading = state is ResetPasswordLoading;
+                        return AppButton(
+                          text: 'auth.resetPassword.submit'.tr(),
+                          onPressed: isLoading ? null : _handleReset,
+                          isLoading: isLoading,
+                          horizontalPadding: 0,
+                          verticalPadding: 0,
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -190,15 +205,17 @@ class _ResetHeader extends StatelessWidget {
         const SizedBox(height: 16),
         Text(
           'auth.resetPassword.headline'.tr(),
-          style: theme.textTheme.headlineSmall
-              ?.copyWith(fontWeight: FontWeight.bold),
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
         Text(
           'auth.resetPassword.subtitle'.tr(),
-          style: theme.textTheme.bodyMedium
-              ?.copyWith(color: Colors.grey.shade600),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: Colors.grey.shade600,
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 4),

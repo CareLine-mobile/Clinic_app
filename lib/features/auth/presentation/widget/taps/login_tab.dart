@@ -3,6 +3,7 @@
 import 'package:clinic_app/core/utils/assets.dart';
 import 'package:clinic_app/core/widgets/CustomIcon.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:clinic_app/core/theme/colors.dart';
@@ -15,6 +16,7 @@ import 'package:clinic_app/core/utils/app_size.dart';
 import '../../cubit/auth_cubit.dart';
 import '../../cubit/auth_state.dart';
 import 'package:clinic_app/features/settings/presentation/cubit/settings_cubit.dart';
+import 'package:clinic_app/features/user_data/user_repo.dart';
 
 class LoginTab extends StatefulWidget {
   const LoginTab({Key? key}) : super(key: key);
@@ -27,6 +29,10 @@ class _LoginTabState extends State<LoginTab> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _emailFocus = FocusNode();
+  final _passwordFocus = FocusNode();
+  bool _submitted = false;
+  bool _storageWarningShown = false;
 
   final _v = AppSizeVertical.instance;
   final _h = AppSizeHorizontal.instance;
@@ -36,16 +42,17 @@ class _LoginTabState extends State<LoginTab> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-
-    return Form(
-      key: _formKey,
-      child: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
+    return AutofillGroup(
+      onDisposeAction: AutofillContextAction.commit,
+      child: Form(
+        key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -53,19 +60,26 @@ class _LoginTabState extends State<LoginTab> {
             AppTextFieldFactory.email(
               controller: _emailController,
               hintText: 'auth.email'.tr(),
+              autofillHints: const [AutofillHints.email],
+              focusNode: _emailFocus,
+              onSubmitted: (_) => _passwordFocus.requestFocus(),
               validator: Validators.validateEmail,
             ),
             SizedBox(height: _v.s16),
             AppTextFieldFactory.password(
               controller: _passwordController,
               hintText: 'auth.password'.tr(),
+              autofillHints: const [AutofillHints.password],
+              focusNode: _passwordFocus,
+              onSubmitted: (_) => _handleLogin(),
               validator: Validators.validatePassword,
             ),
             SizedBox(height: _v.s12),
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
-                onPressed: () => Navigator.pushNamed(context, Routes.forgotPassword),
+                onPressed: () =>
+                    Navigator.pushNamed(context, Routes.forgotPassword),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: _h.s8),
                   minimumSize: Size.zero,
@@ -98,24 +112,27 @@ class _LoginTabState extends State<LoginTab> {
   Widget _buildLoginButton() {
     return BlocConsumer<AuthCubit, AuthState>(
       listenWhen: (_, current) =>
-      current is AuthFailure ||
+          current is AuthFailure ||
           current is LoginSuccess ||
           current is AccountNotVerified,
       listener: (context, state) {
         if (state is AuthFailure) {
+          _submitted = false;
           _showErrorSnackBar(state.message);
         } else if (state is LoginSuccess) {
+          TextInput.finishAutofillContext(shouldSave: true);
+          _showStorageWarning();
           context.read<SettingsCubit>().syncFcmToken();
           Navigator.pushNamedAndRemoveUntil(
-              context, Routes.dashBoard, (_) => false);
+            context,
+            Routes.dashBoard,
+            (_) => false,
+          );
         } else if (state is AccountNotVerified) {
+          _submitted = false;
           Navigator.pushNamed(
             context,
-            Routes.verification,
-            arguments: {
-              'email': state.email,
-              'cubit': context.read<AuthCubit>(),
-            },
+            '${Routes.verification}?email=${Uri.encodeQueryComponent(state.email)}',
           );
         }
       },
@@ -135,14 +152,19 @@ class _LoginTabState extends State<LoginTab> {
   Widget _buildGoogleSignInButton() {
     return BlocConsumer<AuthCubit, AuthState>(
       listenWhen: (_, current) =>
-      current is AuthFailure || current is LoginSuccess,
+          current is AuthFailure || current is LoginSuccess,
       listener: (context, state) {
         if (state is AuthFailure) {
           _showErrorSnackBar(state.message);
         } else if (state is LoginSuccess) {
+          TextInput.finishAutofillContext(shouldSave: true);
+          _showStorageWarning();
           context.read<SettingsCubit>().syncFcmToken();
           Navigator.pushNamedAndRemoveUntil(
-              context, Routes.dashBoard, (_) => false);
+            context,
+            Routes.dashBoard,
+            (_) => false,
+          );
         }
       },
       builder: (context, state) {
@@ -190,22 +212,29 @@ class _LoginTabState extends State<LoginTab> {
     return AppOutlinedButton(
       text: 'auth.continueAsGuest'.tr(),
       onPressed: () => Navigator.pushNamedAndRemoveUntil(
-          context, Routes.dashBoard, (_) => false),
+        context,
+        Routes.dashBoard,
+        (_) => false,
+      ),
       horizontalPadding: 0,
       verticalPadding: 0,
-      leadingWidget: CustomIcon(
-        assetPath: Assets.personIcon,
-        size: _h.s20,
-      ),
+      leadingWidget: CustomIcon(assetPath: Assets.personIcon, size: _h.s20),
     );
   }
 
   void _handleLogin() {
+    final state = context.read<AuthCubit>().state;
+    if (_submitted || state is AuthLoading || state is GoogleLoginLoading) {
+      return;
+    }
     if (_formKey.currentState!.validate()) {
+      _submitted = true;
       context.read<AuthCubit>().login(
         _emailController.text.trim(),
         _passwordController.text,
       );
+    } else {
+      _submitted = false;
     }
   }
 
@@ -215,5 +244,17 @@ class _LoginTabState extends State<LoginTab> {
 
   void _showErrorSnackBar(String message) {
     CustomSnackBar.show(context, message: message, type: SnackBarType.error);
+  }
+
+  void _showStorageWarning() {
+    if (_storageWarningShown || !UserRepository().sessionPersistenceFailed) {
+      return;
+    }
+    _storageWarningShown = true;
+    CustomSnackBar.show(
+      context,
+      message: 'auth.storageUnavailable'.tr(),
+      type: SnackBarType.error,
+    );
   }
 }

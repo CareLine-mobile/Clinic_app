@@ -2,6 +2,7 @@ import 'package:clinic_app/core/api/base_api_services.dart';
 import 'package:dartz/dartz.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../../../core/api/model/endpoints.dart';
 import '../../../../core/api/model/http_method.dart';
@@ -60,14 +61,26 @@ class AuthRepositoryImpl implements AuthRepository {
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
       if (googleUser == null) {
-        return Left(ServerFailure(
-          'errors.network.cancelled'.tr(),
-          'CANCELLED',
-        ));
+        return Left(
+          ServerFailure('errors.network.cancelled'.tr(), 'CANCELLED'),
+        );
       }
 
       final GoogleSignInAuthentication googleAuth =
-      await googleUser.authentication;
+          await googleUser.authentication;
+
+      // The CareLine API's google-login contract currently accepts an ID token.
+      // An access token is not interchangeable unless the backend adds support.
+      if (kIsWeb &&
+          (googleAuth.idToken == null || googleAuth.idToken!.isEmpty)) {
+        return Left(
+          ServerFailure(
+            (kIsWeb ? 'auth.googleWebTokenMissing' : 'auth.googleSignInFailed')
+                .tr(),
+            'GOOGLE_ID_TOKEN_MISSING',
+          ),
+        );
+      }
 
       final response = await apiServices.request(
         method: HttpMethod.post,
@@ -86,20 +99,20 @@ class AuthRepositoryImpl implements AuthRepository {
         return Right(authResponse.user!.toEntity());
       }
 
-      return Left(ServerFailure(
-        authResponse.message.isNotEmpty
-            ? authResponse.message
-            : 'errors.server.unexpected'.tr(),
-        'GOOGLE_LOGIN_FAILED',
-      ));
-
+      return Left(
+        ServerFailure(
+          authResponse.message.isNotEmpty
+              ? authResponse.message
+              : 'errors.server.unexpected'.tr(),
+          'GOOGLE_LOGIN_FAILED',
+        ),
+      );
     } catch (e) {
       // لو المستخدم كنسل من غير ما يختار حساب
       if (e is PlatformException && e.code == 'CANCELLED') {
-        return Left(ServerFailure(
-          'errors.network.cancelled'.tr(),
-          'CANCELLED',
-        ));
+        return Left(
+          ServerFailure('errors.network.cancelled'.tr(), 'CANCELLED'),
+        );
       }
 
       // باقي الـ errors يروا على ErrorHandler
@@ -134,14 +147,15 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       throw ServerException(
-        authResponse.message.isNotEmpty ? authResponse.message : 'Signup failed',
+        authResponse.message.isNotEmpty
+            ? authResponse.message
+            : 'Signup failed',
         'SIGNUP_FAILED',
       );
     } catch (e) {
       return Left(ErrorHandler.handleException(e));
     }
   }
-
 
   @override
   Future<Either<Failure, User>> verifyOtp({
@@ -173,9 +187,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> reSendOtp({
-    required String email,
-  }) async {
+  Future<Either<Failure, void>> reSendOtp({required String email}) async {
     try {
       await apiServices.request(
         method: HttpMethod.post,
@@ -188,7 +200,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-// ─── Forgot Password — بيبعت OTP على الإيميل ────────────────────────────
+  // ─── Forgot Password — بيبعت OTP على الإيميل ────────────────────────────
   @override
   Future<Either<Failure, void>> sendForgotPassword({
     required String email,
@@ -207,7 +219,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-// ─── Reset Password — بيستقبل email + otp + password ────────────────────
+  // ─── Reset Password — بيستقبل email + otp + password ────────────────────
   @override
   Future<Either<Failure, void>> resetPassword({
     required String email,
@@ -230,15 +242,18 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(ErrorHandler.handleException(e));
     }
   }
+
   @override
   Future<void> logout() async {
     await apiServices.request(method: HttpMethod.post, url: Endpoints.logout);
   }
 
   @override
-  Future<void> deleteAccount() async{
+  Future<void> deleteAccount() async {
     await Future.delayed(const Duration(seconds: 4));
-    await apiServices.request(method: HttpMethod.delete, url: Endpoints.deleteAccount);
+    await apiServices.request(
+      method: HttpMethod.delete,
+      url: Endpoints.deleteAccount,
+    );
   }
-
 }

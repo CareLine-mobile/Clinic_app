@@ -7,6 +7,7 @@ import 'package:clinic_app/core/widgets/custom_app_bar.dart';
 import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/core/utils/validators.dart';
+import '../widget/auth_responsive_shell.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 
@@ -38,6 +39,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   void _handleSend() {
+    if (context.read<AuthCubit>().state is ForgotPasswordLoading) return;
     if (!_formKey.currentState!.validate()) return;
     context.read<AuthCubit>().sendForgotPassword(
       email: _emailController.text.trim(),
@@ -48,13 +50,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return BlocListener<AuthCubit, AuthState>(
       listenWhen: (_, current) =>
-      current is ForgotPasswordSuccess || current is ForgotPasswordFailure,
+          current is ForgotPasswordSuccess || current is ForgotPasswordFailure,
       listener: (context, state) {
         if (state is ForgotPasswordSuccess) {
           Navigator.pushNamed(
             context,
-            Routes.resetPassword,
-            arguments: state.email,
+            '${Routes.resetPassword}?email=${Uri.encodeQueryComponent(state.email)}',
           );
         } else if (state is ForgotPasswordFailure) {
           CustomSnackBar.show(
@@ -68,54 +69,46 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: CustomAppBar(title: 'auth.forgotPassword.title'.tr()),
         body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 400),
+          child: AuthResponsiveShell(
+            child: AutofillGroup(
+              child: Form(
+                key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     _ForgotHeader(),
                     const SizedBox(height: 32),
-                    Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          AppTextFieldFactory.email(
-                            controller: _emailController,
-                            hintText: 'auth.email'.tr(),
-                            validator: Validators.validateEmail,
-                            readOnly: _isLoggedIn,
-                          ),
-                          const SizedBox(height: 24),
-
-                          BlocBuilder<AuthCubit, AuthState>(
-                            builder: (context, state) {
-                              final isLoading = state is ForgotPasswordLoading;
-                              return AppButton(
-                                text: 'auth.forgotPassword.send'.tr(),
-                                onPressed: isLoading ? null : _handleSend,
-                                isLoading: isLoading,
-                                horizontalPadding: 0,
-                                verticalPadding: 0,
-                              );
-                            },
-                          ),
-                          if (!_isLoggedIn) ...[
-                            const SizedBox(height: 16),
-                            AppOutlinedButton(
-                              text: 'auth.forgotPassword.backToLogin'.tr(),
-                              leadingIcon: Icons.arrow_back_rounded,
-                              onPressed: () => Navigator.pop(context),
-                              horizontalPadding: 0,
-                              verticalPadding: 0,
-                            ),
-                          ],
-                        ],
-                      ),
+                    AppTextFieldFactory.email(
+                      controller: _emailController,
+                      hintText: 'auth.email'.tr(),
+                      autofillHints: const [AutofillHints.email],
+                      validator: Validators.validateEmail,
+                      readOnly: _isLoggedIn,
+                      onSubmitted: (_) => _handleSend(),
                     ),
+                    const SizedBox(height: 24),
+                    BlocBuilder<AuthCubit, AuthState>(
+                      builder: (context, state) {
+                        final isLoading = state is ForgotPasswordLoading;
+                        return AppButton(
+                          text: 'auth.forgotPassword.send'.tr(),
+                          onPressed: isLoading ? null : _handleSend,
+                          isLoading: isLoading,
+                          horizontalPadding: 0,
+                          verticalPadding: 0,
+                        );
+                      },
+                    ),
+                    if (!_isLoggedIn) ...[
+                      const SizedBox(height: 16),
+                      AppOutlinedButton(
+                        text: 'auth.forgotPassword.backToLogin'.tr(),
+                        leadingIcon: Icons.arrow_back_rounded,
+                        onPressed: () => Navigator.pop(context),
+                        horizontalPadding: 0,
+                        verticalPadding: 0,
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -149,15 +142,17 @@ class _ForgotHeader extends StatelessWidget {
         const SizedBox(height: 16),
         Text(
           'auth.forgotPassword.headline'.tr(),
-          style: theme.textTheme.headlineSmall
-              ?.copyWith(fontWeight: FontWeight.bold),
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
         Text(
           'auth.forgotPassword.subtitle'.tr(),
-          style: theme.textTheme.bodyMedium
-              ?.copyWith(color: Colors.grey.shade600),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: Colors.grey.shade600,
+          ),
           textAlign: TextAlign.center,
         ),
       ],

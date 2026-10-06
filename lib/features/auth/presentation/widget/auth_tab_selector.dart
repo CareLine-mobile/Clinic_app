@@ -15,10 +15,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class AuthTabSelector extends StatelessWidget {
   final TabController controller;
 
-  const AuthTabSelector({
-    Key? key,
-    required this.controller,
-  }) : super(key: key);
+  const AuthTabSelector({Key? key, required this.controller}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +43,7 @@ class AuthTabSelector extends StatelessWidget {
     // so we set a comfortable MAX size and let it shrink when needed.
     final baseStyle = TextStyle(
       fontFamily: 'Poppins',
-      fontSize: 15.sp,   // maximum size — FittedBox shrinks below this if needed
+      fontSize: 15.sp, // maximum size — FittedBox shrinks below this if needed
     );
 
     return Container(
@@ -57,6 +54,7 @@ class AuthTabSelector extends StatelessWidget {
       ),
       child: TabBar(
         controller: controller,
+        mouseCursor: SystemMouseCursors.click,
         indicator: BoxDecoration(
           color: indicatorColor,
           borderRadius: BorderRadius.circular(10.r),
@@ -105,12 +103,8 @@ class _FitTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tab(
       child: FittedBox(
-        fit: BoxFit.scaleDown,   // shrinks only when necessary, never upscales
-        child: Text(
-          label,
-          maxLines: 1,
-          softWrap: false,
-        ),
+        fit: BoxFit.scaleDown, // shrinks only when necessary, never upscales
+        child: Text(label, maxLines: 1, softWrap: false),
       ),
     );
   }

@@ -4,8 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:clinic_app/core/theme/colors.dart';
 import '../utils/app_size.dart';
 
-
-
 class AppTextField extends StatefulWidget {
   // Basic text field properties
   final String hintText;
@@ -25,6 +23,7 @@ class AppTextField extends StatefulWidget {
   // Input properties
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
+  final Iterable<String>? autofillHints;
   final List<TextInputFormatter>? inputFormatters;
   final int? maxLines;
   final int? minLines;
@@ -86,6 +85,7 @@ class AppTextField extends StatefulWidget {
     // Input properties
     this.keyboardType,
     this.textInputAction,
+    this.autofillHints,
     this.inputFormatters,
     this.maxLines = 1,
     this.minLines,
@@ -225,8 +225,7 @@ class _AppTextFieldState extends State<AppTextField> {
       padding: EdgeInsets.only(bottom: widget.titleSpacing),
       child: Text(
         widget.title!,
-        style: widget.titleStyle ??
-            Theme.of(context).textTheme.titleSmall,
+        style: widget.titleStyle ?? Theme.of(context).textTheme.titleSmall,
       ),
     );
   }
@@ -234,36 +233,45 @@ class _AppTextFieldState extends State<AppTextField> {
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final defaultFillColor = widget.fillColor ?? Theme.of(context).scaffoldBackgroundColor;
-    final defaultFocusedFillColor = widget.focusedFillColor ?? const Color(0x4CDBDADA);
+    final defaultFillColor =
+        widget.fillColor ?? Theme.of(context).scaffoldBackgroundColor;
+    final defaultFocusedFillColor =
+        widget.focusedFillColor ?? const Color(0x4CDBDADA);
     final defaultBorderColor = widget.borderColor ?? const Color(0xff8692A6);
-    final defaultFocusedBorderColor = widget.focusedBorderColor ?? ColorsManager.primaryColor;
-    final defaultErrorBorderColor = widget.errorBorderColor ?? ColorsManager.errorFill;
-    final defaultTextColor = widget.textColor ??( isDarkMode ?Colors.white: Colors.black);
+    final defaultFocusedBorderColor =
+        widget.focusedBorderColor ?? ColorsManager.primaryColor;
+    final defaultErrorBorderColor =
+        widget.errorBorderColor ?? ColorsManager.errorFill;
+    final defaultTextColor =
+        widget.textColor ?? (isDarkMode ? Colors.white : Colors.black);
     final defaultHintColor = widget.hintColor ?? Colors.grey;
     final defaultFocusedHintColor = widget.focusedHintColor ?? Colors.grey;
     final defaultCursorColor = widget.cursorColor ?? ColorsManager.primaryColor;
     final defaultBorderRadius = widget.borderRadius ?? SizeApp.radiusSmall;
     final defaultBorderWidth = widget.borderWidth ?? 0.42;
-    final defaultContentPadding = widget.contentPadding ?? const EdgeInsets.symmetric(
-      vertical: 12,
-      horizontal: 16,
-    );
+    final defaultContentPadding =
+        widget.contentPadding ??
+        const EdgeInsets.symmetric(vertical: 12, horizontal: 16);
 
     // Choose fill color based on focus state
-    final currentFillColor = _isFocused ? defaultFocusedFillColor : defaultFillColor;
+    final currentFillColor = _isFocused
+        ? defaultFocusedFillColor
+        : defaultFillColor;
 
     // Choose hint color based on focus state
-    final currentHintColor = _isFocused ? defaultFocusedHintColor : defaultHintColor;
+    final currentHintColor = _isFocused
+        ? defaultFocusedHintColor
+        : defaultHintColor;
 
     Widget textField = TextFormField(
       controller: widget.controller,
       obscureText: widget.keyboardType == TextInputType.visiblePassword
-          ? !_isPasswordVisible  // Use toggle state for password fields
-          : widget.obscureText,  // Use original value for non-password fields
+          ? !_isPasswordVisible // Use toggle state for password fields
+          : widget.obscureText, // Use original value for non-password fields
       cursorColor: defaultCursorColor,
       keyboardType: widget.keyboardType,
       textInputAction: widget.textInputAction,
+      autofillHints: widget.autofillHints,
       inputFormatters: widget.inputFormatters,
       maxLines: widget.maxLines,
       minLines: widget.minLines,
@@ -280,18 +288,21 @@ class _AppTextFieldState extends State<AppTextField> {
       onEditingComplete: widget.onEditingComplete,
       decoration: InputDecoration(
         labelText: widget.labelText,
-        labelStyle: widget.labelStyle ??
-            Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: widget.labelColor,
-            ),
+        labelStyle:
+            widget.labelStyle ??
+            Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: widget.labelColor),
         hintText: widget.hintText,
-        hintStyle: widget.hintStyle ??
+        hintStyle:
+            widget.hintStyle ??
             Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontSize: 13.33.sp,
               color: currentHintColor,
             ),
         prefixIcon: widget.prefixIcon,
-        suffixIcon: _buildSuffixIcon(), // This will now handle password visibility
+        suffixIcon:
+            _buildSuffixIcon(), // This will now handle password visibility
         prefixText: widget.prefixText,
         suffixText: widget.suffixText,
         filled: true,
@@ -305,14 +316,18 @@ class _AppTextFieldState extends State<AppTextField> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(defaultBorderRadius),
           borderSide: BorderSide(
-            color: widget.hasError ? defaultErrorBorderColor : defaultBorderColor,
+            color: widget.hasError
+                ? defaultErrorBorderColor
+                : defaultBorderColor,
             width: defaultBorderWidth,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(defaultBorderRadius),
           borderSide: BorderSide(
-            color: widget.hasError ? defaultErrorBorderColor : defaultFocusedBorderColor,
+            color: widget.hasError
+                ? defaultErrorBorderColor
+                : defaultFocusedBorderColor,
             width: 1,
           ),
         ),
@@ -325,33 +340,28 @@ class _AppTextFieldState extends State<AppTextField> {
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(defaultBorderRadius),
-          borderSide: BorderSide(
-            color: defaultErrorBorderColor,
-            width: 2,
-          ),
+          borderSide: BorderSide(color: defaultErrorBorderColor, width: 2),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(defaultBorderRadius),
           borderSide: BorderSide(
-            color: widget.isDropMenu ? defaultBorderColor : Colors.grey.withOpacity(0.3),
+            color: widget.isDropMenu
+                ? defaultBorderColor
+                : Colors.grey.withOpacity(0.3),
             width: defaultBorderWidth,
           ),
         ),
         errorText: widget.errorText,
-        errorStyle: widget.errorStyle ?? TextStyle(
-            color: defaultErrorBorderColor
-        ),
+        errorStyle:
+            widget.errorStyle ?? TextStyle(color: defaultErrorBorderColor),
         contentPadding: defaultContentPadding,
         counterText: widget.maxLength != null ? null : "",
       ),
-      style: widget.textStyle ?? TextStyle(
-        color: defaultTextColor,
-        fontSize: 16,
-      ),
+      style:
+          widget.textStyle ?? TextStyle(color: defaultTextColor, fontSize: 16),
       validator: widget.validator,
       onChanged: widget.onChanged,
     );
-
 
     // Wrap with SizedBox if height or width is specified
     if (widget.height != null || widget.width != null) {
@@ -366,14 +376,9 @@ class _AppTextFieldState extends State<AppTextField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildTitle(),
-        textField,
-      ],
+      children: [_buildTitle(), textField],
     );
   }
-
-
 }
 
 // Factory constructors for common use cases
@@ -395,6 +400,9 @@ extension AppTextFieldFactory on AppTextField {
     TextStyle? titleStyle,
     Color? titleColor,
     Color? fillColor,
+    FocusNode? focusNode,
+    Iterable<String>? autofillHints,
+    void Function(String)? onSubmitted,
   }) {
     return AppTextField(
       key: key,
@@ -403,12 +411,15 @@ extension AppTextFieldFactory on AppTextField {
       fillColor: fillColor,
       readOnly: readOnly,
       controller: controller,
+      focusNode: focusNode,
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
+      autofillHints: autofillHints,
       textCapitalization: TextCapitalization.none,
       errorText: errorText,
       validator: validator,
       onChanged: onChanged,
+      onSubmitted: onSubmitted,
       hasError: hasError,
       focusedFillColor: focusedFillColor,
       focusedHintColor: focusedHintColor,
@@ -433,18 +444,25 @@ extension AppTextFieldFactory on AppTextField {
     Color? focusedHintColor,
     TextStyle? titleStyle,
     Color? titleColor,
+    FocusNode? focusNode,
+    Iterable<String>? autofillHints,
+    void Function(String)? onSubmitted,
+    TextInputAction textInputAction = TextInputAction.done,
   }) {
     return AppTextField(
       key: key,
       hintText: hintText,
       title: title,
       controller: controller,
+      focusNode: focusNode,
       obscureText: true,
       keyboardType: TextInputType.visiblePassword,
-      textInputAction: TextInputAction.done,
+      textInputAction: textInputAction,
+      autofillHints: autofillHints,
       errorText: errorText,
       validator: validator,
       onChanged: onChanged,
+      onSubmitted: onSubmitted,
       hasError: hasError,
       suffixIcon: suffixIcon, // Will be overridden by X icon if error
       focusedFillColor: focusedFillColor,
@@ -518,13 +536,13 @@ extension AppTextFieldFactory on AppTextField {
       labelText: labelText,
       title: title,
       controller: controller,
-      keyboardType: allowDecimal ?
-      const TextInputType.numberWithOptions(decimal: true) :
-      TextInputType.number,
+      keyboardType: allowDecimal
+          ? const TextInputType.numberWithOptions(decimal: true)
+          : TextInputType.number,
       textInputAction: TextInputAction.next,
-      inputFormatters: allowDecimal ?
-      [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))] :
-      [FilteringTextInputFormatter.digitsOnly],
+      inputFormatters: allowDecimal
+          ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))]
+          : [FilteringTextInputFormatter.digitsOnly],
       errorText: errorText,
       validator: validator,
       onChanged: onChanged,
@@ -539,7 +557,7 @@ extension AppTextFieldFactory on AppTextField {
 
   // Add this to your existing AppTextField factory extension
 
-// Search input field
+  // Search input field
   static AppTextField search({
     Key? key,
     String hintText = 'Search',
@@ -574,11 +592,8 @@ extension AppTextFieldFactory on AppTextField {
       focusNode: focusNode,
       onTap: onTap,
       onSubmitted: onSubmitted,
-      prefixIcon: prefixIcon ?? const Icon(
-        Icons.search,
-        color: Colors.grey,
-        size: 20,
-      ),
+      prefixIcon:
+          prefixIcon ?? const Icon(Icons.search, color: Colors.grey, size: 20),
       suffixIcon: suffixIcon,
       keyboardType: TextInputType.text,
       textInputAction: TextInputAction.search,
@@ -603,10 +618,9 @@ extension AppTextFieldFactory on AppTextField {
       borderRadius: borderRadius ?? 12,
 
       // Content padding
-      contentPadding: contentPadding ?? const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 12,
-      ),
+      contentPadding:
+          contentPadding ??
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     );
   }
 }

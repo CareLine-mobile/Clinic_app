@@ -10,11 +10,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:clinic_app/core/widgets/app_buton.dart';
 import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:clinic_app/core/routes/routes.dart';
-import '../../../../core/utils/app_size.dart';
 import '../../../../core/utils/assets.dart';
+import '../widget/auth_responsive_shell.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 import 'package:clinic_app/features/settings/presentation/cubit/settings_cubit.dart';
+import 'package:clinic_app/features/user_data/user_repo.dart';
 
 class OtpVerificationPage extends StatefulWidget {
   final String email;
@@ -28,13 +29,18 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   static const int _otpLength = 6;
   static const int _cooldownSeconds = 60;
 
-  final List<TextEditingController> _controllers =
-  List.generate(_otpLength, (_) => TextEditingController());
-  final List<FocusNode> _focusNodes =
-  List.generate(_otpLength, (_) => FocusNode());
+  final List<TextEditingController> _controllers = List.generate(
+    _otpLength,
+    (_) => TextEditingController(),
+  );
+  final List<FocusNode> _focusNodes = List.generate(
+    _otpLength,
+    (_) => FocusNode(),
+  );
 
   Timer? _timer;
   int _secondsLeft = 0;
+  bool _storageWarningShown = false;
   bool get _isCoolingDown => _secondsLeft > 0;
 
   @override
@@ -62,29 +68,46 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   }
 
   void _onDigitEntered(int index, String value) {
-    if (value.length == 1 && index < _otpLength - 1) {
+    final digits = value.replaceAll(RegExp(r'\D'), '');
+    if (digits.length > 1) {
+      final start = digits.length >= _otpLength ? 0 : index;
+      for (
+        var offset = 0;
+        offset < digits.length && start + offset < _otpLength;
+        offset++
+      ) {
+        _controllers[start + offset].text = digits[offset];
+        _controllers[start + offset].selection = const TextSelection.collapsed(
+          offset: 1,
+        );
+      }
+      _focusNodes[(start + digits.length).clamp(0, _otpLength - 1).toInt()]
+          .requestFocus();
+    } else if (digits.length == 1 && index < _otpLength - 1) {
       _focusNodes[index + 1].requestFocus();
-    } else if (value.isEmpty && index > 0) {
+    } else if (digits.isEmpty && index > 0) {
       _focusNodes[index - 1].requestFocus();
     }
     setState(() {});
   }
 
   void _onKeyEvent(int index, KeyEvent event) {
-    if (event is KeyDownEvent &&
-        event.logicalKey == LogicalKeyboardKey.backspace &&
+    if (event is! KeyDownEvent) return;
+    if (event.logicalKey == LogicalKeyboardKey.backspace &&
         _controllers[index].text.isEmpty &&
         index > 0) {
       _focusNodes[index - 1].requestFocus();
+    } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft && index > 0) {
+      _focusNodes[index - 1].requestFocus();
+    } else if (event.logicalKey == LogicalKeyboardKey.arrowRight &&
+        index < _otpLength - 1) {
+      _focusNodes[index + 1].requestFocus();
     }
   }
 
   void _handleVerify() {
     if (!_isOtpComplete) return;
-    context.read<AuthCubit>().verifyOtp(
-      email: widget.email,
-      otp: _otpCode,
-    );
+    context.read<AuthCubit>().verifyOtp(email: widget.email, otp: _otpCode);
   }
 
   void _handleResend() {
@@ -108,7 +131,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
     return BlocConsumer<AuthCubit, AuthState>(
       listenWhen: (_, current) =>
-      current is OtpFailure ||
+          current is OtpFailure ||
           current is OtpResendSuccess ||
           current is AuthAuthenticated ||
           current is LoginSuccess,
@@ -129,11 +152,20 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
             type: SnackBarType.success,
           );
         } else if (state is AuthAuthenticated || state is LoginSuccess) {
+          if (!_storageWarningShown &&
+              UserRepository().sessionPersistenceFailed) {
+            _storageWarningShown = true;
+            CustomSnackBar.show(
+              context,
+              message: 'auth.storageUnavailable'.tr(),
+              type: SnackBarType.error,
+            );
+          }
           context.read<SettingsCubit>().syncFcmToken();
           Navigator.pushNamedAndRemoveUntil(
             context,
             Routes.dashBoard,
-                (_) => false,
+            (_) => false,
           );
         }
       },
@@ -144,66 +176,59 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         return Scaffold(
           appBar: CustomAppBar(title: 'auth.otp.title'.tr()),
           body: SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                // Use a centered constrained box on tablets
-                return Center(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: isTablet ? 520 : double.infinity,
-                    ),
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding,
-                        vertical: screenHeight * 0.04,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          _OtpHeader(
-                            email: widget.email,
-                            isTablet: isTablet,
-                            screenWidth: screenWidth,
-                          ),
-                          SizedBox(height: screenHeight * 0.05),
-                          _OtpInputRow(
-                            controllers: _controllers,
-                            focusNodes: _focusNodes,
-                            onChanged: _onDigitEntered,
-                            onKeyEvent: _onKeyEvent,
-                          ),
-                          SizedBox(height: screenHeight * 0.045),
-                          AppButton(
-                            text: 'auth.otp.verify'.tr(),
-                            onPressed:
-                            (isVerifying || isResending || !_isOtpComplete)
-                                ? null
-                                : _handleVerify,
-                            isLoading: isVerifying,
-                            horizontalPadding: 0,
-                            verticalPadding: 0,
-                          ),
-                          SizedBox(height: screenHeight * 0.025),
-                          _ResendRow(
-                            onResend:
-                            (isVerifying || isResending || _isCoolingDown)
-                                ? null
-                                : _handleResend,
-                            isResending: isResending,
-                            secondsLeft: _secondsLeft,
-                          ),
-                          // Extra bottom spacing so keyboard doesn't cover content
-                          SizedBox(
-                            height: MediaQuery.of(context).viewInsets.bottom > 0
-                                ? 24.h
-                                : 0,
-                          ),
-                        ],
-                      ),
-                    ),
+            child: AuthResponsiveShell(
+              child: AutofillGroup(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: horizontalPadding,
+                    vertical: screenHeight * 0.025,
                   ),
-                );
-              },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _OtpHeader(
+                        email: widget.email,
+                        isTablet: isTablet,
+                        screenWidth: screenWidth,
+                      ),
+                      SizedBox(height: screenHeight * 0.05),
+                      _OtpInputRow(
+                        controllers: _controllers,
+                        focusNodes: _focusNodes,
+                        onChanged: _onDigitEntered,
+                        onKeyEvent: _onKeyEvent,
+                        onSubmitted: (index) {
+                          if (index == _otpLength - 1) {
+                            _handleVerify();
+                          } else {
+                            _focusNodes[index + 1].requestFocus();
+                          }
+                        },
+                      ),
+                      SizedBox(height: screenHeight * 0.045),
+                      AppButton(
+                        text: 'auth.otp.verify'.tr(),
+                        onPressed:
+                            (isVerifying || isResending || !_isOtpComplete)
+                            ? null
+                            : _handleVerify,
+                        isLoading: isVerifying,
+                        horizontalPadding: 0,
+                        verticalPadding: 0,
+                      ),
+                      SizedBox(height: screenHeight * 0.025),
+                      _ResendRow(
+                        onResend: (isVerifying || isResending || _isCoolingDown)
+                            ? null
+                            : _handleResend,
+                        isResending: isResending,
+                        secondsLeft: _secondsLeft,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         );
@@ -267,12 +292,14 @@ class _OtpInputRow extends StatelessWidget {
   final List<FocusNode> focusNodes;
   final void Function(int, String) onChanged;
   final void Function(int, KeyEvent) onKeyEvent;
+  final ValueChanged<int> onSubmitted;
 
   const _OtpInputRow({
     required this.controllers,
     required this.focusNodes,
     required this.onChanged,
     required this.onKeyEvent,
+    required this.onSubmitted,
   });
 
   @override
@@ -284,12 +311,15 @@ class _OtpInputRow extends StatelessWidget {
         builder: (context, constraints) {
           // Total horizontal gap budget: 5 gaps between 6 cells + 2 outer padding
           const int cellCount = 6;
-          const double gapUnit = 6.0; // gap between each cell
+          const double gapUnit = 4.0; // gap between each cell
           final double totalGaps = gapUnit * (cellCount - 1);
 
           // Cell fills remaining space equally, clamped to safe extremes
           final double cellSize =
-          ((constraints.maxWidth - totalGaps) / cellCount).clamp(36.0, 64.0);
+              ((constraints.maxWidth - totalGaps) / cellCount).clamp(
+                30.0,
+                64.0,
+              );
           final double cellHeight = (cellSize * 1.2).clamp(44.0, 72.0);
           final double fontSize = (cellSize * 0.38).clamp(14.0, 24.0);
 
@@ -305,6 +335,7 @@ class _OtpInputRow extends StatelessWidget {
                     focusNode: focusNodes[index],
                     onChanged: (v) => onChanged(index, v),
                     onKeyEvent: (e) => onKeyEvent(index, e),
+                    onSubmitted: () => onSubmitted(index),
                     cellWidth: cellSize,
                     cellHeight: cellHeight,
                     fontSize: fontSize,
@@ -325,6 +356,7 @@ class _OtpDigitField extends StatefulWidget {
   final FocusNode focusNode;
   final ValueChanged<String> onChanged;
   final ValueChanged<KeyEvent> onKeyEvent;
+  final VoidCallback onSubmitted;
   final double cellWidth;
   final double cellHeight;
   final double fontSize;
@@ -334,6 +366,7 @@ class _OtpDigitField extends StatefulWidget {
     required this.focusNode,
     required this.onChanged,
     required this.onKeyEvent,
+    required this.onSubmitted,
     required this.cellWidth,
     required this.cellHeight,
     required this.fontSize,
@@ -364,9 +397,11 @@ class _OtpDigitFieldState extends State<_OtpDigitField> {
     final isFocused = widget.focusNode.hasFocus;
     final isDark = theme.brightness == Brightness.dark;
 
-    return KeyboardListener(
-      focusNode: FocusNode(),
-      onKeyEvent: widget.onKeyEvent,
+    return Focus(
+      onKeyEvent: (node, event) {
+        widget.onKeyEvent(event);
+        return KeyEventResult.ignored;
+      },
       child: SizedBox(
         width: widget.cellWidth,
         height: widget.cellHeight,
@@ -376,7 +411,10 @@ class _OtpDigitFieldState extends State<_OtpDigitField> {
           keyboardType: TextInputType.number,
           textAlign: TextAlign.center,
           textDirection: TextDirection.ltr,
-          maxLength: 1,
+          maxLength: 6,
+          autofillHints: const [AutofillHints.oneTimeCode],
+          textInputAction: TextInputAction.done,
+          onFieldSubmitted: (_) => widget.onSubmitted(),
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: widget.onChanged,
           style: theme.textTheme.titleLarge?.copyWith(
@@ -390,14 +428,16 @@ class _OtpDigitFieldState extends State<_OtpDigitField> {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
               borderSide: BorderSide(
-                color: isDark ? Colors.grey.shade800 : Colors.grey.shade300, 
+                color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
                 width: 1.5,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide:
-              BorderSide(color: theme.colorScheme.primary, width: 2),
+              borderSide: BorderSide(
+                color: theme.colorScheme.primary,
+                width: 2,
+              ),
             ),
             filled: true,
             fillColor: isFocused
@@ -443,8 +483,7 @@ class _ResendRow extends StatelessWidget {
             padding: EdgeInsets.symmetric(vertical: 12.h),
             child: RichText(
               text: TextSpan(
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(fontSize: 13.sp),
+                style: theme.textTheme.bodyMedium?.copyWith(fontSize: 13.sp),
                 children: [
                   TextSpan(
                     text: 'auth.otp.resend_in'.tr(),
