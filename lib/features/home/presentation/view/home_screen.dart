@@ -11,6 +11,7 @@ import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:clinic_app/core/utils/responsive.dart';
 import '../../../../core/utils/app_size.dart';
 import '../../../../core/utils/location/location_utils.dart';
 import '../../../../core/widgets/error_state_widget.dart';
@@ -74,14 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (state is HomeLoaded) {
             return ClinicRefreshIndicator(
               onRefresh: () => context.read<HomeCubit>().refresh(),
-              child: CustomScrollView(
-                controller: _scrollController,
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  _buildHeader(),
-                  ..._buildLoadedBody(state),
-                ],
-              ),
+              child: _buildScrollView(state),
             );
           }
 
@@ -120,6 +114,27 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           );
         },
+      ),
+    );
+  }
+
+  // ── Responsive scroll view ────────────────────────────────────────────
+
+  Widget _buildScrollView(HomeLoaded state) {
+    final isWide = Responsive.isWide(context);
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: isWide ? Responsive.maxContentWidth : double.infinity,
+        ),
+        child: CustomScrollView(
+          controller: _scrollController,
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            _buildHeader(),
+            ..._buildLoadedBody(state),
+          ],
+        ),
       ),
     );
   }
@@ -300,7 +315,37 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildClinicsList(List<ClinicSummary> clinics) {
     final h = AppSizeHorizontal.instance;
     final v = AppSizeVertical.instance;
+    final category = Responsive.categoryOf(context);
 
+    // On tablet/desktop use a multi-column grid
+    if (category != ScreenSizeCategory.mobile) {
+      final crossAxisCount = category == ScreenSizeCategory.desktop ? 3 : 2;
+      return SliverPadding(
+        padding: EdgeInsets.symmetric(horizontal: h.s16),
+        sliver: SliverGrid.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: h.s12,
+            mainAxisSpacing: v.s12,
+            childAspectRatio: 2.4,
+          ),
+          itemCount: clinics.length,
+          itemBuilder: (context, index) {
+            final clinic = clinics[index];
+            return ClinicCard(
+              key: ValueKey(clinic.id),
+              clinic: clinic,
+              layout: ClinicCardLayout.list,
+              onTap: () => _navigateToClinicDetails(clinic),
+              onFavoriteToggle: () => _toggleFavorite(clinic),
+              onBookNow: () => _bookAppointment(clinic),
+            );
+          },
+        ),
+      );
+    }
+
+    // Mobile: original single-column list
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: h.s16),
       sliver: SliverList.builder(

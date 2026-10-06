@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -7,6 +8,9 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz_data;
 
 /// خدمة الإشعارات المحلية (Universal)
+/// On web: all methods are no-ops — flutter_local_notifications is not
+/// supported on web. The kIsWeb guards below make every public method
+/// return immediately without calling any plugin code.
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
@@ -19,6 +23,7 @@ class NotificationService {
 
   /// تهيئة خدمة الإشعارات
   Future<void> initialize() async {
+    if (kIsWeb) return; // flutter_local_notifications not supported on web
     if (_isInitialized) {
       debugPrint('⚠️ Notification service already initialized');
       return;
@@ -81,6 +86,7 @@ class NotificationService {
 
   /// التحقق من إمكانية جدولة الإشعارات الدقيقة (Android 12+)
   Future<bool> canScheduleExactAlarms() async {
+    if (kIsWeb) return false;
     if (Platform.isAndroid) {
       final android = _notifications.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
@@ -93,6 +99,7 @@ class NotificationService {
 
   /// طلب إذن جدولة الإشعارات الدقيقة (Android 12+)
   Future<bool> requestExactAlarmPermission() async {
+    if (kIsWeb) return false;
     if (Platform.isAndroid) {
       final android = _notifications.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
@@ -110,6 +117,7 @@ class NotificationService {
     required String body,
     required TimeOfDay time,
   }) async {
+    if (kIsWeb) return;
     try {
       if (!_isInitialized) {
         await initialize();
@@ -204,6 +212,7 @@ class NotificationService {
     required String body,
     String? payload,
   }) async {
+    if (kIsWeb) return;
     try {
       if (!_isInitialized) {
         await initialize();
@@ -256,6 +265,7 @@ class NotificationService {
 
   /// إلغاء تذكير محدد
   Future<void> cancelReminder(int id) async {
+    if (kIsWeb) return;
     try {
       await _notifications.cancel(id);
 
@@ -270,12 +280,14 @@ class NotificationService {
 
   /// التحقق من وجود تذكير
   Future<bool> isReminderSet(int id) async {
+    if (kIsWeb) return false;
     final prefs = await SharedPreferences.getInstance();
     return prefs.containsKey('reminder_$id');
   }
 
   /// الحصول على وقت التذكير
   Future<TimeOfDay?> getReminderTime(int id) async {
+    if (kIsWeb) return null;
     try {
       final prefs = await SharedPreferences.getInstance();
       final str = prefs.getString('reminder_$id');
@@ -295,6 +307,7 @@ class NotificationService {
 
   /// إلغاء جميع الإشعارات
   Future<void> cancelAll() async {
+    if (kIsWeb) return;
     try {
       await _notifications.cancelAll();
 
@@ -312,6 +325,7 @@ class NotificationService {
 
   /// الحصول على الإشعارات المجدولة
   Future<List<PendingNotificationRequest>> getPendingNotifications() async {
+    if (kIsWeb) return [];
     return await _notifications.pendingNotificationRequests();
   }
 
@@ -321,6 +335,7 @@ class NotificationService {
     required String title,
     required String body,
   }) async {
+    if (kIsWeb) return;
     try {
       final now = DateTime.now();
       final snoozeTime = now.add(const Duration(minutes: 10));

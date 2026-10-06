@@ -87,6 +87,9 @@ class ErrorHandler {
         return NetworkFailure('errors.network.certificate'.tr(), 'CERTIFICATE_ERROR');
       case DioExceptionType.unknown:
         return NetworkFailure('errors.network.serverConnection'.tr(), 'CONNECTION_ERROR');
+      case DioExceptionType.transformTimeout:
+        // TODO: Handle this case.
+        throw UnimplementedError();
     }
   }
 

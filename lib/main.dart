@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'core/db/shared_pref_helper.dart';
 import 'core/di/injection_container.dart';
 import 'core/routes/app_routes.dart';
@@ -14,6 +15,7 @@ import 'core/service/app_initializer.dart';
 import 'core/service/notification_permission_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/utils/app_constans.dart';
+import 'core/utils/responsive.dart';
 import 'dev_widget.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
 import 'features/settings/presentation/cubit/settings_cubit.dart';
@@ -28,8 +30,17 @@ Locale initialLocale       = const Locale('ar'); // updated before runApp
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //debugPaintSizeEnabled = true;
+
+  // Use path-based URL strategy on web (no # in URLs)
+  usePathUrlStrategy();
+
   await AppInitializer.init();
-  NotificationPermissionService.requestPermission().ignore();
+
+  // Notifications are not supported on web — guard the call
+  if (!kIsWeb) {
+    NotificationPermissionService.requestPermission().ignore();
+  }
+
   await UserRepository().loadUser();
 
   // Read both flags before showing any UI
@@ -79,35 +90,53 @@ class MyApp extends StatelessWidget {
       child: BlocBuilder<SettingsCubit, SettingsState>(
         buildWhen: (prev, curr) => prev.themeMode != curr.themeMode,
         builder: (context, settings) {
-          return ScreenUtilInit(
-            designSize: const Size(375, 812),
-            minTextAdapt: true,
-            splitScreenMode: true,
-            builder: (context, child) {
-              return BlocListener<SettingsCubit, SettingsState>(
-                // ── FIX: whenever SettingsCubit loads or changes the
-                //         locale (e.g. on startup via loadSettings()),
-                //         push that locale into EasyLocalization so the
-                //         two sources stay in sync. ──────────────────────
-                listenWhen: (prev, curr) => prev.locale != curr.locale,
-                listener: (context, state) {
-                  if (context.locale != state.locale) {
-                    context.setLocale(state.locale);
-                  }
+          // ── Responsive ScreenUtilInit ──────────────────────────────────
+          // LayoutBuilder fires on every window-resize, allowing ScreenUtilInit
+          // to pick the correct design canvas for each breakpoint so that
+          // existing .w / .h / .sp calls keep scaling without any rewrite.
+          return LayoutBuilder(
+            builder: (layoutContext, constraints) {
+              final w = constraints.maxWidth;
+              final Size designSize;
+              if (w > Responsive.desktopBreakpoint) {
+                designSize = const Size(1440, 900); // desktop reference
+              } else if (w > Responsive.tabletBreakpoint) {
+                designSize = const Size(768, 1024); // tablet reference
+              } else {
+                designSize = const Size(375, 812); // original phone reference
+              }
+
+              return ScreenUtilInit(
+                designSize: designSize,
+                minTextAdapt: true,
+                splitScreenMode: true,
+                builder: (context, child) {
+                  return BlocListener<SettingsCubit, SettingsState>(
+                    // ── FIX: whenever SettingsCubit loads or changes the
+                    //         locale (e.g. on startup via loadSettings()),
+                    //         push that locale into EasyLocalization so the
+                    //         two sources stay in sync. ──────────────────────
+                    listenWhen: (prev, curr) => prev.locale != curr.locale,
+                    listener: (context, state) {
+                      if (context.locale != state.locale) {
+                        context.setLocale(state.locale);
+                      }
+                    },
+                    child: MaterialApp(
+                      navigatorKey:            AppRouter.navigatorKey,
+                      theme:                   AppTheme.light,
+                      darkTheme:               AppTheme.dark,
+                      themeMode:               settings.themeMode,
+                      localizationsDelegates:  context.localizationDelegates,
+                      supportedLocales:        context.supportedLocales,
+                      locale:                  context.locale,
+                      debugShowCheckedModeBanner: kDebugMode,
+                      initialRoute:            _initialRoute,
+                      onGenerateRoute:         AppRouter.onGenerateRoute,
+                    //   builder: (context, child) => DevToolsOverlay(child:child!),
+                    ),
+                  );
                 },
-                child: MaterialApp(
-                  navigatorKey:            AppRouter.navigatorKey,
-                  theme:                   AppTheme.light,
-                  darkTheme:               AppTheme.dark,
-                  themeMode:               settings.themeMode,
-                  localizationsDelegates:  context.localizationDelegates,
-                  supportedLocales:        context.supportedLocales,
-                  locale:                  context.locale,
-                  debugShowCheckedModeBanner: kDebugMode,
-                  initialRoute:            _initialRoute,
-                  onGenerateRoute:         AppRouter.onGenerateRoute,
-              //   builder: (context, child) => DevToolsOverlay(child:child!),
-                ),
               );
             },
           );

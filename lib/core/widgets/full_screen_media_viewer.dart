@@ -1,4 +1,5 @@
-import 'dart:io';
+import 'dart:io' show File;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../theme/colors.dart';
@@ -22,7 +23,13 @@ class FullScreenMediaViewer extends StatelessWidget {
         children: [
           Center(
             child: InteractiveViewer(
-              child: Image.file(
+              child: kIsWeb
+                  ? const Icon(
+                      Icons.image_not_supported_rounded,
+                      size: 64,
+                      color: Colors.white54,
+                    )
+                  : Image.file(
                 File(filePath),
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {

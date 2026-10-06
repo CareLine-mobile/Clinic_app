@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -71,8 +71,8 @@ class LocationDataSourceUtilits  {
         permission == LocationPermission.whileInUse;
   }
   static Future<void> openLocationSettings() async {
-
-      if (Platform.isAndroid) {
+    if (kIsWeb) return;
+      if (defaultTargetPlatform == TargetPlatform.android) {
         // On Android, open app settings to allow user to grant permission
         await Geolocator.openLocationSettings();
       } else {

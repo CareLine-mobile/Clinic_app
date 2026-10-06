@@ -1,4 +1,5 @@
-import 'dart:io';
+import 'dart:io' show HttpClient;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:ui' as ui;
 
 import 'package:bloc/bloc.dart';
@@ -86,6 +87,7 @@ class MapLocationsCubit extends Cubit<MapLocationsState> {
   }
 
   Future<void> _downloadImage(ClinicSummary clinic) async {
+    if (kIsWeb) return; // Custom bitmap markers not supported on web
     if (_imageCache.containsKey(clinic.id)) return;
     try {
       final httpClient = HttpClient();

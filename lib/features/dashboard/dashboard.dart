@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -87,6 +87,7 @@ class _DashBoardScreenState extends State<DashBoardScreen>
   // ── Location check ───────────────────────────────────────
 
   Future<void> _checkLocationService() async {
+    if (kIsWeb) return; // Geolocator.isLocationServiceEnabled not reliable on web
     if (_bannerDismissed) return;
     final enabled = await Geolocator.isLocationServiceEnabled();
     if (!mounted) return;
@@ -163,7 +164,7 @@ class _DashBoardScreenState extends State<DashBoardScreen>
   // ── Modern Location Permission Bottom Sheet ──────────────
 
   void showLocationPermissionSheet(BuildContext context) {
-    final isAndroid = Platform.isAndroid;
+    final isAndroid = !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
     final theme = Theme.of(context);
 
     showModalBottomSheet(

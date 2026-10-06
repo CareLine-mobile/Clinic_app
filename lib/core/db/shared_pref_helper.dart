@@ -14,7 +14,7 @@ import '../utils/app_constans.dart';
 class SharedPrefHelper {
   // ── Secure storage (encrypted) ────────────────────────────
   static const FlutterSecureStorage _secure = FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    aOptions: AndroidOptions(),
   );
 
   // ── Plain storage (fast, non-sensitive) ───────────────────

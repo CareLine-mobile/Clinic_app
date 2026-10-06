@@ -1,5 +1,9 @@
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+// sqflite is not supported on web — import is conditional
+import 'package:sqflite/sqflite.dart'
+    if (dart.library.html) 'package:clinic_app/core/db/web_stub.dart';
+import 'package:path/path.dart'
+    if (dart.library.html) 'package:clinic_app/core/db/web_stub.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -9,6 +13,7 @@ class DatabaseHelper {
   static Database? _database;
 
   Future<Database> get database async {
+    if (kIsWeb) throw UnsupportedError('DatabaseHelper is not supported on web');
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
@@ -106,11 +111,13 @@ class DatabaseHelper {
   // ==================== MEDICATIONS CRUD ====================
 
   Future<int> insertMedication(Map<String, dynamic> medication) async {
+    if (kIsWeb) return 0;
     final db = await database;
     return await db.insert('medications', medication);
   }
 
   Future<List<Map<String, dynamic>>> getAllMedications(String userId) async {
+    if (kIsWeb) return [];
     final db = await database;
     return await db.query(
       'medications',
@@ -121,6 +128,7 @@ class DatabaseHelper {
   }
 
   Future<Map<String, dynamic>?> getMedicationById(String id) async {
+    if (kIsWeb) return null;
     final db = await database;
     final results = await db.query(
       'medications',
@@ -132,6 +140,7 @@ class DatabaseHelper {
   }
 
   Future<int> updateMedication(Map<String, dynamic> medication) async {
+    if (kIsWeb) return 0;
     final db = await database;
     final id = medication['id'] as String;
 
@@ -150,6 +159,7 @@ class DatabaseHelper {
   }
 
   Future<int> deleteMedication(String id) async {
+    if (kIsWeb) return 0;
     final db = await database;
     // Soft delete
     return await db.update(
@@ -163,6 +173,7 @@ class DatabaseHelper {
   // ==================== ADHERENCE LOGS ====================
 
   Future<int> insertAdherenceLog(Map<String, dynamic> log) async {
+    if (kIsWeb) return 0;
     final db = await database;
     return await db.insert('adherence_logs', log);
   }
@@ -172,6 +183,7 @@ class DatabaseHelper {
       DateTime startDate,
       DateTime endDate,
       ) async {
+    if (kIsWeb) return [];
     final db = await database;
     return await db.query(
       'adherence_logs',
@@ -186,6 +198,7 @@ class DatabaseHelper {
   }
 
   Future<double> getAdherenceRate(String userId, DateTime startDate, DateTime endDate) async {
+    if (kIsWeb) return 0.0;
     final db = await database;
 
     final total = Sqflite.firstIntValue(
@@ -209,11 +222,13 @@ class DatabaseHelper {
   // ==================== REMINDERS ====================
 
   Future<int> insertReminder(Map<String, dynamic> reminder) async {
+    if (kIsWeb) return 0;
     final db = await database;
     return await db.insert('reminders', reminder);
   }
 
   Future<List<Map<String, dynamic>>> getReminders(String medicationId) async {
+    if (kIsWeb) return [];
     final db = await database;
     return await db.query(
       'reminders',
@@ -223,6 +238,7 @@ class DatabaseHelper {
   }
 
   Future<int> updateReminder(String id, Map<String, dynamic> reminder) async {
+    if (kIsWeb) return 0;
     final db = await database;
     return await db.update(
       'reminders',
@@ -257,6 +273,7 @@ class DatabaseHelper {
   }
 
   Future<int> cacheInteraction(Map<String, dynamic> interaction) async {
+    if (kIsWeb) return 0;
     final db = await database;
     return await db.insert(
       'drug_interactions',
@@ -268,6 +285,7 @@ class DatabaseHelper {
   // ==================== MEDICATIONS DATABASE ====================
 
   Future<int> insertMedicationData(Map<String, dynamic> medication) async {
+    if (kIsWeb) return 0;
     final db = await database;
     return await db.insert(
       'medications_database',
@@ -277,6 +295,7 @@ class DatabaseHelper {
   }
 
   Future<List<Map<String, dynamic>>> searchMedicationsDatabase(String query) async {
+    if (kIsWeb) return [];
     final db = await database;
     return await db.query(
       'medications_database',
@@ -287,6 +306,7 @@ class DatabaseHelper {
   }
 
   Future<Map<String, dynamic>?> getMedicationByName(String name) async {
+    if (kIsWeb) return null;
     final db = await database;
     final results = await db.query(
       'medications_database',
@@ -300,6 +320,7 @@ class DatabaseHelper {
   // ==================== UTILITY ====================
 
   Future<void> clearAllData() async {
+    if (kIsWeb) return;
     final db = await database;
     await db.delete('medications');
     await db.delete('adherence_logs');
@@ -307,6 +328,7 @@ class DatabaseHelper {
   }
 
   Future<void> close() async {
+    if (kIsWeb) return;
     final db = await database;
     await db.close();
   }

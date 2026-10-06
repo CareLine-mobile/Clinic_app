@@ -1,6 +1,6 @@
 // lib/features/map_locations/presentation/view/map_locations_screen.dart
 
-import 'dart:io';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
 import 'package:clinic_app/core/theme/colors.dart';
 import 'package:clinic_app/core/utils/location/location_utils.dart';
@@ -101,7 +101,7 @@ class _MapLocationsScreenState extends State<MapLocationsScreen>
           if (state is MapLocationsServiceDisabled) {
             return MapServiceDisabledView(
               onOpenSettings: () async {
-                if (Platform.isAndroid) {
+                if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
                   await Geolocator.openLocationSettings();
                 } else {
                   await LocationUtils.openLocationSettings();
