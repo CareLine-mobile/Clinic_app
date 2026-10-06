@@ -1,5 +1,4 @@
 // lib/main.dart
-import 'package:clinic_app/features/auth/presentation/view/otp_verification_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +23,8 @@ import 'features/user_data/user_repo.dart';
 
 // ── First-launch flags ────────────────────────────────────────────────────
 bool isConfigurationDone = false;
-bool isOnBoarding        = false;
-Locale initialLocale       = const Locale('ar'); // updated before runApp
+bool isOnBoarding = false;
+Locale initialLocale = const Locale('ar'); // updated before runApp
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,11 +44,14 @@ void main() async {
 
   // Read both flags before showing any UI
   isConfigurationDone =
-      await SharedPrefHelper.getBool(key: AppConstants.configurationKey) ?? false;
+      await SharedPrefHelper.getBool(key: AppConstants.configurationKey) ??
+      false;
   isOnBoarding =
       await SharedPrefHelper.getBool(key: AppConstants.onboardingKey) ?? false;
 
-  final savedLang = await SharedPrefHelper.getString(key: AppConstants.languageCode);
+  final savedLang = await SharedPrefHelper.getString(
+    key: AppConstants.languageCode,
+  );
   if (savedLang != null) {
     initialLocale = Locale(savedLang);
   }
@@ -70,6 +72,14 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   String get _initialRoute {
+    if (kIsWeb) {
+      final current = Uri.base;
+      if (current.path != '/' && current.path.isNotEmpty) {
+        return current.hasQuery
+            ? '${current.path}?${current.query}'
+            : current.path;
+      }
+    }
     if (!isConfigurationDone) return Routes.configuration;
     // if (!isOnBoarding)        return Routes.onboarding;
     return UserRepository().isLoggedIn ? Routes.dashBoard : Routes.auth;
@@ -79,12 +89,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<UserCubit>(
-          create: (_) => UserCubit(UserRepository()),
-        ),
+        BlocProvider<UserCubit>(create: (_) => UserCubit(UserRepository())),
         BlocProvider<SettingsCubit>(
           create: (_) =>
-          SettingsCubit(settingsRepository: sl())..loadSettings(),
+              SettingsCubit(settingsRepository: sl())..loadSettings(),
         ),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
@@ -123,17 +131,17 @@ class MyApp extends StatelessWidget {
                       }
                     },
                     child: MaterialApp(
-                      navigatorKey:            AppRouter.navigatorKey,
-                      theme:                   AppTheme.light,
-                      darkTheme:               AppTheme.dark,
-                      themeMode:               settings.themeMode,
-                      localizationsDelegates:  context.localizationDelegates,
-                      supportedLocales:        context.supportedLocales,
-                      locale:                  context.locale,
+                      navigatorKey: AppRouter.navigatorKey,
+                      theme: AppTheme.light,
+                      darkTheme: AppTheme.dark,
+                      themeMode: settings.themeMode,
+                      localizationsDelegates: context.localizationDelegates,
+                      supportedLocales: context.supportedLocales,
+                      locale: context.locale,
                       debugShowCheckedModeBanner: kDebugMode,
-                      initialRoute:            _initialRoute,
-                      onGenerateRoute:         AppRouter.onGenerateRoute,
-                    //   builder: (context, child) => DevToolsOverlay(child:child!),
+                      initialRoute: _initialRoute,
+                      onGenerateRoute: AppRouter.onGenerateRoute,
+                      //   builder: (context, child) => DevToolsOverlay(child:child!),
                     ),
                   );
                 },
