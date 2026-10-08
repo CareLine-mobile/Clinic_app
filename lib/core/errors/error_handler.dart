@@ -186,7 +186,29 @@ class ErrorHandler {
   static String _extractErrorMessage(dynamic data) {
     if (data == null) return '';
 
-    if (data is Map<String, dynamic>) {
+    if (data is Map) {
+      // Prefer field-level validation details over a generic message such as
+      // "Validation failed" so the user sees the actionable response text.
+      final errors = data['errors'];
+      if (errors is Map && errors.isNotEmpty) {
+        final parts = <String>[];
+        errors.forEach((_, value) {
+          if (value is List) {
+            parts.addAll(
+              value
+                  .where((item) => item != null && item.toString().isNotEmpty)
+                  .map((item) => item.toString()),
+            );
+          } else if (value != null && value.toString().isNotEmpty) {
+            parts.add(value.toString());
+          }
+        });
+        if (parts.isNotEmpty) return parts.join(' • ');
+      }
+      if (errors is List && errors.isNotEmpty) {
+        return errors.map((item) => item.toString()).join(' • ');
+      }
+
       // ─── message field ────────────────────────────────────────────
       if (data.containsKey('message')) {
         final msg = data['message'];
@@ -205,21 +227,6 @@ class ErrorHandler {
             }
           });
           return parts.join(' • ');
-        }
-      }
-
-      // ─── errors field ─────────────────────────────────────────────
-      if (data.containsKey('errors')) {
-        final errors = data['errors'];
-        if (errors is Map && errors.isNotEmpty) {
-          final firstError = errors.values.first;
-          if (firstError is List && firstError.isNotEmpty) {
-            return firstError.first.toString();
-          }
-          return firstError.toString();
-        }
-        if (errors is List && errors.isNotEmpty) {
-          return errors.first.toString();
         }
       }
 

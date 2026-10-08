@@ -12,7 +12,7 @@
 
 ## Configuration
 
-- **Google web sign-in:** replace `YOUR_GOOGLE_WEB_CLIENT_ID.apps.googleusercontent.com` in `web/index.html` with the OAuth 2.0 Web client ID. The API currently receives `id_token`; this client does not send an access token as a substitute. If the web plugin returns no ID token, the user sees a localized configuration error.
+- **Google web sign-in:** `web/index.html` uses the Web OAuth client ID from the project's Firebase Android configuration. In Google Cloud Console, add each development/deployment origin under **APIs & Services → Credentials → OAuth 2.0 Client IDs → Web client → Authorized JavaScript origins**. For the reported run, add exactly `http://localhost:50998`; Flutter's debug port can change, so use a fixed `flutter run -d chrome --web-port=50998` command or register the port actually shown at runtime. Also add the production HTTPS origin. The API currently receives `id_token`; this client does not send an access token as a substitute. If the web plugin returns no ID token, the user sees a localized configuration error.
 - **Firebase web:** provide `FIREBASE_WEB_API_KEY`, `FIREBASE_WEB_APP_ID`, `FIREBASE_MESSAGING_SENDER_ID`, `FIREBASE_PROJECT_ID`, and `FIREBASE_WEB_AUTH_DOMAIN` using `--dart-define`. `FIREBASE_STORAGE_BUCKET` is optional. Until the required values are supplied, Firebase initialization is skipped on web.
 - **Web push:** FCM web push is disabled for auth flows. To enable it later, configure the Firebase web app, a VAPID key, and the Firebase messaging service worker, then implement the browser permission flow.
 - **Hosting:** configure the host to serve `index.html` as the SPA fallback for application paths such as `/auth`, `/verification`, and `/resetPassword`. Keep `usePathUrlStrategy()` enabled.
@@ -33,7 +33,7 @@ For deployed auth requests, the backend must answer OPTIONS preflights and allow
 `flutter_secure_storage` is pinned to 11.0.0. Its web implementation uses WebCrypto with browser storage and requires HTTPS or localhost. The package describes web storage as experimental and tied to the same browser/domain. If access fails, the app logs the storage failure and does not silently fall back to plaintext preferences; a session that cannot be written will not survive refresh. See the [package web notes](https://pub.dev/packages/flutter_secure_storage) and [WebOptions API](https://pub.dev/documentation/flutter_secure_storage/latest/flutter_secure_storage/WebOptions-class.html).
 
 - No live login/signup/OTP/forgot-password flow was submitted: that would send credentials or personal contact details to the production API, and the required test account/Google OAuth configuration was not provided.
-- Google sign-in remains unverified until a real web client ID is configured.
+- Google sign-in remains unverified until the development and production origins are registered in Google Cloud Console.
 - FCM web push is intentionally unavailable until VAPID and service-worker setup is provided.
 - Flutter's WebAssembly dry-run reports `google_sign_in_web` uses `dart:html`/`package:js`; the standard JavaScript web build succeeds, but a WASM build is not supported by that dependency version.
 - The API preflight was checked from localhost, not from the final hosted origin.
