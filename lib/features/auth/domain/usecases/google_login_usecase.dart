@@ -4,11 +4,20 @@ import 'package:clinic_app/features/auth/domain/entities/user.dart';
 import 'package:clinic_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:dartz/dartz.dart';
 
-
 class GoogleLoginUseCase {
   final AuthRepository repository;
 
   GoogleLoginUseCase(this.repository);
 
-  Future<Either<Failure, User>> call() => repository.googleLogin();
+  Future<Either<Failure, User>> call({
+    String? email,
+    String? name,
+    String? googleId,
+    String? idToken,
+  }) => repository.googleLogin(
+    email: email,
+    name: name,
+    googleId: googleId,
+    idToken: idToken,
+  );
 }

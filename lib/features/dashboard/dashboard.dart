@@ -1,9 +1,11 @@
-import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../../../core/di/injection_container.dart' as di;
@@ -24,7 +26,8 @@ import '../user_data/user_repo.dart';
 import 'widgets/dashboard_body.dart';
 
 class DashBoardScreen extends StatefulWidget {
-  const DashBoardScreen({Key? key}) : super(key: key);
+  final StatefulNavigationShell navigationShell;
+  const DashBoardScreen({super.key, required this.navigationShell});
 
   @override
   State<DashBoardScreen> createState() => _DashBoardScreenState();
@@ -32,16 +35,12 @@ class DashBoardScreen extends StatefulWidget {
 
 class _DashBoardScreenState extends State<DashBoardScreen>
     with WidgetsBindingObserver {
-
-  int _currentIndex = 0;
   bool _isNavBarVisible = true;
   double _lastScrollPosition = 0;
 
   // ── Location banner state ────────────────────────────────
   bool _showLocationBanner = false;
   bool _bannerDismissed = false; // user tapped ✕ → never re-show this session
-
-  late final List<Widget> _screens;
 
   final List<String> _icons = [
     Assets.homeIcon,
@@ -57,18 +56,9 @@ class _DashBoardScreenState extends State<DashBoardScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _screens = [
-      HomeScreen(onNavigateToSearch: (i) => setState(() => _currentIndex = i)),
-      BlocProvider<SearchCubit>.value(
-        value: di.sl<SearchCubit>(),
-        child: const SearchScreen(),
-      ),
-      const FavouritesScreen(),
-      const BookingListScreen(),
-      const SettingsTabScreen(),
-    ];
-
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkLocationService());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _checkLocationService(),
+    );
   }
 
   @override
@@ -87,7 +77,8 @@ class _DashBoardScreenState extends State<DashBoardScreen>
   // ── Location check ───────────────────────────────────────
 
   Future<void> _checkLocationService() async {
-    if (kIsWeb) return; // Geolocator.isLocationServiceEnabled not reliable on web
+    if (kIsWeb)
+      return; // Geolocator.isLocationServiceEnabled not reliable on web
     if (_bannerDismissed) return;
     final enabled = await Geolocator.isLocationServiceEnabled();
     if (!mounted) return;
@@ -134,29 +125,25 @@ class _DashBoardScreenState extends State<DashBoardScreen>
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<BookingCubit>(
-      create: (_) {
-        final cubit = di.sl<BookingCubit>();
-        if (UserRepository().isLoggedIn) cubit.loadBookings();
-        return cubit;
-      },
-      child: BlocListener<AuthCubit, AuthState>(
-        listenWhen: (_, curr) => curr is AuthUnauthenticated,
-        listener: (context, _) => context.read<BookingCubit>().close(),
-        child: DashBoardBody(
-          currentIndex: _currentIndex,
-          screens: _screens,
-          icons: _icons,
-          isNavBarVisible: _isNavBarVisible,
-          onScroll: _onScroll,
-          onTabTap: (index) {
-            FocusManager.instance.primaryFocus?.unfocus();
-            setState(() => _currentIndex = index);
-          },
-          showLocationBanner: _showLocationBanner,
-          onOpenLocationSettings: _openLocationSettings,
-          onDismissBanner: _dismissBanner,
-        ),
+    return BlocListener<AuthCubit, AuthState>(
+      listenWhen: (_, curr) => curr is AuthUnauthenticated,
+      listener: (context, _) => context.read<BookingCubit>().resetSession(),
+      child: DashBoardBody(
+        currentIndex: widget.navigationShell.currentIndex,
+        navigationShell: widget.navigationShell,
+        icons: _icons,
+        isNavBarVisible: _isNavBarVisible,
+        onScroll: _onScroll,
+        onTabTap: (index) {
+          FocusManager.instance.primaryFocus?.unfocus();
+          widget.navigationShell.goBranch(
+            index,
+            initialLocation: index == widget.navigationShell.currentIndex,
+          );
+        },
+        showLocationBanner: _showLocationBanner,
+        onOpenLocationSettings: _openLocationSettings,
+        onDismissBanner: _dismissBanner,
       ),
     );
   }
@@ -164,7 +151,8 @@ class _DashBoardScreenState extends State<DashBoardScreen>
   // ── Modern Location Permission Bottom Sheet ──────────────
 
   void showLocationPermissionSheet(BuildContext context) {
-    final isAndroid = !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+    final isAndroid =
+        !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
     final theme = Theme.of(context);
 
     showModalBottomSheet(
@@ -274,7 +262,11 @@ class _DashBoardScreenState extends State<DashBoardScreen>
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                icon: Icon(Icons.settings_rounded, size: 20.sp, color: Colors.white),
+                icon: Icon(
+                  Icons.settings_rounded,
+                  size: 20.sp,
+                  color: Colors.white,
+                ),
                 label: Text(
                   'location.open_settings'.tr(),
                   style: theme.textTheme.labelLarge?.copyWith(
@@ -310,40 +302,43 @@ class _DashBoardScreenState extends State<DashBoardScreen>
     final prefix = isAndroid ? 'location.android' : 'location.ios';
     final count = isAndroid ? 5 : 4;
 
-    return List.generate(count, (i) => Padding(
-      padding: EdgeInsets.only(bottom: 16.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 24.r,
-            height: 24.r,
-            decoration: BoxDecoration(
-              color: ColorsManager.primaryColor.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                '${i + 1}',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: ColorsManager.primaryColor,
+    return List.generate(
+      count,
+      (i) => Padding(
+        padding: EdgeInsets.only(bottom: 16.h),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 24.r,
+              height: 24.r,
+              decoration: BoxDecoration(
+                color: ColorsManager.primaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  '${i + 1}',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: ColorsManager.primaryColor,
+                  ),
                 ),
               ),
             ),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Text(
-              '$prefix.step${i + 1}'.tr(),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: ColorsManager.defaultText,
-                height: 1.4,
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Text(
+                '$prefix.step${i + 1}'.tr(),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: ColorsManager.defaultText,
+                  height: 1.4,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ));
+    );
   }
 }

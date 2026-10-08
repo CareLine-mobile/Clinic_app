@@ -8,7 +8,12 @@ abstract class AuthRepository {
     required String password,
   });
 
-  Future<Either<Failure, User>> googleLogin();
+  Future<Either<Failure, User>> googleLogin({
+    String? email,
+    String? name,
+    String? googleId,
+    String? idToken,
+  });
 
   Future<Either<Failure, String>> signup({
     required String name,
@@ -17,9 +22,7 @@ abstract class AuthRepository {
     required String password,
   });
 
-  Future<Either<Failure, void>> reSendOtp({
-    required String email,
-  });
+  Future<Either<Failure, void>> reSendOtp({required String email});
 
   Future<Either<Failure, User>> verifyOtp({
     required String email,
@@ -32,9 +35,7 @@ abstract class AuthRepository {
     required String newPassword,
   });
 
-  Future<Either<Failure, void>> sendForgotPassword({
-    required String email,
-  });
+  Future<Either<Failure, void>> sendForgotPassword({required String email});
 
   Future<void> logout();
   Future<void> deleteAccount();

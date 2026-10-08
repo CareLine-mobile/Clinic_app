@@ -12,6 +12,7 @@ import 'package:clinic_app/features/clinic_details/presentation/cubit/clinic_det
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../domain/entites/doctor_entity.dart';
@@ -34,8 +35,13 @@ class DoctorCard extends StatelessWidget {
 
   String _getDayName(DateTime date) {
     const days = [
-      'monday', 'tuesday', 'wednesday', 'thursday',
-      'friday', 'saturday', 'sunday',
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
     ];
     return days[date.weekday - 1];
   }
@@ -44,10 +50,10 @@ class DoctorCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final dayName = _getDayName(selectedDate);
     final availableSlots = doctor.availableSlots
-        .where((s) =>
-    s.day.toLowerCase().trim() == dayName && s.isAvailable)
+        .where((s) => s.day.toLowerCase().trim() == dayName && s.isAvailable)
         .toList();
     final cardBackGroundColor = Theme.of(context).cardColor;
+    final isNarrow = MediaQuery.sizeOf(context).width < 340;
 
     return GestureDetector(
       onTap: onTap,
@@ -55,7 +61,9 @@ class DoctorCard extends StatelessWidget {
         margin: EdgeInsets.only(bottom: 16.h),
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
-          color: isSelected ? accentColor.withOpacity(0.04) : cardBackGroundColor,
+          color: isSelected
+              ? accentColor.withOpacity(0.04)
+              : cardBackGroundColor,
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
             color: isSelected ? accentColor : Colors.grey.shade200,
@@ -81,19 +89,18 @@ class DoctorCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12.r),
                   child: Image.network(
                     doctor.imageUrl,
-                    width: 65.w,
-                    height: 65.w,
+                    width: isNarrow ? 56.w : 65.w,
+                    height: isNarrow ? 56.w : 65.w,
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Container(
-                      width: 65.w,
-                      height: 65.w,
+                      width: isNarrow ? 56.w : 65.w,
+                      height: isNarrow ? 56.w : 65.w,
                       color: Colors.grey.shade100,
-                      child:
-                      Icon(Icons.person, color: Colors.grey.shade400),
+                      child: Icon(Icons.person, color: Colors.grey.shade400),
                     ),
                   ),
                 ),
-                SizedBox(width: 12.w),
+                SizedBox(width: isNarrow ? 8.w : 12.w),
 
                 // Name / specialty / rating
                 Expanded(
@@ -102,36 +109,45 @@ class DoctorCard extends StatelessWidget {
                     children: [
                       Text(
                         doctor.name,
-                        maxLines: 1,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.titleMedium,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       SizedBox(height: 4.h),
                       Text(
                         doctor.specialty,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style:Theme.of(context).textTheme.bodySmall,
-                          ),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                       SizedBox(height: 8.h),
-                      Row(
+                      Wrap(
+                        spacing: 6.w,
+                        runSpacing: 4.h,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
-                          Icon(Icons.star_rounded,
-                              size: 16.sp, color: Colors.amber),
-                          SizedBox(width: 4.w),
+                          Icon(
+                            Icons.star_rounded,
+                            size: 16.sp,
+                            color: Colors.amber,
+                          ),
                           Text(
                             doctor.rating.toStringAsFixed(1),
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
-                          SizedBox(width: 12.w),
-                          Icon(Icons.work_outline,
-                              size: 14.sp, color: Colors.grey.shade400),
-                          SizedBox(width: 4.w),
+                          Icon(
+                            Icons.work_outline,
+                            size: 14.sp,
+                            color: Colors.grey.shade400,
+                          ),
                           // ✅ was hardcoded 'سنة'
                           Text(
-                            'clinic.years_exp'.tr(namedArgs: {
-                              'count': '${doctor.experienceYears}'
-                            }),
+                            'clinic.years_exp'.tr(
+                              namedArgs: {'count': '${doctor.experienceYears}'},
+                            ),
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
@@ -141,66 +157,113 @@ class DoctorCard extends StatelessWidget {
                 ),
 
                 // Consultation fee + View Profile
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                if (!isNarrow)
+                  ConstrainedBox(
+                    constraints: BoxConstraints(minWidth: 72.w, maxWidth: 92.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '${doctor.consultationFee.toInt()}',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w800,
+                            color: accentColor,
+                          ),
+                        ),
+                        Text(
+                          'clinic.currency'.tr(),
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                        SizedBox(height: 6.h),
+                        // ── View Profile button ───────────────────
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: AlignmentDirectional.centerEnd,
+                          child: GestureDetector(
+                            onTap: () {
+                              final id = int.tryParse(doctor.id);
+                              if (id != null) {
+                                context.push(Routes.doctor(id));
+                              }
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 4.w,
+                                vertical: 4.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: accentColor.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8.r),
+                                border: Border.all(
+                                  color: accentColor.withOpacity(0.3),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.person_outline_rounded,
+                                    size: 11.sp,
+                                    color: accentColor,
+                                  ),
+                                  SizedBox(width: 2.w),
+                                  Text(
+                                    'settings.account.profile'.tr(),
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      fontSize: 10.sp,
+                                      color: accentColor,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+
+            if (isNarrow) ...[
+              SizedBox(height: 8.h),
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: Wrap(
+                  spacing: 8.w,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
-                      '${doctor.consultationFee.toInt()}',
+                      '${doctor.consultationFee.toInt()} ${'clinic.currency'.tr()}',
                       style: TextStyle(
-                        fontSize: 16.sp,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.w800,
                         color: accentColor,
                       ),
                     ),
-                    Text(
-                      'clinic.currency'.tr(),
-                      style: TextStyle(
-                          fontSize: 11.sp, color: Colors.grey.shade500),
-                    ),
-                    SizedBox(height: 6.h),
-                    // ── View Profile button ───────────────────
-                    GestureDetector(
-                      onTap: () {
+                    TextButton.icon(
+                      onPressed: () {
                         final id = int.tryParse(doctor.id);
-                        if (id != null) {
-                          Navigator.pushNamed(
-                            context,
-                            Routes.doctorProfile,
-                            arguments: id,
-                          );
-                        }
+                        if (id != null) context.push(Routes.doctor(id));
                       },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 8.w, vertical: 4.h),
-                        decoration: BoxDecoration(
-                          color: accentColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8.r),
-                          border: Border.all(
-                              color: accentColor.withOpacity(0.3)),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.person_outline_rounded,
-                                size: 11.sp, color: accentColor),
-                            SizedBox(width: 3.w),
-                            Text(
-                              'settings.account.profile'.tr(),
-                              style: TextStyle(
-                                fontSize: 10.sp,
-                                color: accentColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
+                      icon: Icon(Icons.person_outline_rounded, size: 16.sp),
+                      label: Text('settings.account.profile'.tr()),
+                      style: TextButton.styleFrom(
+                        foregroundColor: accentColor,
+                        padding: EdgeInsets.symmetric(horizontal: 8.w),
+                        visualDensity: VisualDensity.compact,
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
 
             SizedBox(height: 16.h),
             Divider(height: 1, color: Colors.grey.shade100),
@@ -217,14 +280,23 @@ class DoctorCard extends StatelessWidget {
             else
               Row(
                 children: [
-                  Icon(Icons.info_outline,
-                      size: 16.sp, color: Colors.grey.shade400),
+                  Icon(
+                    Icons.info_outline,
+                    size: 16.sp,
+                    color: Colors.grey.shade400,
+                  ),
                   SizedBox(width: 6.w),
                   // ✅ was hardcoded 'لا توجد مواعيد متاحة اليوم'
-                  Text(
-                    'clinic.no_slots_today'.tr(),
-                    style: TextStyle(
-                        fontSize: 12.sp, color: Colors.grey.shade500),
+                  Expanded(
+                    child: Text(
+                      'clinic.no_slots_today'.tr(),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -264,8 +336,9 @@ class _TimeSlotRow extends StatelessWidget {
         return true;
       },
       builder: (context, state) {
-        final selectedTime =
-        state is ClinicDetailsLoaded ? state.selectedTime : null;
+        final selectedTime = state is ClinicDetailsLoaded
+            ? state.selectedTime
+            : null;
         final cubit = context.read<ClinicDetailsCubit>();
 
         return Column(
@@ -276,7 +349,7 @@ class _TimeSlotRow extends StatelessWidget {
                 'clinic.choose_time'.tr(),
                 style: theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.w600,
-                //  color: ColorsManager.defaultTextSecondary,
+                  //  color: ColorsManager.defaultTextSecondary,
                 ),
               ),
               SizedBox(height: 8.h), // مساحة أقل
@@ -329,6 +402,7 @@ class _TimeSlotRow extends StatelessWidget {
                               horizontal: 14.w,
                               vertical: 6.h,
                             ),
+
                             /// استخدام Row بدلاً من Column لتوفير الطول
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -338,8 +412,12 @@ class _TimeSlotRow extends StatelessWidget {
                                 Text(
                                   slot.timeSlot,
                                   style: theme.textTheme.bodySmall!.copyWith(
-                                    fontWeight: isSlotSelected?FontWeight.w600:FontWeight.w500,
-                                    color: isSlotSelected?Colors.white:ColorsManager.primaryColor,
+                                    fontWeight: isSlotSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.w500,
+                                    color: isSlotSelected
+                                        ? Colors.white
+                                        : ColorsManager.primaryColor,
                                   ),
                                 ),
                                 // إظهار المتبقي بجانب الوقت بشكل احترافي وصغير
@@ -355,8 +433,8 @@ class _TimeSlotRow extends StatelessWidget {
                                       color: isSlotSelected
                                           ? Colors.white70
                                           : (remaining <= 2
-                                          ? ColorsManager.warningText
-                                          : ColorsManager.inputBorder),
+                                                ? ColorsManager.warningText
+                                                : ColorsManager.inputBorder),
                                     ),
                                   ),
                                   SizedBox(width: 4.w),
@@ -377,8 +455,12 @@ class _TimeSlotRow extends StatelessWidget {
                                     style: theme.textTheme.bodySmall!.copyWith(
                                       fontSize: 10.sp,
                                       height: 1.2,
-                                      fontWeight: isSlotSelected?FontWeight.w600:FontWeight.w500,
-                                      color: isSlotSelected?Colors.white:ColorsManager.primaryColor,
+                                      fontWeight: isSlotSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.w500,
+                                      color: isSlotSelected
+                                          ? Colors.white
+                                          : ColorsManager.primaryColor,
                                     ),
                                   ),
                                 ],

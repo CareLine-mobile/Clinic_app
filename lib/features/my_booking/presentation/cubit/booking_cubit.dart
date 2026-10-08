@@ -21,12 +21,12 @@ class BookingCubit extends Cubit<BookingState> {
     required CreateReviewUseCase createReview,
     required IsClinicReviewedUseCase isClinicReviewed,
     required MarkClinicReviewedUseCase markClinicReviewed,
-  })  : _getUserBookings = getUserBookings,
-        _cancelBooking = cancelBooking,
-        _createReview = createReview,
-        _isClinicReviewed = isClinicReviewed,
-        _markClinicReviewed = markClinicReviewed,
-        super(BookingInitial());
+  }) : _getUserBookings = getUserBookings,
+       _cancelBooking = cancelBooking,
+       _createReview = createReview,
+       _isClinicReviewed = isClinicReviewed,
+       _markClinicReviewed = markClinicReviewed,
+       super(BookingInitial());
 
   int _currentPage = 1;
 
@@ -37,12 +37,34 @@ class BookingCubit extends Cubit<BookingState> {
     _currentPage = 1;
     final result = await _getUserBookings(page: _currentPage);
     result.fold(
-          (failure) => emit(BookingError(failure.message)),
-          (list) => emit(BookingLoaded(
-        bookings: list.data,
-        hasNextPage: list.hasNextPage,
-      )),
+      (failure) => emit(BookingError(failure.message)),
+      (list) => emit(
+        BookingLoaded(bookings: list.data, hasNextPage: list.hasNextPage),
+      ),
     );
+  }
+
+  Future<BookingEntity?> getBookingById(int bookingId) async {
+    final current = state;
+    if (current is BookingLoaded) {
+      for (final booking in current.bookings) {
+        if (booking.id == bookingId) return booking;
+      }
+    }
+
+    await loadBookings();
+    final loaded = state;
+    if (loaded is BookingLoaded) {
+      for (final booking in loaded.bookings) {
+        if (booking.id == bookingId) return booking;
+      }
+    }
+    return null;
+  }
+
+  void resetSession() {
+    _currentPage = 1;
+    emit(BookingInitial());
   }
 
   Future<void> loadMoreBookings() async {
@@ -55,15 +77,17 @@ class BookingCubit extends Cubit<BookingState> {
 
     final result = await _getUserBookings(page: _currentPage);
     result.fold(
-          (failure) {
+      (failure) {
         _currentPage--;
         emit(current.copyWith(isPaginating: false));
         emit(BookingError(failure.message));
       },
-          (list) => emit(BookingLoaded(
-        bookings: [...current.bookings, ...list.data],
-        hasNextPage: list.hasNextPage,
-      )),
+      (list) => emit(
+        BookingLoaded(
+          bookings: [...current.bookings, ...list.data],
+          hasNextPage: list.hasNextPage,
+        ),
+      ),
     );
   }
 
@@ -73,27 +97,23 @@ class BookingCubit extends Cubit<BookingState> {
     emit(CancelBookingLoading());
     final result = await _cancelBooking(bookingId);
     result.fold(
-          (failure) => emit(CancelBookingError(failure.message)),
-          (_) => emit(CancelBookingSuccess()),
+      (failure) => emit(CancelBookingError(failure.message)),
+      (_) => emit(CancelBookingSuccess()),
     );
   }
 
   // ─── Review ───────────────────────────────────────────────────────────────
 
   /// Check cache before showing the form
-  Future<bool> isClinicReviewed(int clinicId) =>
-      _isClinicReviewed(clinicId);
+  Future<bool> isClinicReviewed(int clinicId) => _isClinicReviewed(clinicId);
 
   Future<void> submitReview(CreateReviewParams params) async {
     emit(ReviewSubmitting());
     final result = await _createReview(params);
-    result.fold(
-          (failure) => emit(ReviewError(failure.message)),
-          (_) async {
-        // Save to cache on success
-        await _markClinicReviewed(params.clinicId);
-        emit(ReviewSuccess());
-      },
-    );
+    result.fold((failure) => emit(ReviewError(failure.message)), (_) async {
+      // Save to cache on success
+      await _markClinicReviewed(params.clinicId);
+      emit(ReviewSuccess());
+    });
   }
 }

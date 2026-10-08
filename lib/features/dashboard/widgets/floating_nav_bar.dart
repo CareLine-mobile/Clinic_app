@@ -43,8 +43,9 @@ class FloatingNavBar extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: List.generate(displayIcons.length, (displayIndex) {
-            final actualIndex =
-            isRTL ? (totalIcons - 1 - displayIndex) : displayIndex;
+            final actualIndex = isRTL
+                ? (totalIcons - 1 - displayIndex)
+                : displayIndex;
             final isSelected = currentIndex == actualIndex;
 
             return Expanded(

@@ -1,6 +1,7 @@
 import 'package:clinic_app/features/user_data/user_repo.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/routes/routes.dart';
 import '../../../../core/utils/app_size.dart';
 import 'settings_card.dart';
@@ -24,7 +25,7 @@ class AccountSection extends StatelessWidget {
               icon: Icons.person_outline_rounded,
               title: 'settings.account.profile'.tr(),
               subtitle: 'settings.account.profile_sub'.tr(),
-              onTap: () => Navigator.pushNamed(context, Routes.profile),
+              onTap: () => context.push(Routes.profile),
             ),
             _divider(),
             SettingsItem(
@@ -32,10 +33,13 @@ class AccountSection extends StatelessWidget {
               title: 'settings.account.change_password'.tr(),
               subtitle: 'settings.account.change_password_sub'.tr(),
               onTap: () {
-                Navigator.pushNamed(context, Routes.forgotPassword,arguments: UserRepository().currentUser!.email);
+                context.push(
+                  Routes.forgotPasswordForEmail(
+                    UserRepository().currentUser!.email,
+                  ),
+                );
               },
             ),
-
           ],
         ),
       ],

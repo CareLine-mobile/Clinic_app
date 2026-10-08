@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -11,14 +12,14 @@ import 'filter_bar.dart';
 
 class SearchResultsView extends StatelessWidget {
   final List<ClinicSummary> clinics;
-  final SearchLoaded loadedState;    // ← pass full state for filter access
+  final SearchLoaded loadedState; // ← pass full state for filter access
   const SearchResultsView({required this.clinics, required this.loadedState});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        FilterBar(state: loadedState),   // ← active-filter chips row
+        FilterBar(state: loadedState), // ← active-filter chips row
         Expanded(
           child: ListView.builder(
             padding: EdgeInsets.symmetric(vertical: 8.h),
@@ -30,10 +31,11 @@ class SearchResultsView extends StatelessWidget {
                 key: ValueKey(clinic.id),
                 clinic: clinic,
                 layout: ClinicCardLayout.list,
-                onTap: () => Navigator.pushNamed(
-                  context, Routes.clinicDetails, arguments: clinic.id,
-                ),
-                onFavoriteToggle:()=> context.read<SearchCubit>().toggleFavorite(clinic.id),
+                onTap: () {
+                  context.push(Routes.clinic(clinic.id));
+                },
+                onFavoriteToggle: () =>
+                    context.read<SearchCubit>().toggleFavorite(clinic.id),
               );
             },
           ),

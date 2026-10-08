@@ -1,4 +1,22 @@
 {
+  "route_titles": {
+    "app": "CareLine",
+    "home": "Home",
+    "search": "Search",
+    "favorites": "Favorites",
+    "bookings": "My Bookings",
+    "settings": "Settings",
+    "auth": "Sign in",
+    "verification": "Verify account",
+    "forgot_password": "Forgot password",
+    "reset_password": "Reset password",
+    "clinic": "Clinic details",
+    "doctor": "Doctor profile",
+    "booking": "Book an appointment",
+    "profile": "Profile",
+    "map": "Nearby clinics",
+    "not_found": "Page not found"
+  },
   "auth_guard": {
     "title": "Login Required",
     "message": "This feature requires you to be logged in.\nWould you like to log in now?",
@@ -165,6 +183,7 @@
     },
     "detail": {
       "title": "Booking Details",
+      "not_found": "Booking not found",
       "appointment_info": "Appointment Info",
       "patient_info": "Client Info",
       "patient_name": "Name",
@@ -236,6 +255,9 @@
     "missing_info": "Missing required booking information"
   },
   "clinic": {
+    "doctors_count": "{count} doctors",
+    "empty_list": "No clinics available",
+    "login_to_favorite": "Please sign in to add favorites",
     "choose_date": "Choose Date",
     "status": {
       "open": "Open",
@@ -248,6 +270,7 @@
     "remaining": "{count} remaining",
     "selected_summary_clear": "Clear selection",
     "book_now": "Book Now",
+    "confirm_booking": "Book an appointment with {doctor}?",
     "currency": "EGP",
     "years_exp": "{count} yrs exp.",
     "tabs": {
@@ -371,6 +394,7 @@
     "phoneRequired": "Phone number is required"
   },
   "errors": {
+    "route_not_found": "Page not found",
     "network": {
       "title": "No Internet Connection",
       "subtitle": "Check your internet connection and try again",

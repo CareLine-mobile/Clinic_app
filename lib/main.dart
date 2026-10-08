@@ -8,8 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'core/db/shared_pref_helper.dart';
 import 'core/di/injection_container.dart';
-import 'core/routes/app_routes.dart';
-import 'core/routes/routes.dart';
+import 'core/routes/app_router.dart';
 import 'core/service/app_initializer.dart';
 import 'core/service/notification_permission_service.dart';
 import 'core/theme/app_theme.dart';
@@ -20,6 +19,7 @@ import 'features/auth/presentation/cubit/auth_cubit.dart';
 import 'features/settings/presentation/cubit/settings_cubit.dart';
 import 'features/user_data/user_cubit.dart';
 import 'features/user_data/user_repo.dart';
+import 'features/my_booking/presentation/cubit/booking_cubit.dart';
 
 // ── First-launch flags ────────────────────────────────────────────────────
 bool isConfigurationDone = false;
@@ -71,25 +71,19 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  String get _initialRoute {
-    if (kIsWeb) {
-      final current = Uri.base;
-      if (current.path != '/' && current.path.isNotEmpty) {
-        return current.hasQuery
-            ? '${current.path}?${current.query}'
-            : current.path;
-      }
-    }
-    if (!isConfigurationDone) return Routes.configuration;
-    // if (!isOnBoarding)        return Routes.onboarding;
-    return UserRepository().isLoggedIn ? Routes.dashBoard : Routes.auth;
-  }
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<UserCubit>(create: (_) => UserCubit(UserRepository())),
+        BlocProvider<BookingCubit>(
+          lazy: false,
+          create: (_) {
+            final bookingCubit = sl<BookingCubit>();
+            if (UserRepository().isLoggedIn) bookingCubit.loadBookings();
+            return bookingCubit;
+          },
+        ),
         BlocProvider<SettingsCubit>(
           create: (_) =>
               SettingsCubit(settingsRepository: sl())..loadSettings(),
@@ -130,8 +124,7 @@ class MyApp extends StatelessWidget {
                         context.setLocale(state.locale);
                       }
                     },
-                    child: MaterialApp(
-                      navigatorKey: AppRouter.navigatorKey,
+                    child: MaterialApp.router(
                       theme: AppTheme.light,
                       darkTheme: AppTheme.dark,
                       themeMode: settings.themeMode,
@@ -139,8 +132,7 @@ class MyApp extends StatelessWidget {
                       supportedLocales: context.supportedLocales,
                       locale: context.locale,
                       debugShowCheckedModeBanner: kDebugMode,
-                      initialRoute: _initialRoute,
-                      onGenerateRoute: AppRouter.onGenerateRoute,
+                      routerConfig: appRouter,
                       //   builder: (context, child) => DevToolsOverlay(child:child!),
                     ),
                   );

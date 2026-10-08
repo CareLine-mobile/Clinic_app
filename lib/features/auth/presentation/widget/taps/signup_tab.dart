@@ -1,6 +1,7 @@
 import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:clinic_app/core/widgets/app_buton.dart';
 import 'package:clinic_app/core/widgets/app_text_feild.dart';
@@ -63,15 +64,12 @@ class _SignupTabState extends State<SignupTab> {
             message: 'errors.server.accountNotVerified'.tr(),
             type: SnackBarType.success,
           );
-          Navigator.pushNamed(
-            context,
-            '${Routes.verification}?email=${Uri.encodeQueryComponent(state.email)}',
-          );
+          final from = GoRouterState.of(context).uri.queryParameters['from'];
+          context.push(Routes.verificationForEmail(state.email, from: from));
         } else if (state is AuthAuthenticated) {
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            Routes.dashBoard,
-            (_) => false,
+          context.go(
+            GoRouterState.of(context).uri.queryParameters['from'] ??
+                Routes.home,
           );
         }
       },
@@ -158,11 +156,7 @@ class _SignupTabState extends State<SignupTab> {
                 AppOutlinedButton(
                   text: 'auth.continueAsGuest'.tr(),
                   leadingIcon: Icons.person_outline,
-                  onPressed: () => Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    Routes.dashBoard,
-                    (_) => false,
-                  ),
+                  onPressed: () => context.go(Routes.home),
                   horizontalPadding: 0,
                   verticalPadding: 0,
                 ),

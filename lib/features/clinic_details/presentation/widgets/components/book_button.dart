@@ -1,8 +1,10 @@
-import 'package:clinic_app/features/clinic_details/presentation/view/booking/booking_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../../core/utils/app_size.dart';
+import '../../../../../core/routes/routes.dart';
 import '../../../../../core/widgets/confirmation_dialog.dart';
 import '../../../../user_data/auth_guard.dart';
 import '../../../domain/entites/clinic_entities.dart';
@@ -31,25 +33,32 @@ class BookButton extends StatelessWidget {
           onPressed: isBooking ? null : () => _showBookingDialog(context),
           style: ElevatedButton.styleFrom(
             backgroundColor: accentColor,
-            padding: EdgeInsets.symmetric(vertical: AppSizeVertical.instance.s16),
+            padding: EdgeInsets.symmetric(
+              vertical: AppSizeVertical.instance.s16,
+            ),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSizeHorizontal.instance.s12),
+              borderRadius: BorderRadius.circular(
+                AppSizeHorizontal.instance.s12,
+              ),
             ),
           ),
           child: isBooking
               ? SizedBox(
-            height: 20.h,
-            width: 20.w,
-            child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-          )
+                  height: 20.h,
+                  width: 20.w,
+                  child: const CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
               : Text(
-            'احجز الآن',
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
+                  'clinic.book_now'.tr(),
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
         );
       },
     );
@@ -59,20 +68,10 @@ class BookButton extends StatelessWidget {
     if (!AuthGuard.check(context)) return;
     AppDialog.warning(
       context: context,
-      message: 'هل تريد حجز موعد مع ${doctor.name}؟',
+      message: 'clinic.confirm_booking'.tr(namedArgs: {'doctor': doctor.name}),
       onConfirm: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BookingScreen(
-              clinicalId: int.parse(clinic.id),
-              doctorId: doctor.id,
-              clinicName: clinic.name,
-              doctorName: doctor.name,
-              availableSlots: doctor.availableSlots,
-            ),
-          ),
-        );
+        final clinicId = int.tryParse(clinic.id);
+        if (clinicId != null) context.push(Routes.clinicBooking(clinicId));
       },
     );
   }

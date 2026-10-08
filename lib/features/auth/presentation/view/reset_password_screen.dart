@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:clinic_app/core/widgets/app_buton.dart';
 import 'package:clinic_app/core/widgets/app_text_feild.dart';
@@ -66,7 +67,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             message: 'auth.resetPassword.success'.tr(),
             type: SnackBarType.success,
           );
-          Navigator.pushNamedAndRemoveUntil(context, Routes.auth, (_) => false);
+          final from = GoRouterState.of(context).uri.queryParameters['from'];
+          context.go(from ?? Routes.auth);
         } else if (state is ResetPasswordFailure) {
           CustomSnackBar.show(
             context,

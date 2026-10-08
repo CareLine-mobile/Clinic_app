@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/routes/routes.dart';
 import '../../../../core/utils/app_size.dart';
@@ -19,9 +20,7 @@ class LegalSection extends StatelessWidget {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is DeleteAccountSuccess) {
-          Navigator.pushNamedAndRemoveUntil(
-            context, Routes.auth, (_) => false,
-          );
+          context.go(Routes.auth);
         }
         if (state is DeleteAccountFailure) {
           CustomSnackBar.show(
@@ -49,7 +48,7 @@ class LegalSection extends StatelessWidget {
                 title: 'settings.legal.privacy'.tr(),
                 subtitle: 'settings.legal.privacy_sub'.tr(),
                 onTap: () {
-                  Navigator.pushNamed(context, Routes.privacyPolicy);
+                  context.push(Routes.privacyPolicy);
                 },
               ),
               _divider(),
@@ -58,7 +57,6 @@ class LegalSection extends StatelessWidget {
                 title: 'settings.legal.about'.tr(),
                 subtitle: 'settings.legal.version'.tr(),
                 showArrow: false,
-
               ),
               _divider(),
               // ─── Delete account — red icon ──────────────────────

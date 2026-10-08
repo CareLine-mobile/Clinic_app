@@ -2,6 +2,10 @@
 
 ## What changed
 
+- Routing now uses GoRouter with path-based URLs. The dashboard tabs are addressable at `/home`, `/search`, `/favourites`, `/bookings`, and `/settings`; detail paths include `/clinic/:id`, `/clinic/:id/booking`, `/doctor/:id`, and `/bookings/:id`. Profile, map, privacy, auth, verification, password recovery, configuration, and onboarding have their own paths. Legacy `/dashBoard` redirects to `/home`.
+- The router preserves the browser's current path and query on startup, sends first-run users through configuration and onboarding, and preserves protected destinations in the `from` query when login is required. Each routed page sets its browser title.
+- The web deployment must serve `index.html` for every application path. Enable an SPA fallback/rewrite so refreshing `/clinic/12`, `/doctor/573`, or `/bookings/45` loads Flutter instead of returning a host-level 404.
+
 - Added the shared `AuthResponsiveShell` for auth, verification, forgot-password, and reset-password screens. It keeps the narrow phone treatment, constrains tablet cards, and adds a two-pane wide-screen layout.
 - Replaced the fixed-height auth tab viewport with content-sized animated tabs inside a scrollable shell.
 - Added form autofill hints, keyboard focus order, Enter submission, and password-save context completion.

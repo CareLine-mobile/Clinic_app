@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/routes/routes.dart';
 import '../../../../core/utils/app_size.dart';
 import '../../../../core/widgets/app_buton.dart';
@@ -26,9 +27,6 @@ class SettingsTabScreen extends StatelessWidget {
       listenWhen: (_, curr) => curr is AuthUnauthenticated,
       listener: (context, _) {
         context.read<SettingsCubit>().clearNotifications();
-        Navigator.pushNamedAndRemoveUntil(
-          context, Routes.auth, (_) => false,
-        );
       },
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -60,9 +58,7 @@ class _SettingsScrollView extends StatelessWidget {
         userPhotoUrl: user!.avatar,
       );
     }
-    return const SliverToBoxAdapter(
-      child: SafeArea(child: GuestBanner()),
-    );
+    return const SliverToBoxAdapter(child: SafeArea(child: GuestBanner()));
   }
 }
 
@@ -77,26 +73,18 @@ class _SettingsBody extends StatelessWidget {
 
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: h.s16,
-          vertical: v.s16,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: h.s16, vertical: v.s16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (user != null) ...[
-               AccountSection(),
-              SizedBox(height: v.s20),
-            ],
-             PreferencesSection(),
+            if (user != null) ...[AccountSection(), SizedBox(height: v.s20)],
+            PreferencesSection(),
             SizedBox(height: v.s20),
-          //  const SupportSection(),
+            //  const SupportSection(),
             SizedBox(height: v.s20),
-             LegalSection(),
+            LegalSection(),
             SizedBox(height: v.s20),
-            user != null
-                ?  LogoutSection()
-                :  _GuestAuthButtons(),
+            user != null ? LogoutSection() : _GuestAuthButtons(),
             SizedBox(height: v.s70),
           ],
         ),
@@ -114,7 +102,9 @@ class _GuestAuthButtons extends StatelessWidget {
       text: 'common.login'.tr(),
       horizontalPadding: 0,
       verticalPadding: 0,
-      onPressed: () => Navigator.pushNamed(context, Routes.auth),
+      onPressed: () => context.push(
+        Routes.authFor(GoRouterState.of(context).uri.toString()),
+      ),
     );
   }
 }

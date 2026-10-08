@@ -1,9 +1,9 @@
 // ==================== components/clinic_app_bar.dart ====================
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/widgets/app_buton.dart';
 import '../../../domain/entites/clinic_entities.dart';
-
 
 class ClinicAppBar extends StatelessWidget implements PreferredSizeWidget {
   final ClinicEntity clinic;
@@ -22,12 +22,14 @@ class ClinicAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: isTransparent ? Colors.transparent : Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: isTransparent
+          ? Colors.transparent
+          : Theme.of(context).scaffoldBackgroundColor,
       elevation: 0,
       leading: AppBarButton(
         icon: Icons.arrow_back_ios_new, // شكل عصري أكثر
         isTransparent: isTransparent,
-        onPressed: () => Navigator.pop(context),
+        onPressed: () => context.canPop() ? context.pop() : context.go('/home'),
       ),
       actions: [
         // زر المشاركة

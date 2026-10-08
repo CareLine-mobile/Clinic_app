@@ -10,6 +10,7 @@ import 'package:clinic_app/features/home/domain/entities/clinic_summary.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/di/injection_container.dart' as di;
@@ -50,21 +51,21 @@ class _FavouritesBody extends StatelessWidget {
             );
           }
         },
-          builder: (context, state) => RefreshIndicator(
-            onRefresh: () => context.read<FavouriteCubit>().loadFavourites(),
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-               SliverToBoxAdapter(
-                 child: CustomAppBar(
-                   title: 'favorites.title'.tr(),
-                   showBackIcon: false,
-                 ),
-               ),
-                _bodySliver(context, state),  // No RefreshIndicator here anymore
-              ],
-            ),
-          )
+        builder: (context, state) => RefreshIndicator(
+          onRefresh: () => context.read<FavouriteCubit>().loadFavourites(),
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                child: CustomAppBar(
+                  title: 'favorites.title'.tr(),
+                  showBackIcon: false,
+                ),
+              ),
+              _bodySliver(context, state), // No RefreshIndicator here anymore
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -81,12 +82,12 @@ class _FavouritesBody extends StatelessWidget {
           subtitle: 'bookings.auth_required_subtitle'.tr(),
           enableBackButton: false,
           actionLabel: 'auth.login'.tr(),
-          onActionPressed: () => Navigator.pushNamed(context, Routes.auth),
+          onActionPressed: () => context.push(
+            Routes.authFor(GoRouterState.of(context).uri.toString()),
+          ),
         ),
       ),
-      FavouriteEmpty() => SliverFillRemaining(
-        child: _EmptyView(),
-      ),
+      FavouriteEmpty() => SliverFillRemaining(child: _EmptyView()),
       FavouriteError(:final failure) => SliverFillRemaining(
         child: ErrorStateWidget(
           failure: failure,
@@ -98,7 +99,6 @@ class _FavouritesBody extends StatelessWidget {
     };
   }
 }
-
 
 // ─────────────────────────────────────────────────────────────
 
@@ -131,11 +131,7 @@ class _ClinicListSliver extends StatelessWidget {
   }
 
   void _openDetails(BuildContext context, ClinicSummary clinic) {
-    Navigator.pushNamed(
-      context,
-      Routes.clinicDetails,
-      arguments: clinic.id,
-    );
+    context.push(Routes.clinic(clinic.id));
   }
 }
 
@@ -150,7 +146,7 @@ class _EmptyView extends StatelessWidget {
       subtitle: 'favorites.empty_subtitle'.tr(),
       enableBackButton: false,
       actionLabel: 'favorites.find_clinic'.tr(),
-      onActionPressed: () => Navigator.pushNamed(context, Routes.dashBoard),
+      onActionPressed: () => context.go(Routes.home),
     );
   }
 }

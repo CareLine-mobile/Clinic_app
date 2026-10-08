@@ -9,12 +9,14 @@ import 'package:clinic_app/features/doctor_details/presentation/cubit/doctor_pro
 import 'package:clinic_app/features/doctor_details/presentation/widgets/doctor_rating_dialog.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/widgets/app_text_widgets.dart';
 import '../widgets/Info_tile.dart';
+
 class DoctorClinicCard extends StatelessWidget {
   final DoctorProfileEntity doctor;
 
@@ -32,8 +34,9 @@ class DoctorClinicCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SectionTitle(
-              'doctorProfile.availableAt'.tr(),
-              icon: Icons.local_hospital_outlined),
+            'doctorProfile.availableAt'.tr(),
+            icon: Icons.local_hospital_outlined,
+          ),
           SizedBox(height: 12.h),
           Container(
             padding: EdgeInsets.all(16.w),
@@ -82,14 +85,18 @@ class DoctorClinicCard extends StatelessWidget {
                           SizedBox(height: 3.h),
                           Row(
                             children: [
-                              Icon(Icons.place_rounded,
-                                  size: 13.sp, color: theme.hintColor),
+                              Icon(
+                                Icons.place_rounded,
+                                size: 13.sp,
+                                color: theme.hintColor,
+                              ),
                               SizedBox(width: 3.w),
                               Flexible(
                                 child: Text(
                                   clinic.location,
                                   style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.hintColor),
+                                    color: theme.hintColor,
+                                  ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -116,8 +123,9 @@ class DoctorClinicCard extends StatelessWidget {
                         Text(
                           'doctorProfile.egp'.tr(),
                           style: TextStyle(
-                              fontSize: 10.sp,
-                              color: ColorsManager.primaryColor),
+                            fontSize: 10.sp,
+                            color: ColorsManager.primaryColor,
+                          ),
                         ),
                       ],
                     ),
@@ -128,7 +136,10 @@ class DoctorClinicCard extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.pop(context);
+                      if (context.canPop())
+                        context.pop();
+                      else
+                        context.go('/home');
                     },
                     icon: const Icon(Icons.calendar_month_rounded),
                     label: Text('doctorProfile.bookHere'.tr()),

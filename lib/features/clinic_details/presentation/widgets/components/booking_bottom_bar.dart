@@ -6,12 +6,12 @@
 // ══════════════════════════════════════════════════════════════════════════════
 
 import 'package:clinic_app/features/clinic_details/domain/entites/clinic_entities.dart';
-import 'package:clinic_app/features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
-import 'package:clinic_app/features/clinic_details/presentation/view/booking/booking_screen.dart';
+import 'package:clinic_app/core/routes/routes.dart';
 import 'package:clinic_app/features/user_data/auth_guard.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../../core/theme/colors.dart';
 import '../../../domain/entites/doctor_entity.dart';
@@ -20,11 +20,8 @@ class BookingBottomBar extends StatelessWidget {
   final ClinicEntity clinic;
   final DoctorEntity doctor;
 
-  const BookingBottomBar({
-    Key? key,
-    required this.clinic,
-    required this.doctor,
-  }) : super(key: key);
+  const BookingBottomBar({Key? key, required this.clinic, required this.doctor})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -98,21 +95,7 @@ class BookingBottomBar extends StatelessWidget {
   void _openBookingScreen(BuildContext context) {
     if (!AuthGuard.check(context)) return;
 
-    final cubit = context.read<ClinicDetailsCubit>();
-
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
-          value: cubit,
-          child: BookingScreen(
-            clinicalId: int.parse(clinic.id),
-            doctorId: doctor.id,
-            clinicName: clinic.name,
-            doctorName: doctor.name,
-            availableSlots: doctor.availableSlots,
-          ),
-        ),
-      ),
-    );
+    final clinicId = int.tryParse(clinic.id);
+    if (clinicId != null) context.push(Routes.clinicBooking(clinicId));
   }
 }

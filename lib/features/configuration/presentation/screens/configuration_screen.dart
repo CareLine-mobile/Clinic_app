@@ -3,6 +3,7 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -94,7 +95,7 @@ class _ConfigurationScreenState extends State<ConfigurationScreen>
     );
 
     if (!mounted) return;
-    Navigator.pushReplacementNamed(context, Routes.onboarding);
+    context.go(Routes.onboarding);
   }
 
   // ── Build ─────────────────────────────────────────────────────────────────
@@ -104,19 +105,21 @@ class _ConfigurationScreenState extends State<ConfigurationScreen>
     final v = AppSizeVertical.instance;
     final h = AppSizeHorizontal.instance;
 
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness:
-      _selectedDark ? Brightness.light : Brightness.dark,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: _selectedDark
+            ? Brightness.light
+            : Brightness.dark,
+      ),
+    );
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       color: _bgColor,
       child: Directionality(
         // Immediately mirror layout to preview the selection
-        textDirection:
-        _isArabic ? ui.TextDirection.rtl : ui.TextDirection.ltr,
+        textDirection: _isArabic ? ui.TextDirection.rtl : ui.TextDirection.ltr,
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: SafeArea(
@@ -207,10 +210,7 @@ class _ConfigurationScreenState extends State<ConfigurationScreen>
             ],
           ),
           padding: EdgeInsets.all(14.r),
-          child: Image.asset(
-            Assets.logoApp,
-            fit: BoxFit.contain,
-          ),
+          child: Image.asset(Assets.logoApp, fit: BoxFit.contain),
         ),
         SizedBox(height: v.s16),
         Text(
@@ -245,11 +245,7 @@ class _ConfigurationScreenState extends State<ConfigurationScreen>
               ? 'اختر لغتك وشكل المفضل للبدء'
               : 'Choose your language & appearance to get started',
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 14.sp,
-            color: _textSecondary,
-            height: 1.5,
-          ),
+          style: TextStyle(fontSize: 14.sp, color: _textSecondary, height: 1.5),
         ),
       ],
     );
@@ -449,18 +445,18 @@ class _SelectionTile extends StatelessWidget {
             color: isSelected
                 ? ColorsManager.primaryColor
                 : (isDark
-                ? Colors.white.withOpacity(0.08)
-                : const Color(0xFFE5EAF2)),
+                      ? Colors.white.withOpacity(0.08)
+                      : const Color(0xFFE5EAF2)),
             width: isSelected ? 1.8 : 1.0,
           ),
           boxShadow: isSelected
               ? [
-            BoxShadow(
-              color: ColorsManager.primaryColor.withOpacity(0.15),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            )
-          ]
+                  BoxShadow(
+                    color: ColorsManager.primaryColor.withOpacity(0.15),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
               : [],
         ),
         child: Center(child: child),

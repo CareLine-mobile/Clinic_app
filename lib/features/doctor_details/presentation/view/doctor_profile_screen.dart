@@ -9,6 +9,8 @@ import 'package:clinic_app/features/doctor_details/presentation/cubit/doctor_pro
 import 'package:clinic_app/features/doctor_details/presentation/widgets/doctor_rating_dialog.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:clinic_app/core/routes/routes.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -30,7 +32,7 @@ class DoctorProfileScreen extends StatefulWidget {
   final int doctorId;
 
   const DoctorProfileScreen({Key? key, required this.doctorId})
-      : super(key: key);
+    : super(key: key);
 
   @override
   State<DoctorProfileScreen> createState() => _DoctorProfileScreenState();
@@ -71,16 +73,16 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
             title: message,
             icon: Icons.error_outline_rounded,
             enableBackButton: true,
-            onBackPressed: () => Navigator.pop(context),
-            onActionPressed: () => context
-                .read<DoctorProfileCubit>()
-                .loadDoctor(widget.doctorId),
+            onBackPressed: () =>
+                context.canPop() ? context.pop() : context.go(Routes.home),
+            onActionPressed: () =>
+                context.read<DoctorProfileCubit>().loadDoctor(widget.doctorId),
             actionLabel: 'common.retry'.tr(),
             subtitle: 'doctorProfile.loadErrorTitle'.tr(),
           ),
         ),
         DoctorProfileLoaded(:final doctor, :final isRatingLoading) =>
-            _buildProfile(doctor, isRatingLoading),
+          _buildProfile(doctor, isRatingLoading),
         DoctorRatingSuccess(:final doctor) => _buildProfile(doctor, false),
         DoctorRatingError(:final doctor) => _buildProfile(doctor, false),
         _ => const Scaffold(body: LoadingSpinner()),
@@ -98,11 +100,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
         );
         break;
       case DoctorRatingError(:final message):
-        CustomSnackBar.show(
-          ctx,
-          message: message,
-          type: SnackBarType.error,
-        );
+        CustomSnackBar.show(ctx, message: message, type: SnackBarType.error);
         break;
       default:
         break;
@@ -121,7 +119,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
               DoctorSliverAppBar(
                 doctor: doctor,
                 isAppBarSolid: _isAppBarSolid,
-                onBackTap: () => Navigator.pop(context),
+                onBackTap: () =>
+                    context.canPop() ? context.pop() : context.go(Routes.home),
               ),
               SliverToBoxAdapter(
                 child: Column(
@@ -179,29 +178,3 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
 // ── Capitalize helper ─────────────────────────────────────────────────────
 String capitalizeWord(String s) =>
     s.isEmpty ? s : s[0].toUpperCase() + s.substring(1).toLowerCase();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

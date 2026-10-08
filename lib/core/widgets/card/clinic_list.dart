@@ -38,6 +38,27 @@ class _FeaturedClinicsSectionState extends State<FeaturedClinicsSection> {
     _controller.addListener(_onScroll);
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final width = MediaQuery.sizeOf(context).width;
+    final fraction = width < 600
+        ? 0.88
+        : width < 1024
+        ? 0.45
+        : 0.32;
+    if (_controller.viewportFraction != fraction) {
+      _controller.removeListener(_onScroll);
+      final page = _controller.hasClients ? (_controller.page ?? 0) : 0.0;
+      _controller.dispose();
+      _controller = PageController(
+        viewportFraction: fraction,
+        initialPage: page.round(),
+      );
+      _controller.addListener(_onScroll);
+    }
+  }
+
   void _onScroll() {
     if (!mounted) return;
     setState(() {
@@ -69,7 +90,12 @@ class _FeaturedClinicsSectionState extends State<FeaturedClinicsSection> {
         ),
         SizedBox(height: 16.h),
         SizedBox(
-          height: 420.h,
+          height:
+              (MediaQuery.sizeOf(context).width *
+                      _controller.viewportFraction *
+                      1.2)
+                  .clamp(320.0, 480.0)
+                  .toDouble(),
           child: Directionality(
             textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
             child: PageView.builder(
@@ -80,7 +106,8 @@ class _FeaturedClinicsSectionState extends State<FeaturedClinicsSection> {
                 final clinic = widget.clinics[index];
                 final double diff = (currentPage - index).abs();
                 // عكس اتجاه الـ parallax في RTL
-                final double parallax = (currentPage - index) * 80.w * (isRTL ? -1 : 1);
+                final double parallax =
+                    (currentPage - index) * 80.w * (isRTL ? -1 : 1);
                 final double scale = 1.0 - (diff * 0.035).clamp(0.0, 0.15);
                 final double opacity = (1.0 - (diff * 0.15)).clamp(0.5, 1.0);
 
@@ -128,7 +155,8 @@ class HorizontalClinicsCarousel extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<HorizontalClinicsCarousel> createState() => _HorizontalClinicsCarouselState();
+  State<HorizontalClinicsCarousel> createState() =>
+      _HorizontalClinicsCarouselState();
 }
 
 class _HorizontalClinicsCarouselState extends State<HorizontalClinicsCarousel> {
@@ -140,6 +168,27 @@ class _HorizontalClinicsCarouselState extends State<HorizontalClinicsCarousel> {
     super.initState();
     _controller = PageController(viewportFraction: 0.88);
     _controller.addListener(_onScroll);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final width = MediaQuery.sizeOf(context).width;
+    final fraction = width < 600
+        ? 0.88
+        : width < 1024
+        ? 0.45
+        : 0.32;
+    if (_controller.viewportFraction != fraction) {
+      _controller.removeListener(_onScroll);
+      final page = _controller.hasClients ? (_controller.page ?? 0) : 0.0;
+      _controller.dispose();
+      _controller = PageController(
+        viewportFraction: fraction,
+        initialPage: page.round(),
+      );
+      _controller.addListener(_onScroll);
+    }
   }
 
   void _onScroll() {
@@ -180,7 +229,12 @@ class _HorizontalClinicsCarouselState extends State<HorizontalClinicsCarousel> {
           ),
         if (widget.title != null) SizedBox(height: 16.h),
         SizedBox(
-          height: 280.h,
+          height:
+              (MediaQuery.sizeOf(context).width *
+                      _controller.viewportFraction *
+                      1.5)
+                  .clamp(380.0, 520.0)
+                  .toDouble(),
           child: Directionality(
             textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
             child: PageView.builder(
@@ -191,7 +245,8 @@ class _HorizontalClinicsCarouselState extends State<HorizontalClinicsCarousel> {
                 final clinic = widget.clinics[index];
                 final double diff = (currentPage - index).abs();
                 // عكس اتجاه الـ parallax في RTL
-                final double parallax = (currentPage - index) * 60.w * (isRTL ? -1 : 1);
+                final double parallax =
+                    (currentPage - index) * 60.w * (isRTL ? -1 : 1);
                 final double scale = 1.0 - (diff * 0.03).clamp(0.0, 0.12);
                 final double opacity = (1.0 - (diff * 0.12)).clamp(0.6, 1.0);
 
@@ -250,7 +305,7 @@ class ClinicsList extends StatelessWidget {
               ),
               SizedBox(height: 16.h),
               Text(
-                "لا توجد عيادات",
+                'clinic.empty_list'.tr(),
                 style: TextStyle(
                   fontSize: 18.sp,
                   color: Colors.grey[600],

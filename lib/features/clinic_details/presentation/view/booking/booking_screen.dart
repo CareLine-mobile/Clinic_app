@@ -7,6 +7,7 @@ import 'package:clinic_app/features/clinic_details/presentation/widgets/booking/
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'booking_date_time_page.dart';
 import 'booking_your_info_page.dart';
 import 'booking_confirmation_page.dart';
@@ -29,10 +30,7 @@ class BookingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _BookingScreenBody(
-      clinicName: clinicName,
-      doctorName: doctorName,
-    );
+    return _BookingScreenBody(clinicName: clinicName, doctorName: doctorName);
   }
 }
 
@@ -51,22 +49,28 @@ class _BookingScreenBody extends StatelessWidget {
     return BlocListener<ClinicDetailsCubit, ClinicDetailsState>(
       listener: (context, state) {
         if (state is BookingError) {
-          CustomSnackBar.show(context,
-              message: state.message, type: SnackBarType.error);
+          CustomSnackBar.show(
+            context,
+            message: state.message,
+            type: SnackBarType.error,
+          );
         }
 
         if (state is BookingSuccess) {
-          CustomSnackBar.show(context,
-              message: state.message, type: SnackBarType.success);
+          CustomSnackBar.show(
+            context,
+            message: state.message,
+            type: SnackBarType.success,
+          );
 
-             Navigator.of(context).pushNamedAndRemoveUntil(Routes.dashBoard, (route) => false);
-
+          context.go(Routes.home);
         }
       },
       child: BlocBuilder<ClinicDetailsCubit, ClinicDetailsState>(
         builder: (context, state) {
-          final currentStep =
-          state is ClinicDetailsLoaded ? state.bookingStep : 0;
+          final currentStep = state is ClinicDetailsLoaded
+              ? state.bookingStep
+              : 0;
 
           return Scaffold(
             backgroundColor: theme.scaffoldBackgroundColor,
@@ -75,27 +79,28 @@ class _BookingScreenBody extends StatelessWidget {
               surfaceTintColor: Colors.transparent,
               elevation: 0,
               leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Theme.of(context).primaryColor),
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Theme.of(context).primaryColor,
+                ),
                 onPressed: () {
                   if (currentStep > 0) {
                     context.read<ClinicDetailsCubit>().previousBookingStep();
                   } else {
-                    Navigator.of(context).pop();
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go(Routes.home);
+                    }
                   }
                 },
               ),
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    clinicName,
-                    style: theme.textTheme.titleMedium,
-                  ),
+                  Text(clinicName, style: theme.textTheme.titleMedium),
                   SizedBox(height: 2.h),
-                  Text(
-                    doctorName,
-                    style: theme.textTheme.bodySmall,
-                  ),
+                  Text(doctorName, style: theme.textTheme.bodySmall),
                   SizedBox(height: 8.h),
                 ],
               ),

@@ -1,6 +1,7 @@
 // lib/features/map_locations/presentation/view/map_locations_screen.dart
 
-import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
 import 'package:clinic_app/core/theme/colors.dart';
 import 'package:clinic_app/core/utils/location/location_utils.dart';
@@ -10,6 +11,8 @@ import 'package:clinic_app/features/map_locations/presentation/widgets/map_error
 import 'package:clinic_app/features/map_locations/presentation/widgets/map_loading_view.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:clinic_app/core/routes/routes.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -37,10 +40,7 @@ class _MapLocationsScreenState extends State<MapLocationsScreen>
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(
-      viewportFraction: 0.88,
-      initialPage: 0,
-    );
+    _pageController = PageController(viewportFraction: 0.88, initialPage: 0);
     // Trigger load
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => context.read<MapLocationsCubit>().loadLocations(),
@@ -90,8 +90,7 @@ class _MapLocationsScreenState extends State<MapLocationsScreen>
           if (state is MapLocationsPermissionDenied) {
             return MapPermissionDeniedView(
               isPermanent: state.isPermanent,
-              onRetry: () =>
-                  context.read<MapLocationsCubit>().loadLocations(),
+              onRetry: () => context.read<MapLocationsCubit>().loadLocations(),
               onOpenSettings: () async {
                 await LocationUtils.openLocationSettings();
               },
@@ -101,22 +100,21 @@ class _MapLocationsScreenState extends State<MapLocationsScreen>
           if (state is MapLocationsServiceDisabled) {
             return MapServiceDisabledView(
               onOpenSettings: () async {
-                if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+                if (!kIsWeb &&
+                    defaultTargetPlatform == TargetPlatform.android) {
                   await Geolocator.openLocationSettings();
                 } else {
                   await LocationUtils.openLocationSettings();
                 }
               },
-              onRetry: () =>
-                  context.read<MapLocationsCubit>().loadLocations(),
+              onRetry: () => context.read<MapLocationsCubit>().loadLocations(),
             );
           }
 
           if (state is MapLocationsError) {
             return MapGenericErrorView(
               message: state.message,
-              onRetry: () =>
-                  context.read<MapLocationsCubit>().loadLocations(),
+              onRetry: () => context.read<MapLocationsCubit>().loadLocations(),
             );
           }
 
@@ -142,7 +140,7 @@ class _MapLocationsScreenState extends State<MapLocationsScreen>
       ),
       leading: _GlassIconButton(
         icon: Icons.arrow_back_ios_new_rounded,
-        onTap: () => Navigator.of(context).pop(),
+        onTap: () => context.canPop() ? context.pop() : context.go(Routes.home),
       ),
       actions: [
         Padding(
@@ -165,7 +163,8 @@ class _MapLocationsScreenState extends State<MapLocationsScreen>
 
   Widget _buildMapWithCards(BuildContext context, MapLocationsLoaded state) {
     // Initial camera target: user location OR first clinic
-    final initialTarget = state.clinics.isNotEmpty &&
+    final initialTarget =
+        state.clinics.isNotEmpty &&
             state.clinics.first.lat != null &&
             state.clinics.first.lng != null
         ? LatLng(state.clinics.first.lat!, state.clinics.first.lng!)
@@ -175,8 +174,7 @@ class _MapLocationsScreenState extends State<MapLocationsScreen>
       children: [
         // ── Google Map fills the screen ──────────────────────────────
         GoogleMap(
-          onMapCreated:
-              context.read<MapLocationsCubit>().onMapCreated,
+          onMapCreated: context.read<MapLocationsCubit>().onMapCreated,
           initialCameraPosition: CameraPosition(
             target: initialTarget,
             zoom: 14,
@@ -197,7 +195,8 @@ class _MapLocationsScreenState extends State<MapLocationsScreen>
           left: 0,
           right: 0,
           child: SizedBox(
-            height: 135.h, // Increased from 110.h to fix overflow and look better
+            height:
+                135.h, // Increased from 110.h to fix overflow and look better
             child: state.clinics.isEmpty
                 ? _buildNoLocationCard(context)
                 : NotificationListener<ScrollNotification>(
@@ -223,7 +222,8 @@ class _MapLocationsScreenState extends State<MapLocationsScreen>
                           curve: Curves.easeOutCubic,
                           child: MapClinicCard(
                             clinic: clinic,
-                            onTap: () => MapClinicSummarySheet.show(context, clinic),
+                            onTap: () =>
+                                MapClinicSummarySheet.show(context, clinic),
                           ),
                         );
                       },
@@ -377,4 +377,3 @@ class _PageIndicator extends StatelessWidget {
     );
   }
 }
-

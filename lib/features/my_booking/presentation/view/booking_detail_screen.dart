@@ -9,6 +9,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../../../core/utils/app_size.dart';
 import '../../../../../../core/widgets/custom_app_bar.dart';
@@ -16,12 +17,36 @@ import '../cubit/booking_cubit.dart';
 import '../widgets/review_form_widget.dart';
 
 class BookingDetailScreen extends StatelessWidget {
-  final BookingEntity booking;
+  final BookingEntity? booking;
+  final int? bookingId;
 
-  const BookingDetailScreen({super.key, required this.booking});
+  const BookingDetailScreen({super.key, this.booking, this.bookingId});
 
   @override
   Widget build(BuildContext context) {
+    if (booking != null) return _buildDetails(context, booking!);
+    return FutureBuilder<BookingEntity?>(
+      future: context.read<BookingCubit>().getBookingById(bookingId!),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return Scaffold(
+            appBar: CustomAppBar(title: 'bookings.detail.title'.tr()),
+            body: const Center(child: CircularProgressIndicator()),
+          );
+        }
+        final loadedBooking = snapshot.data;
+        if (loadedBooking == null) {
+          return Scaffold(
+            appBar: CustomAppBar(title: 'bookings.detail.title'.tr()),
+            body: Center(child: Text('bookings.detail.not_found'.tr())),
+          );
+        }
+        return _buildDetails(context, loadedBooking);
+      },
+    );
+  }
+
+  Widget _buildDetails(BuildContext context, BookingEntity booking) {
     return BlocListener<BookingCubit, BookingState>(
       listener: (context, state) {
         if (state is CancelBookingSuccess) {
@@ -31,7 +56,7 @@ class BookingDetailScreen extends StatelessWidget {
             isError: false,
           );
           context.read<BookingCubit>().loadBookings();
-          Navigator.of(context).pop();
+          if (context.canPop()) context.pop();
         } else if (state is CancelBookingError) {
           _showSnackBar(context, message: state.message, isError: true);
         }
@@ -52,7 +77,8 @@ class BookingDetailScreen extends StatelessWidget {
 
               _AppointmentInfoSection(booking: booking),
 
-              if (booking.patientName != null || booking.patientPhone != null) ...[
+              if (booking.patientName != null ||
+                  booking.patientPhone != null) ...[
                 SizedBox(height: SizeApp.s16),
                 _PatientSection(booking: booking),
               ],
@@ -83,15 +109,16 @@ class BookingDetailScreen extends StatelessWidget {
   }
 
   void _showSnackBar(
-      BuildContext context, {
-        required String message,
-        required bool isError,
-      }) {
+    BuildContext context, {
+    required String message,
+    required bool isError,
+  }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor:
-        isError ? const Color(0xFFC62828) : const Color(0xFF2E7D32),
+        backgroundColor: isError
+            ? const Color(0xFFC62828)
+            : const Color(0xFF2E7D32),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.r),
@@ -127,30 +154,44 @@ class _ClinicCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          ClinicAvatar(thumbnailUrl: clinical.thumbnailUrl, size: 64, radius: 14),
+          ClinicAvatar(
+            thumbnailUrl: clinical.thumbnailUrl,
+            size: 64,
+            radius: 14,
+          ),
           SizedBox(width: SizeApp.s12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(clinical.name,
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                  clinical.name,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 SizedBox(height: 4.h),
-                Text(clinical.specialty,
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(color: theme.hintColor)),
+                Text(
+                  clinical.specialty,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.hintColor,
+                  ),
+                ),
                 SizedBox(height: 6.h),
                 Row(
                   children: [
-                    Icon(Icons.location_on_outlined,
-                        size: 14.sp, color: theme.hintColor),
+                    Icon(
+                      Icons.location_on_outlined,
+                      size: 14.sp,
+                      color: theme.hintColor,
+                    ),
                     SizedBox(width: 4.w),
                     Expanded(
                       child: Text(
                         clinical.location,
-                        style: theme.textTheme.bodySmall
-                            ?.copyWith(color: theme.hintColor),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.hintColor,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -179,7 +220,9 @@ class _StatusBanner extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(
-          horizontal: SizeApp.s16, vertical: SizeApp.s12),
+        horizontal: SizeApp.s16,
+        vertical: SizeApp.s12,
+      ),
       decoration: BoxDecoration(
         color: config.bgColor,
         borderRadius: BorderRadius.circular(12.r),
@@ -211,7 +254,8 @@ class _AppointmentInfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool showQueueInfo = booking.status == 'confirmed' || booking.status == 'checked_in';
+    final bool showQueueInfo =
+        booking.status == 'confirmed' || booking.status == 'checked_in';
     return SectionCard(
       title: 'bookings.detail.appointment_info'.tr(),
       children: [
@@ -226,7 +270,9 @@ class _AppointmentInfoSection extends StatelessWidget {
           value: _formatDate(context, booking.date),
         ),
 
-        if (showQueueInfo && booking.waitTurns != null && booking.turnNumber != null) ...[
+        if (showQueueInfo &&
+            booking.waitTurns != null &&
+            booking.turnNumber != null) ...[
           const Divider(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -236,11 +282,16 @@ class _AppointmentInfoSection extends StatelessWidget {
                 children: [
                   Text(
                     'bookings.time'.tr(),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).hintColor),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).hintColor,
+                    ),
                   ),
                   Text(
                     _formatTime(context, booking.time),
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14.sp,
+                    ),
                   ),
                 ],
               ),
@@ -260,10 +311,13 @@ class _AppointmentInfoSection extends StatelessWidget {
       ],
     );
   }
+
   String _formatDate(BuildContext context, String date) {
     try {
       final locale = context.locale.languageCode;
-      final pattern = locale == 'ar' ? 'EEEE، d MMMM yyyy' : 'EEEE, d MMMM yyyy';
+      final pattern = locale == 'ar'
+          ? 'EEEE، d MMMM yyyy'
+          : 'EEEE, d MMMM yyyy';
       return DateFormat(pattern, locale).format(DateTime.parse(date));
     } catch (_) {
       return date;
@@ -359,27 +413,27 @@ class _CancelButton extends StatelessWidget {
             ),
             child: isLoading
                 ? SizedBox(
-              width: 22.w,
-              height: 22.w,
-              child: const CircularProgressIndicator(
-                strokeWidth: 2.5,
-                color: Color(0xFFC62828),
-              ),
-            )
+                    width: 22.w,
+                    height: 22.w,
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Color(0xFFC62828),
+                    ),
+                  )
                 : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.cancel_outlined, size: 20.sp),
-                SizedBox(width: SizeApp.s8),
-                Text(
-                  'bookings.detail.cancel_booking'.tr(),
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.cancel_outlined, size: 20.sp),
+                      SizedBox(width: SizeApp.s8),
+                      Text(
+                        'bookings.detail.cancel_booking'.tr(),
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           ),
         );
       },
@@ -418,4 +472,3 @@ class _CancelButton extends StatelessWidget {
     );
   }
 }
-

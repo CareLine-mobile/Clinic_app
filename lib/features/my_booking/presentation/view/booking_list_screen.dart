@@ -6,6 +6,7 @@ import 'package:clinic_app/features/my_booking/presentation/widgets/wait_turns_c
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import '../../../../../../core/routes/routes.dart';
@@ -27,17 +28,16 @@ class BookingListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!UserRepository().isLoggedIn) {
       return Scaffold(
-        appBar: CustomAppBar(
-          title: 'bookings.title'.tr(),
-          showBackIcon: false,
-        ),
+        appBar: CustomAppBar(title: 'bookings.title'.tr(), showBackIcon: false),
         body: EmptyStateWidget(
           icon: Icons.lock_outline_rounded,
           title: 'bookings.auth_required_title'.tr(),
           subtitle: 'bookings.auth_required_subtitle'.tr(),
           enableBackButton: false,
           actionLabel: 'auth.login'.tr(),
-          onActionPressed: () => Navigator.pushNamed(context, Routes.auth),
+          onActionPressed: () => context.push(
+            Routes.authFor(GoRouterState.of(context).uri.toString()),
+          ),
         ),
       );
     }
@@ -81,20 +81,19 @@ class _BookingListBodyState extends State<_BookingListBody> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: CustomAppBar(
-        title: 'bookings.title'.tr(),
-        showBackIcon: false,
-      ),
+      appBar: CustomAppBar(title: 'bookings.title'.tr(), showBackIcon: false),
       body: BlocBuilder<BookingCubit, BookingState>(
         buildWhen: (_, curr) =>
-        curr is BookingLoading ||
+            curr is BookingLoading ||
             curr is BookingLoaded ||
             curr is BookingError,
         builder: (context, state) => switch (state) {
           BookingLoading() => const Center(child: LoadingSpinner()),
           BookingError(:final message) => _ErrorView(message: message),
-          BookingLoaded() =>
-              _BookingList(state: state, scrollController: _scrollController),
+          BookingLoaded() => _BookingList(
+            state: state,
+            scrollController: _scrollController,
+          ),
           _ => const SizedBox.shrink(),
         },
       ),
@@ -127,7 +126,7 @@ class _BookingList extends StatelessWidget {
                 subtitle: 'bookings.empty_subtitle'.tr(),
                 enableBackButton: false,
                 actionLabel: 'bookings.find_clinic'.tr(),
-                onActionPressed: () => Navigator.pushNamed(context, Routes.dashBoard),
+                onActionPressed: () => context.go(Routes.home),
               ),
             ),
           ],
@@ -191,14 +190,8 @@ class _BookingCard extends StatelessWidget {
 
     return InkWell(
       borderRadius: BorderRadius.circular(16.r),
-      onTap: () => Navigator.pushNamed(
-        context,
-        Routes.bookingDetails,
-        arguments: {
-          'booking': booking,
-          'cubit': context.read<BookingCubit>(),
-        },
-      ),
+      onTap: () =>
+          context.push(Routes.bookingDetail(booking.id), extra: booking),
       child: Container(
         margin: EdgeInsets.only(bottom: SizeApp.s12),
         decoration: BoxDecoration(
@@ -215,10 +208,7 @@ class _BookingCard extends StatelessWidget {
         child: Column(
           children: [
             _CardHeader(booking: booking),
-            Divider(
-                height: 1,
-                indent: SizeApp.s16,
-                endIndent: SizeApp.s16),
+            Divider(height: 1, indent: SizeApp.s16, endIndent: SizeApp.s16),
             _CardDetails(booking: booking),
             _StatusFooter(status: booking.status),
           ],
@@ -248,9 +238,9 @@ class _CardHeaderState extends State<_CardHeader> {
   }
 
   Future<void> _checkReviewStatus() async {
-    final reviewed = await context
-        .read<BookingCubit>()
-        .isClinicReviewed(widget.booking.clinical.id);
+    final reviewed = await context.read<BookingCubit>().isClinicReviewed(
+      widget.booking.clinical.id,
+    );
     if (mounted) setState(() => _isReviewed = reviewed);
   }
 
@@ -270,16 +260,18 @@ class _CardHeaderState extends State<_CardHeader> {
               children: [
                 Text(
                   widget.booking.clinical.name,
-                  style: theme.textTheme.titleSmall
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 2.h),
                 Text(
                   widget.booking.clinical.specialty,
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: theme.hintColor),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.hintColor,
+                  ),
                 ),
               ],
             ),
@@ -289,17 +281,17 @@ class _CardHeaderState extends State<_CardHeader> {
           if (widget.booking.isCompleted)
             _isReviewed
                 ? _ReviewBadge(
-              label: 'bookings.reviewed'.tr(),
-              icon: Icons.check_circle_outline_rounded,
-              color: const Color(0xFF2E7D32),
-              bgColor: const Color(0xFFE8F5E9),
-            )
+                    label: 'bookings.reviewed'.tr(),
+                    icon: Icons.check_circle_outline_rounded,
+                    color: const Color(0xFF2E7D32),
+                    bgColor: const Color(0xFFE8F5E9),
+                  )
                 : _ReviewBadge(
-              label: 'reviews.form.title'.tr(),
-              icon: Icons.rate_review_outlined,
-              color: const Color(0xFF1565C0),
-              bgColor: const Color(0xFF1565C0).withOpacity(0.1),
-            ),
+                    label: 'reviews.form.title'.tr(),
+                    icon: Icons.rate_review_outlined,
+                    color: const Color(0xFF1565C0),
+                    bgColor: const Color(0xFF1565C0).withOpacity(0.1),
+                  ),
         ],
       ),
     );
@@ -382,8 +374,11 @@ class _CardDetails extends StatelessWidget {
             SizedBox(height: SizeApp.s8),
             Row(
               children: [
-                Icon(Icons.hourglass_top_rounded,
-                    size: 16.sp, color: Theme.of(context).primaryColor),
+                Icon(
+                  Icons.hourglass_top_rounded,
+                  size: 16.sp,
+                  color: Theme.of(context).primaryColor,
+                ),
                 SizedBox(width: SizeApp.s8),
                 Text(
                   '${'bookings.wait_turns.label'.tr()}:',

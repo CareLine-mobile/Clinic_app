@@ -6,6 +6,7 @@ import 'package:clinic_app/core/widgets/custom_network_image.dart';
 import 'package:clinic_app/features/home/domain/entities/clinic_summary.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -28,8 +29,7 @@ class MapClinicSummarySheet {
 // ── Custom transparent PageRoute (enables Hero + slide from bottom) ──────────
 
 class _ClinicSheetRoute extends PageRoute<void> {
-  _ClinicSheetRoute({required this.clinic})
-      : super(fullscreenDialog: true);
+  _ClinicSheetRoute({required this.clinic}) : super(fullscreenDialog: true);
 
   final ClinicSummary clinic;
 
@@ -52,14 +52,21 @@ class _ClinicSheetRoute extends PageRoute<void> {
   Duration get transitionDuration => const Duration(milliseconds: 420);
 
   @override
-  Widget buildPage(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation) {
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
     return _ClinicSummaryPage(clinic: clinic, animation: animation);
   }
 
   @override
-  Widget buildTransitions(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation, Widget child) {
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
     // Barrier fade
     final fade = CurvedAnimation(
       parent: animation,
@@ -73,10 +80,7 @@ class _ClinicSheetRoute extends PageRoute<void> {
 // ── The actual page rendered by the route ───────────────────────────────────
 
 class _ClinicSummaryPage extends StatefulWidget {
-  const _ClinicSummaryPage({
-    required this.clinic,
-    required this.animation,
-  });
+  const _ClinicSummaryPage({required this.clinic, required this.animation});
 
   final ClinicSummary clinic;
   final Animation<double> animation;
@@ -92,20 +96,21 @@ class _ClinicSummaryPageState extends State<_ClinicSummaryPage> {
   @override
   void initState() {
     super.initState();
-    _slideAnim = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: widget.animation,
-      curve: Curves.easeOutCubic,
-      reverseCurve: Curves.easeInCubic,
-    ));
+    _slideAnim = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: widget.animation,
+            curve: Curves.easeOutCubic,
+            reverseCurve: Curves.easeInCubic,
+          ),
+        );
   }
 
   Future<void> _openMaps() async {
     if (widget.clinic.lat == null || widget.clinic.lng == null) return;
     final uri = Uri.parse(
-        'https://maps.google.com/?q=${widget.clinic.lat},${widget.clinic.lng}');
+      'https://maps.google.com/?q=${widget.clinic.lat},${widget.clinic.lng}',
+    );
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
@@ -194,7 +199,9 @@ class _ClinicSummaryPageState extends State<_ClinicSummaryPage> {
                         right: 12.w,
                         child: Container(
                           padding: EdgeInsets.symmetric(
-                              horizontal: 10.w, vertical: 4.h),
+                            horizontal: 10.w,
+                            vertical: 4.h,
+                          ),
                           decoration: BoxDecoration(
                             color: widget.clinic.isOpen
                                 ? ColorsManager.successSurface
@@ -240,18 +247,23 @@ class _ClinicSummaryPageState extends State<_ClinicSummaryPage> {
                       ),
                       Container(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 8.w, vertical: 4.h),
+                          horizontal: 8.w,
+                          vertical: 4.h,
+                        ),
                         decoration: BoxDecoration(
-                          color:
-                              ColorsManager.warningFill.withValues(alpha: 0.12),
+                          color: ColorsManager.warningFill.withValues(
+                            alpha: 0.12,
+                          ),
                           borderRadius: BorderRadius.circular(10.r),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.star_rounded,
-                                size: 16.sp,
-                                color: ColorsManager.warningFill),
+                            Icon(
+                              Icons.star_rounded,
+                              size: 16.sp,
+                              color: ColorsManager.warningFill,
+                            ),
                             SizedBox(width: 4.w),
                             Text(
                               widget.clinic.rating,
@@ -276,8 +288,11 @@ class _ClinicSummaryPageState extends State<_ClinicSummaryPage> {
                           color: theme.primaryColor.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.location_on_rounded,
-                            size: 16.sp, color: theme.primaryColor),
+                        child: Icon(
+                          Icons.location_on_rounded,
+                          size: 16.sp,
+                          color: theme.primaryColor,
+                        ),
                       ),
                       SizedBox(width: 10.w),
                       Expanded(
@@ -309,8 +324,11 @@ class _ClinicSummaryPageState extends State<_ClinicSummaryPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.directions_rounded,
-                                  size: 18.sp, color: theme.primaryColor),
+                              Icon(
+                                Icons.directions_rounded,
+                                size: 18.sp,
+                                color: theme.primaryColor,
+                              ),
                               SizedBox(width: 6.w),
                               Text(
                                 'map.navigate'.tr(),
@@ -329,10 +347,7 @@ class _ClinicSummaryPageState extends State<_ClinicSummaryPage> {
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.pop(context); // close sheet
-                            Navigator.of(context).pushNamed(
-                              Routes.clinicDetails,
-                              arguments: widget.clinic.id,
-                            );
+                            context.push(Routes.clinic(widget.clinic.id));
                           },
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(vertical: 14.h),

@@ -2,6 +2,7 @@
 import 'package:clinic_app/core/utils/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/colors.dart';
 import '../../../core/utils/app_size.dart';
@@ -11,7 +12,7 @@ import 'location_banner.dart';
 
 class DashBoardBody extends StatelessWidget {
   final int currentIndex;
-  final List<Widget> screens;
+  final StatefulNavigationShell navigationShell;
   final List<String> icons;
   final bool isNavBarVisible;
   final bool Function(ScrollNotification) onScroll;
@@ -24,7 +25,7 @@ class DashBoardBody extends StatelessWidget {
 
   const DashBoardBody({
     required this.currentIndex,
-    required this.screens,
+    required this.navigationShell,
     required this.icons,
     required this.isNavBarVisible,
     required this.onScroll,
@@ -39,7 +40,7 @@ class DashBoardBody extends StatelessWidget {
     return ResponsiveLayout(
       mobile: _MobileDashboard(
         currentIndex: currentIndex,
-        screens: screens,
+        navigationShell: navigationShell,
         icons: icons,
         isNavBarVisible: isNavBarVisible,
         onScroll: onScroll,
@@ -50,7 +51,7 @@ class DashBoardBody extends StatelessWidget {
       ),
       tablet: _WideDashboard(
         currentIndex: currentIndex,
-        screens: screens,
+        navigationShell: navigationShell,
         icons: icons,
         onScroll: onScroll,
         onTabTap: onTabTap,
@@ -61,7 +62,7 @@ class DashBoardBody extends StatelessWidget {
       ),
       desktop: _WideDashboard(
         currentIndex: currentIndex,
-        screens: screens,
+        navigationShell: navigationShell,
         icons: icons,
         onScroll: onScroll,
         onTabTap: onTabTap,
@@ -78,7 +79,7 @@ class DashBoardBody extends StatelessWidget {
 
 class _MobileDashboard extends StatelessWidget {
   final int currentIndex;
-  final List<Widget> screens;
+  final StatefulNavigationShell navigationShell;
   final List<String> icons;
   final bool isNavBarVisible;
   final bool Function(ScrollNotification) onScroll;
@@ -89,7 +90,7 @@ class _MobileDashboard extends StatelessWidget {
 
   const _MobileDashboard({
     required this.currentIndex,
-    required this.screens,
+    required this.navigationShell,
     required this.icons,
     required this.isNavBarVisible,
     required this.onScroll,
@@ -137,10 +138,7 @@ class _MobileDashboard extends StatelessWidget {
               Expanded(
                 child: NotificationListener<ScrollNotification>(
                   onNotification: onScroll,
-                  child: IndexedStack(
-                    index: currentIndex,
-                    children: screens,
-                  ),
+                  child: navigationShell,
                 ),
               ),
             ],
@@ -177,7 +175,7 @@ class _MobileDashboard extends StatelessWidget {
 
 class _WideDashboard extends StatelessWidget {
   final int currentIndex;
-  final List<Widget> screens;
+  final StatefulNavigationShell navigationShell;
   final List<String> icons;
   final bool Function(ScrollNotification) onScroll;
   final ValueChanged<int> onTabTap;
@@ -188,7 +186,7 @@ class _WideDashboard extends StatelessWidget {
 
   const _WideDashboard({
     required this.currentIndex,
-    required this.screens,
+    required this.navigationShell,
     required this.icons,
     required this.onScroll,
     required this.onTabTap,
@@ -200,11 +198,31 @@ class _WideDashboard extends StatelessWidget {
 
   // Map icon assets → NavigationRail labels / icons
   static const List<_NavItem> _navItems = [
-    _NavItem(icon: Icons.home_outlined,          activeIcon: Icons.home_rounded,              label: 'Home'),
-    _NavItem(icon: Icons.search_outlined,        activeIcon: Icons.search_rounded,            label: 'Search'),
-    _NavItem(icon: Icons.favorite_outline,       activeIcon: Icons.favorite_rounded,          label: 'Favourites'),
-    _NavItem(icon: Icons.calendar_today_outlined,activeIcon: Icons.calendar_today_rounded,    label: 'Bookings'),
-    _NavItem(icon: Icons.settings_outlined,      activeIcon: Icons.settings_rounded,          label: 'Settings'),
+    _NavItem(
+      icon: Icons.home_outlined,
+      activeIcon: Icons.home_rounded,
+      label: 'Home',
+    ),
+    _NavItem(
+      icon: Icons.search_outlined,
+      activeIcon: Icons.search_rounded,
+      label: 'Search',
+    ),
+    _NavItem(
+      icon: Icons.favorite_outline,
+      activeIcon: Icons.favorite_rounded,
+      label: 'Favourites',
+    ),
+    _NavItem(
+      icon: Icons.calendar_today_outlined,
+      activeIcon: Icons.calendar_today_rounded,
+      label: 'Bookings',
+    ),
+    _NavItem(
+      icon: Icons.settings_outlined,
+      activeIcon: Icons.settings_rounded,
+      label: 'Settings',
+    ),
   ];
 
   @override
@@ -251,8 +269,9 @@ class _WideDashboard extends StatelessWidget {
                   color: theme.colorScheme.onSurfaceVariant,
                   fontSize: 13,
                 ),
-                indicatorColor:
-                    ColorsManager.primaryColor.withValues(alpha: 0.12),
+                indicatorColor: ColorsManager.primaryColor.withValues(
+                  alpha: 0.12,
+                ),
                 destinations: _navItems
                     .map(
                       (item) => NavigationRailDestination(
@@ -283,10 +302,7 @@ class _WideDashboard extends StatelessWidget {
                 Expanded(
                   child: NotificationListener<ScrollNotification>(
                     onNotification: onScroll,
-                    child: IndexedStack(
-                      index: currentIndex,
-                      children: screens,
-                    ),
+                    child: navigationShell,
                   ),
                 ),
               ],

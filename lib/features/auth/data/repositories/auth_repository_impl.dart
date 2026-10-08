@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../../../../core/auth/google_sign_in_service.dart';
 import '../../../../core/api/model/endpoints.dart';
 import '../../../../core/api/model/http_method.dart';
 import '../../../../core/errors/error_handler.dart';
@@ -52,27 +53,35 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, User>> googleLogin() async {
+  Future<Either<Failure, User>> googleLogin({
+    String? email,
+    String? name,
+    String? googleId,
+    String? idToken,
+  }) async {
     try {
-      final GoogleSignIn googleSignIn = GoogleSignIn(
-        scopes: ['email', 'profile'],
-      );
+      await GoogleSignInService.ensureInitialized();
 
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-
-      if (googleUser == null) {
+      // Web sign-in arrives from Google's rendered button. Native platforms
+      // start their supported interactive flow here.
+      if (email == null) {
+        final GoogleSignInAccount googleUser = await GoogleSignInService
+            .instance
+            .authenticate();
+        email = googleUser.email;
+        name = googleUser.displayName ?? '';
+        googleId = googleUser.id;
+        idToken = googleUser.authentication.idToken;
+      } else if (idToken == null || idToken.isEmpty) {
         return Left(
-          ServerFailure('errors.network.cancelled'.tr(), 'CANCELLED'),
+          ServerFailure(
+            'auth.googleWebTokenMissing'.tr(),
+            'GOOGLE_ID_TOKEN_MISSING',
+          ),
         );
       }
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      // The CareLine API's google-login contract currently accepts an ID token.
-      // An access token is not interchangeable unless the backend adds support.
-      if (kIsWeb &&
-          (googleAuth.idToken == null || googleAuth.idToken!.isEmpty)) {
+      if (idToken == null || idToken.isEmpty) {
         return Left(
           ServerFailure(
             (kIsWeb ? 'auth.googleWebTokenMissing' : 'auth.googleSignInFailed')
@@ -86,10 +95,10 @@ class AuthRepositoryImpl implements AuthRepository {
         method: HttpMethod.post,
         url: Endpoints.googleLogin,
         body: {
-          'email': googleUser.email,
-          'name': googleUser.displayName ?? '',
-          'google_id': googleUser.id,
-          'id_token': googleAuth.idToken ?? '',
+          'email': email,
+          'name': name ?? '',
+          'google_id': googleId,
+          'id_token': idToken,
         },
       );
 
@@ -108,6 +117,13 @@ class AuthRepositoryImpl implements AuthRepository {
         ),
       );
     } catch (e) {
+      if (e is GoogleSignInException &&
+          e.code == GoogleSignInExceptionCode.canceled) {
+        return Left(
+          ServerFailure('errors.network.cancelled'.tr(), 'CANCELLED'),
+        );
+      }
+
       // لو المستخدم كنسل من غير ما يختار حساب
       if (e is PlatformException && e.code == 'CANCELLED') {
         return Left(

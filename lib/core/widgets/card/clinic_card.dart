@@ -36,7 +36,8 @@ class ClinicCard extends StatefulWidget {
   State<ClinicCard> createState() => _ClinicCardState();
 }
 
-class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateMixin {
+class _ClinicCardState extends State<ClinicCard>
+    with SingleTickerProviderStateMixin {
   bool _isExpanded = false;
   late AnimationController _animationController;
   late Animation<double> _slideAnimation;
@@ -56,17 +57,11 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
     );
 
     _slideAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeOutCubic,
-      ),
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOut,
-      ),
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
   }
 
@@ -130,13 +125,13 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
               Row(
                 children: [
                   _buildImage(
-                      width: 120.w,
-                      height: null,
-                      borderRadius: BorderRadius.horizontal(
-                        left: Radius.circular(_hSize.s16),
-                      ),
-                      showOverlay: true,
-                      showFavIcon: false
+                    width: 120.w,
+                    height: null,
+                    borderRadius: BorderRadius.horizontal(
+                      left: Radius.circular(_hSize.s16),
+                    ),
+                    showOverlay: true,
+                    showFavIcon: false,
                   ),
                   Expanded(
                     child: Padding(
@@ -161,10 +156,8 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
     return GestureDetector(
       onTap: widget.onTap,
       child: Container(
-        width: 340.w,
-        margin: EdgeInsets.symmetric(
-          horizontal: _hSize.s6,
-        ),
+        width: double.infinity,
+        margin: EdgeInsets.symmetric(horizontal: _hSize.s6),
         decoration: BoxDecoration(
           color: theme.cardColor,
           borderRadius: BorderRadius.circular(_hSize.s16),
@@ -175,7 +168,9 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
           children: [
             _buildImage(
               width: double.infinity,
-              height: _vSize.s100 + _vSize.s20,
+              height: (MediaQuery.sizeOf(context).width * 0.28)
+                  .clamp(100.0, 170.0)
+                  .toDouble(),
               borderRadius: BorderRadius.vertical(
                 top: Radius.circular(_hSize.s16),
               ),
@@ -280,27 +275,27 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
 
                   // Doctors Count Row
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Doctors Count
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CustomIcon(
-                            assetPath: Assets.doctorIcon,
-                            size: _tSize.s16,
-                            color: theme.hintColor,
+                      CustomIcon(
+                        assetPath: Assets.doctorIcon,
+                        size: _tSize.s16,
+                        color: theme.hintColor,
+                      ),
+                      SizedBox(width: _hSize.s4),
+                      Expanded(
+                        child: Text(
+                          'clinic.doctors_count'.tr(
+                            namedArgs: {
+                              'count': '${widget.clinic.doctorsCount}',
+                            },
                           ),
-                          SizedBox(width: _hSize.s4),
-                          Text(
-                            '${widget.clinic.doctorsCount} أطباء',
-                            style: textTheme.labelMedium?.copyWith(
-                              fontSize: _tSize.s12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            overflow: TextOverflow.ellipsis,
+                          style: textTheme.labelMedium?.copyWith(
+                            fontSize: _tSize.s12,
+                            fontWeight: FontWeight.w600,
                           ),
-                        ],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),
@@ -331,6 +326,7 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
         child: ClipRRect(
           borderRadius: BorderRadius.circular(_hSize.s24),
           child: Stack(
+            fit: StackFit.expand,
             children: [
               _buildImage(
                 width: double.infinity,
@@ -388,16 +384,16 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: _vSize.s8),
-                    Row(
+                    Wrap(
+                      spacing: _hSize.s6,
+                      runSpacing: _vSize.s4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        Icon(
-                          Icons.star,
-                          color: Colors.amber,
-                          size: _tSize.s18,
-                        ),
-                        SizedBox(width: _hSize.s6),
+                        Icon(Icons.star, color: Colors.amber, size: _tSize.s18),
                         Text(
                           '${widget.clinic.rating} (${widget.clinic.reviewsCount})',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: _tSize.s14,
@@ -413,20 +409,23 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
               AnimatedBuilder(
                 animation: _animationController,
                 builder: (context, child) {
-                  final double slideOffset = (1.0 - _animationController.value) * 300.w;
+                  final double slideOffset =
+                      (1.0 - _animationController.value) *
+                      MediaQuery.sizeOf(context).width *
+                      0.8;
 
                   return Transform.translate(
                     offset: Offset(slideOffset, 0),
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Container(
-                        width: 200.w,
+                        width: 200.w < MediaQuery.sizeOf(context).width * 0.5
+                            ? 200.w
+                            : MediaQuery.sizeOf(context).width * 0.5,
                         height: double.infinity,
-                        decoration: BoxDecoration(
-                          color: theme.cardColor,
-                        ),
+                        decoration: BoxDecoration(color: theme.cardColor),
                         padding: EdgeInsets.symmetric(
-                          vertical: _vSize.s32,
+                          vertical: _vSize.s12,
                           horizontal: _hSize.s16,
                         ),
                         child: child,
@@ -434,105 +433,103 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
                     ),
                   );
                 },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Top Section
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: _hSize.s12,
-                            vertical: _vSize.s8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(_hSize.s12),
-                          ),
-                          child: Text(
-                            widget.clinic.displaySpecialty,
-                            style: textTheme.labelMedium?.copyWith(
-                              fontSize: _tSize.s12,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).primaryColor,
-                            ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: _hSize.s12,
+                          vertical: _vSize.s8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).primaryColor.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(_hSize.s12),
+                        ),
+                        child: Text(
+                          widget.clinic.displaySpecialty,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.labelMedium?.copyWith(
+                            fontSize: _tSize.s12,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
                           ),
                         ),
-                        SizedBox(height: _vSize.s12),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.location_on_outlined,
-                              size: _tSize.s16,
-                              color: theme.hintColor,
-                            ),
-                            SizedBox(width: _hSize.s6),
-                            Expanded(
-                              child: Text(
-                                widget.clinic.location,
-                                style: textTheme.bodySmall?.copyWith(
-                                  fontSize: _tSize.s12,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: _vSize.s12),
-                        // Doctors Count
-                        Row(
-                          children: [
-                            CustomIcon(
-                              assetPath: Assets.doctorIcon,
-                              size: _tSize.s16,
-                              color: theme.hintColor,
-                            ),
-                            SizedBox(width: _hSize.s6),
-                            Text(
-                              '${widget.clinic.doctorsCount} أطباء',
+                      ),
+                      SizedBox(height: _vSize.s12),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_outlined,
+                            size: _tSize.s16,
+                            color: theme.hintColor,
+                          ),
+                          SizedBox(width: _hSize.s6),
+                          Expanded(
+                            child: Text(
+                              widget.clinic.location,
                               style: textTheme.bodySmall?.copyWith(
                                 fontSize: _tSize.s12,
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-
-                    // Bottom Section (Book Button)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: widget.onBookNow,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).primaryColor,
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(
-                                vertical: _vSize.s12,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(_hSize.s14),
-                              ),
-                              elevation: 0,
-                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: _vSize.s12),
+                      Row(
+                        children: [
+                          CustomIcon(
+                            assetPath: Assets.doctorIcon,
+                            size: _tSize.s16,
+                            color: theme.hintColor,
+                          ),
+                          SizedBox(width: _hSize.s6),
+                          Expanded(
                             child: Text(
-                              'احجز الآن',
-                              style: TextStyle(
-                                fontSize: _tSize.s14,
-                                fontWeight: FontWeight.bold,
+                              'clinic.doctors_count'.tr(
+                                namedArgs: {
+                                  'count': '${widget.clinic.doctorsCount}',
+                                },
                               ),
+                              style: textTheme.bodySmall?.copyWith(
+                                fontSize: _tSize.s12,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: _vSize.s16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: widget.onBookNow,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColor,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: _vSize.s12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(_hSize.s14),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            'clinic.book_now'.tr(),
+                            style: TextStyle(
+                              fontSize: _tSize.s14,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -568,7 +565,9 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
                     width: (width ?? 400) * 1.3,
                     height: height,
                     fit: BoxFit.cover,
-                    backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                    backgroundColor: Theme.of(
+                      context,
+                    ).primaryColor.withOpacity(0.1),
                     showLoadingIndicator: false,
                     customErrorWidget: Container(
                       color: Theme.of(context).primaryColor.withOpacity(0.1),
@@ -589,10 +588,7 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.4),
-                    ],
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.4)],
                   ),
                 ),
               ),
@@ -603,28 +599,29 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
       ),
     );
   }
+
   void _toggleFavorite(BuildContext context) {
     final user = UserRepository().currentUser;
 
     if (user == null) {
       CustomSnackBar.show(
         context,
-          message: 'يجب تسجيل الدخول أولاً للإضافة إلى المفضلة',
+        message: 'clinic.login_to_favorite'.tr(),
 
         type: SnackBarType.warning,
-
-
       );
       return;
     }
 
     widget.onFavoriteToggle!();
   }
-  Widget _buildBadges({
-    bool showFavIcon = true,
-  }) {
+
+  Widget _buildBadges({bool showFavIcon = true}) {
     final theme = Theme.of(context);
-    if(widget.clinic.id == 3 )print('clic data ${widget.clinic.id}${widget.clinic.name}  ${widget.clinic.isFavorite}');
+    if (widget.clinic.id == 3)
+      print(
+        'clic data ${widget.clinic.id}${widget.clinic.name}  ${widget.clinic.isFavorite}',
+      );
     return Stack(
       children: [
         // Status Badge
@@ -644,7 +641,7 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
             ),
             child: Text(
               widget.clinic.isOpen
-                ? 'clinic.status.open'.tr()
+                  ? 'clinic.status.open'.tr()
                   : 'clinic.status.closed'.tr(),
               style: TextStyle(
                 color: Colors.white,
@@ -656,16 +653,16 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
         ),
 
         if (showFavIcon)
-        // Favorite Badge
+          // Favorite Badge
           Positioned(
             top: _vSize.s10,
             right: _hSize.s10,
             child: AnimatedLottieIcon(
-           //   key: ValueKey(widget.clinic.isFavorite),
+              //   key: ValueKey(widget.clinic.isFavorite),
               assetPath: Assets.favIcon,
               size: _tSize.s32,
-            isActive: widget.clinic.isFavorite,
-             // isActive: true,
+              isActive: widget.clinic.isFavorite,
+              // isActive: true,
               onTap: () => _toggleFavorite(context),
             ),
           ),
@@ -687,11 +684,7 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.star,
-                    color: Colors.amber,
-                    size: _tSize.s14,
-                  ),
+                  Icon(Icons.star, color: Colors.amber, size: _tSize.s14),
                   SizedBox(width: _hSize.s4),
                   Text(
                     widget.clinic.rating,
@@ -759,9 +752,7 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
                 Expanded(
                   child: Text(
                     widget.clinic.location,
-                    style: textTheme.bodySmall?.copyWith(
-                      fontSize: _tSize.s12,
-                    ),
+                    style: textTheme.bodySmall?.copyWith(fontSize: _tSize.s12),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -786,7 +777,9 @@ class _ClinicCardState extends State<ClinicCard> with SingleTickerProviderStateM
                     SizedBox(width: _hSize.s4),
                     Flexible(
                       child: Text(
-                        '${widget.clinic.doctorsCount} أطباء',
+                        'clinic.doctors_count'.tr(
+                          namedArgs: {'count': '${widget.clinic.doctorsCount}'},
+                        ),
                         style: textTheme.labelMedium?.copyWith(
                           fontSize: _tSize.s12,
                           fontWeight: FontWeight.w600,

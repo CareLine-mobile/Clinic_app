@@ -7,7 +7,6 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/utils/app_size.dart';
 import '../../../../core/utils/assets.dart';
 import '../../../../core/widgets/CustomIcon.dart';
-import '../../../../core/routes/routes.dart';
 import '../widget/auth_responsive_shell.dart';
 import '../widget/auth_tab_selector.dart';
 import '../widget/auth_title.dart';
@@ -16,9 +15,7 @@ import '../widget/taps/signup_tab.dart';
 
 class AuthScreen extends StatefulWidget {
   final String? initialMessage;
-  final bool redirectToAuth;
-  const AuthScreen({Key? key, this.initialMessage, this.redirectToAuth = false})
-    : super(key: key);
+  const AuthScreen({super.key, this.initialMessage});
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -42,14 +39,7 @@ class _AuthScreenState extends State<AuthScreen>
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(widget.initialMessage!.tr())));
-          if (widget.redirectToAuth) {
-            Navigator.of(context).pushReplacementNamed(Routes.auth);
-          }
         }
-      });
-    } else if (widget.redirectToAuth) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) Navigator.of(context).pushReplacementNamed(Routes.auth);
       });
     }
   }

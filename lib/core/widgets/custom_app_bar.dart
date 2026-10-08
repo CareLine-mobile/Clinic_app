@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -17,33 +17,40 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.isTransparent = false,
     this.showBackIcon = true,
     this.action,
-    this.onBackPressed});
+    this.onBackPressed,
+  });
 
   final VoidCallback? onBackPressed;
-
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: isTransparent! ? Colors.transparent : Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: isTransparent!
+          ? Colors.transparent
+          : Theme.of(context).scaffoldBackgroundColor,
       surfaceTintColor: Colors.transparent,
       elevation: 0.0,
       title: Text(title, style: Theme.of(context).textTheme.titleLarge),
-      leading:showBackIcon?MaterialButton(
-        onPressed: onBackPressed ?? () => Navigator.pop(context),
-        child: const Icon(CupertinoIcons.left_chevron),
-      ):null,
+      leading: showBackIcon
+          ? MaterialButton(
+              onPressed:
+                  onBackPressed ??
+                  () => context.canPop() ? context.pop() : context.go('/home'),
+              child: const Icon(CupertinoIcons.left_chevron),
+            )
+          : null,
       automaticallyImplyLeading: false,
       centerTitle: centerTitle,
       actions: [
         Padding(
-          padding: const EdgeInsets.only(left: 2.0,right: 8,top: 8,bottom: 8),
-          child: Row(
-            children: [
-              action ?? SizedBox(),
-            ],
+          padding: const EdgeInsets.only(
+            left: 2.0,
+            right: 8,
+            top: 8,
+            bottom: 8,
           ),
-        )
+          child: Row(children: [action ?? SizedBox()]),
+        ),
       ],
     );
   }

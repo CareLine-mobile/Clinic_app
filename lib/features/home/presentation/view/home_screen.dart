@@ -10,6 +10,7 @@ import 'package:clinic_app/core/widgets/card/clinic_list.dart';
 import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:clinic_app/core/utils/responsive.dart';
 import '../../../../core/utils/app_size.dart';
@@ -39,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _scrollController = ScrollController()..addListener(_onScroll);
-  //  context.read<HomeCubit>().initHome();
+    //  context.read<HomeCubit>().initHome();
 
     if (UserRepository().isLoggedIn) {
       context.read<BookingCubit>().loadBookings();
@@ -69,8 +70,8 @@ class _HomeScreenState extends State<HomeScreen> {
       body: BlocConsumer<HomeCubit, HomeState>(
         listener: _handleStateChanges,
         // ─── Don't rebuild for same state type ───────────────────
-        buildWhen: (prev, curr) => curr.runtimeType != prev.runtimeType ||
-            curr is HomeLoaded,
+        buildWhen: (prev, curr) =>
+            curr.runtimeType != prev.runtimeType || curr is HomeLoaded,
         builder: (context, state) {
           if (state is HomeLoaded) {
             return ClinicRefreshIndicator(
@@ -130,10 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: CustomScrollView(
           controller: _scrollController,
           physics: const BouncingScrollPhysics(),
-          slivers: [
-            _buildHeader(),
-            ..._buildLoadedBody(state),
-          ],
+          slivers: [_buildHeader(), ..._buildLoadedBody(state)],
         ),
       ),
     );
@@ -160,18 +158,13 @@ class _HomeScreenState extends State<HomeScreen> {
         message: state.failure.message,
         type: SnackBarType.error,
       );
-    } else if(state is LocationError) {
-
-      if (state.failure is LocationFailure){
-
+    } else if (state is LocationError) {
+      if (state.failure is LocationFailure) {
         final f = state.failure as LocationFailure;
-        if(f.locationErrorType == LocationErrorType.serviceDisabled){
-
-        }
-     //   LocationErrorHandler.handleError(f.locationErrorType, context);
+        if (f.locationErrorType == LocationErrorType.serviceDisabled) {}
+        //   LocationErrorHandler.handleError(f.locationErrorType, context);
       }
-
-     }
+    }
   }
 
   // ── Loaded body ───────────────────────────────────────────────────────────
@@ -206,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onFavorite: _toggleFavorite,
             onBook: _bookAppointment,
             trailing: InkWell(
-              onTap: () => Navigator.of(context).pushNamed(Routes.mapLocations),
+              onTap: () => context.push(Routes.mapLocations),
               borderRadius: BorderRadius.circular(100.r),
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
@@ -225,7 +218,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     Container(
                       padding: EdgeInsets.all(6.w),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                        color: Theme.of(
+                          context,
+                        ).primaryColor.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -247,9 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.fromLTRB(h.s20, v.s16, h.s20, v.s8),
           child: Text(
             'home.sections.all_clinics'.tr(),
-            style: textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
         ),
       ),
@@ -302,9 +295,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (state.allClinics.isEmpty &&
           state.featuredClinics.isEmpty &&
           state.nearbyClinics.isEmpty)
-        SliverFillRemaining(
-          child: _EmptyHomeView(),
-        ),
+        SliverFillRemaining(child: _EmptyHomeView()),
 
       SliverToBoxAdapter(child: SizedBox(height: v.s40)),
     ];
@@ -370,8 +361,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ── Event handlers ────────────────────────────────────────────────────────
 
-  void _navigateToClinicDetails(ClinicSummary clinic) =>
-      Navigator.pushNamed(context, Routes.clinicDetails, arguments: clinic.id);
+  void _navigateToClinicDetails(ClinicSummary clinic) {
+    context.push(Routes.clinic(clinic.id));
+  }
 
   void _toggleFavorite(ClinicSummary clinic) =>
       context.read<HomeCubit>().toggleFavorite(clinic.id);
@@ -415,9 +407,7 @@ class _EmptyHomeView extends StatelessWidget {
           SizedBox(height: v.s8),
           Text(
             'home.sections.empty_subtitle'.tr(),
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.hintColor,
-            ),
+            style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
             textAlign: TextAlign.center,
           ),
         ],

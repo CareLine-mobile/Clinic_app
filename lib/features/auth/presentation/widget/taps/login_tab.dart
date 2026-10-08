@@ -3,8 +3,10 @@
 import 'package:clinic_app/core/utils/assets.dart';
 import 'package:clinic_app/core/widgets/CustomIcon.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:clinic_app/core/theme/colors.dart';
 import 'package:clinic_app/core/widgets/app_buton.dart';
@@ -17,6 +19,7 @@ import '../../cubit/auth_cubit.dart';
 import '../../cubit/auth_state.dart';
 import 'package:clinic_app/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:clinic_app/features/user_data/user_repo.dart';
+import 'package:clinic_app/core/auth/google_sign_in_button.dart' as google_web;
 
 class LoginTab extends StatefulWidget {
   const LoginTab({Key? key}) : super(key: key);
@@ -78,8 +81,12 @@ class _LoginTabState extends State<LoginTab> {
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
-                onPressed: () =>
-                    Navigator.pushNamed(context, Routes.forgotPassword),
+                onPressed: () => context.push(
+                  Routes.forgotPasswordForEmail(
+                    _emailController.text.trim(),
+                    from: GoRouterState.of(context).uri.queryParameters['from'],
+                  ),
+                ),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: _h.s8),
                   minimumSize: Size.zero,
@@ -123,17 +130,11 @@ class _LoginTabState extends State<LoginTab> {
           TextInput.finishAutofillContext(shouldSave: true);
           _showStorageWarning();
           context.read<SettingsCubit>().syncFcmToken();
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            Routes.dashBoard,
-            (_) => false,
-          );
+          context.go(_destinationAfterLogin(context));
         } else if (state is AccountNotVerified) {
           _submitted = false;
-          Navigator.pushNamed(
-            context,
-            '${Routes.verification}?email=${Uri.encodeQueryComponent(state.email)}',
-          );
+          final from = GoRouterState.of(context).uri.queryParameters['from'];
+          context.push(Routes.verificationForEmail(state.email, from: from));
         }
       },
       builder: (context, state) {
@@ -160,16 +161,22 @@ class _LoginTabState extends State<LoginTab> {
           TextInput.finishAutofillContext(shouldSave: true);
           _showStorageWarning();
           context.read<SettingsCubit>().syncFcmToken();
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            Routes.dashBoard,
-            (_) => false,
-          );
+          context.go(_destinationAfterLogin(context));
         }
       },
       builder: (context, state) {
         final isGoogleLoading = state is GoogleLoginLoading;
         final isAnyLoading = state is AuthLoading || isGoogleLoading;
+
+        if (kIsWeb) {
+          return IgnorePointer(
+            ignoring: isAnyLoading,
+            child: Opacity(
+              opacity: isAnyLoading ? 0.55 : 1,
+              child: Center(child: google_web.buildGoogleSignInWebButton()),
+            ),
+          );
+        }
 
         return AppOutlinedButton(
           text: 'auth.signInWithGoogle'.tr(),
@@ -211,11 +218,7 @@ class _LoginTabState extends State<LoginTab> {
   Widget _buildGuestButton() {
     return AppOutlinedButton(
       text: 'auth.continueAsGuest'.tr(),
-      onPressed: () => Navigator.pushNamedAndRemoveUntil(
-        context,
-        Routes.dashBoard,
-        (_) => false,
-      ),
+      onPressed: () => context.go(Routes.home),
       horizontalPadding: 0,
       verticalPadding: 0,
       leadingWidget: CustomIcon(assetPath: Assets.personIcon, size: _h.s20),
@@ -237,6 +240,9 @@ class _LoginTabState extends State<LoginTab> {
       _submitted = false;
     }
   }
+
+  String _destinationAfterLogin(BuildContext context) =>
+      GoRouterState.of(context).uri.queryParameters['from'] ?? Routes.home;
 
   void _handleGoogleSignIn() {
     context.read<AuthCubit>().googleLogin();

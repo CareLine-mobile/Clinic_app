@@ -1,4 +1,22 @@
 {
+  "route_titles": {
+    "app": "كيرلاين",
+    "home": "الرئيسية",
+    "search": "البحث",
+    "favorites": "المفضلة",
+    "bookings": "حجوزاتي",
+    "settings": "الإعدادات",
+    "auth": "تسجيل الدخول",
+    "verification": "تأكيد الحساب",
+    "forgot_password": "نسيت كلمة المرور",
+    "reset_password": "إعادة تعيين كلمة المرور",
+    "clinic": "تفاصيل العيادة",
+    "doctor": "ملف الطبيب",
+    "booking": "حجز موعد",
+    "profile": "الملف الشخصي",
+    "map": "العيادات القريبة",
+    "not_found": "الصفحة غير موجودة"
+  },
   "auth_guard": {
     "title": "تسجيل الدخول مطلوب",
     "message": "هذه الخاصية تتطلب تسجيل الدخول.\nهل تريد تسجيل الدخول الآن؟",
@@ -157,6 +175,7 @@
     },
     "detail": {
       "title": "تفاصيل الحجز",
+      "not_found": "لم يتم العثور على الحجز",
       "appointment_info": "معلومات الموعد",
       "patient_info": "معلومات المستخدم",
       "patient_name": "الاسم",
@@ -236,6 +255,9 @@
     "missing_info": "معلومات الحجز غير مكتملة"
   },
   "clinic": {
+    "doctors_count": "{count} أطباء",
+    "empty_list": "لا توجد عيادات متاحة",
+    "login_to_favorite": "يرجى تسجيل الدخول لإضافة العيادات إلى المفضلة",
     "choose_date": "اختر التاريخ",
     "status": {
       "open": "متاح",
@@ -248,6 +270,7 @@
     "remaining": "متبقي {count}",
     "selected_summary_clear": "إلغاء الاختيار",
     "book_now": "احجز الآن",
+    "confirm_booking": "هل تريد حجز موعد مع {doctor}؟",
     "currency": "ج.م",
     "years_exp": "{count} سنة خبرة",
     "tabs": {
@@ -371,6 +394,7 @@
     "phoneRequired": "رقم الهاتف مطلوب"
   },
   "errors": {
+    "route_not_found": "الصفحة غير موجودة",
     "network": {
       "title": "لا يوجد اتصال بالإنترنت",
       "subtitle": "تحقق من اتصالك بالإنترنت وحاول مرة أخرى",

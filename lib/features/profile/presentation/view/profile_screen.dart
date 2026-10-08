@@ -4,6 +4,8 @@ import 'package:clinic_app/core/widgets/custom_snack_bar.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:clinic_app/core/routes/routes.dart';
 
 import '../cubit/profile_cubit.dart';
 import '../cubit/profile_state.dart';
@@ -13,7 +15,6 @@ import '../widget/profile_load_error_widget.dart';
 import '../widget/profile_medical_section.dart';
 import '../widget/profile_personal_section.dart';
 import '../widget/profile_progress_section.dart';
-
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -83,22 +84,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: Text('profile.appBarTitle'.tr()),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go(Routes.home),
         ),
       ),
       body: BlocConsumer<ProfileCubit, ProfileState>(
         listenWhen: (_, current) =>
-        current is ProfileLoaded ||
+            current is ProfileLoaded ||
             current is ProfileLoadError ||
             current is ProfileUpdateSuccess ||
-            current is ProfileUpdateFailure||
+            current is ProfileUpdateFailure ||
             current is ProfileNoChanges,
         listener: (context, state) {
           if (state is ProfileLoaded) {
             _ctrl.populateFrom(state.profile, () => setState(() {}));
           } else if (state is ProfileLoadError) {
-            CustomSnackBar.show(context,
-                message: state.message, type: SnackBarType.error);
+            CustomSnackBar.show(
+              context,
+              message: state.message,
+              type: SnackBarType.error,
+            );
           } else if (state is ProfileUpdateSuccess) {
             CustomSnackBar.show(
               context,
@@ -106,12 +111,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
               type: SnackBarType.success,
             );
             Future.delayed(const Duration(milliseconds: 900), () {
-              if (mounted) Navigator.pop(context);
+              if (mounted) {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go(Routes.home);
+                }
+              }
             });
           } else if (state is ProfileUpdateFailure) {
-            CustomSnackBar.show(context,
-                message: state.message, type: SnackBarType.error);
-          }else if (state is ProfileNoChanges) {
+            CustomSnackBar.show(
+              context,
+              message: state.message,
+              type: SnackBarType.error,
+            );
+          } else if (state is ProfileNoChanges) {
             print('no changes from state ');
             CustomSnackBar.show(
               context,
@@ -138,8 +152,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           return Form(
             key: _formKey,
             child: SingleChildScrollView(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -166,8 +179,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     addDiseaseController: _ctrl.addDiseaseController,
                     onBloodTypeToggle: (t) =>
                         _ctrl.onBloodTypeSelected(t, () => setState(() {})),
-                    onAddDisease: () =>
-                        _ctrl.addDisease(() => setState(() {})),
+                    onAddDisease: () => _ctrl.addDisease(() => setState(() {})),
                     onRemoveDisease: (d) =>
                         _ctrl.removeDisease(d, () => setState(() {})),
                   ),

@@ -1,6 +1,7 @@
 // ==================== clinic_details_screen.dart ====================
 import 'package:clinic_app/core/widgets/Loading_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -13,10 +14,8 @@ import 'content_view.dart';
 class ClinicDetailsScreen extends StatefulWidget {
   final int clinicId;
 
-  const ClinicDetailsScreen({
-    Key? key,
-    required this.clinicId,
-  }) : super(key: key);
+  const ClinicDetailsScreen({Key? key, required this.clinicId})
+    : super(key: key);
 
   @override
   State<ClinicDetailsScreen> createState() => _ClinicDetailsScreenState();
@@ -76,9 +75,7 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
 
   Widget _buildBody(ClinicDetailsState state) {
     return switch (state) {
-      ClinicDetailsLoading() => const Scaffold(
-        body: LoadingSpinner(),
-      ),
+      ClinicDetailsLoading() => const Scaffold(body: LoadingSpinner()),
       ClinicDetailsError() => Scaffold(
         body: EmptyStateWidget(
           title: state.message,
@@ -86,30 +83,27 @@ class _ClinicDetailsScreenState extends State<ClinicDetailsScreen>
           icon: Icons.error,
           enableBackButton: true,
           onBackPressed: () {
-            Navigator.pop(context);
+            if (context.canPop())
+              context.pop();
+            else
+              context.go('/home');
           },
           actionLabel: 'اضغط للمحاولة مرة أخرى',
           subtitle: '',
         ),
       ),
       ClinicDetailsLoaded() => _buildLoadedContent(state.clinic),
-    // Booking states: show cached clinic content with overlay handling in listener
+      // Booking states: show cached clinic content with overlay handling in listener
       BookingLoading() => _buildLoadedContent(_lastLoadedClinic!),
       BookingSuccess() => _buildLoadedContent(_lastLoadedClinic!),
       BookingError() => _buildLoadedContent(_lastLoadedClinic!),
-      _ => const Scaffold(
-        body: Center(
-          child: LoadingSpinner(),
-        ),
-      ),
+      _ => const Scaffold(body: Center(child: LoadingSpinner())),
     };
   }
 
   Widget _buildLoadedContent(ClinicEntity? clinic) {
     if (clinic == null) {
-      return const Scaffold(
-        body: Center(child: LoadingSpinner()),
-      );
+      return const Scaffold(body: Center(child: LoadingSpinner()));
     }
 
     _lastLoadedClinic = clinic;

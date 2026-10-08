@@ -19,14 +19,10 @@ class HomeBodyShimmer extends StatelessWidget {
           SliverToBoxAdapter(child: SizedBox(height: SizeApp.s50)),
 
           // Featured Clinics Shimmer
-          SliverToBoxAdapter(
-            child: _buildFeaturedClinicsShimmer(),
-          ),
+          SliverToBoxAdapter(child: _buildFeaturedClinicsShimmer()),
 
           // Nearby Clinics Shimmer
-          SliverToBoxAdapter(
-            child: _buildNearbyClinicsShimmer(),
-          ),
+          SliverToBoxAdapter(child: _buildNearbyClinicsShimmer()),
 
           // All Clinics Header Shimmer
           SliverToBoxAdapter(
@@ -49,15 +45,12 @@ class HomeBodyShimmer extends StatelessWidget {
           SliverPadding(
             padding: EdgeInsets.symmetric(horizontal: SizeApp.s20),
             sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: SizeApp.s12),
-                    child: _buildClinicCardShimmer(),
-                  );
-                },
-                childCount: 5,
-              ),
+              delegate: SliverChildBuilderDelegate((context, index) {
+                return Padding(
+                  padding: EdgeInsets.only(bottom: SizeApp.s12),
+                  child: _buildClinicCardShimmer(),
+                );
+              }, childCount: 5),
             ),
           ),
 
@@ -94,7 +87,7 @@ class HomeBodyShimmer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Bone.square(
-                          size: 180,
+                          size: 150,
                           borderRadius: BorderRadius.vertical(
                             top: Radius.circular(16),
                           ),
@@ -158,7 +151,7 @@ class HomeBodyShimmer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Bone.square(
-                          size: 120,
+                          size: 110,
                           borderRadius: BorderRadius.vertical(
                             top: Radius.circular(16),
                           ),
@@ -189,7 +182,7 @@ class HomeBodyShimmer extends StatelessWidget {
 
   Widget _buildClinicCardShimmer() {
     return Container(
-      height: 120,
+      constraints: const BoxConstraints(minHeight: 120),
       decoration: BoxDecoration(
         color: Colors.grey[300],
         borderRadius: BorderRadius.circular(16),
@@ -197,7 +190,7 @@ class HomeBodyShimmer extends StatelessWidget {
       padding: EdgeInsets.all(SizeApp.s12),
       child: Row(
         children: [
-          Bone.square(size: 100, borderRadius: BorderRadius.circular(12)),
+          Bone.square(size: 88, borderRadius: BorderRadius.circular(12)),
           SizedBox(width: SizeApp.s12),
           Expanded(
             child: Column(

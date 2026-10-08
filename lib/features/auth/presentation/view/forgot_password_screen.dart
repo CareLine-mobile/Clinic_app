@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:clinic_app/core/widgets/app_buton.dart';
 import 'package:clinic_app/core/widgets/app_text_feild.dart';
@@ -53,10 +54,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           current is ForgotPasswordSuccess || current is ForgotPasswordFailure,
       listener: (context, state) {
         if (state is ForgotPasswordSuccess) {
-          Navigator.pushNamed(
-            context,
-            '${Routes.resetPassword}?email=${Uri.encodeQueryComponent(state.email)}',
-          );
+          final from = GoRouterState.of(context).uri.queryParameters['from'];
+          context.push(Routes.resetPasswordForEmail(state.email, from: from));
         } else if (state is ForgotPasswordFailure) {
           CustomSnackBar.show(
             context,
@@ -104,7 +103,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       AppOutlinedButton(
                         text: 'auth.forgotPassword.backToLogin'.tr(),
                         leadingIcon: Icons.arrow_back_rounded,
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => context.pop(),
                         horizontalPadding: 0,
                         verticalPadding: 0,
                       ),
