@@ -34,6 +34,7 @@ import 'package:clinic_app/features/settings/presentation/view/settings_screen.d
 import 'package:clinic_app/features/onboarding/presentation/pages/onboarding_screen.dart';
 import 'package:clinic_app/features/user_data/user_repo.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -78,10 +79,14 @@ final GoRouter appRouter = GoRouter(
       : '${Uri.base.path}${Uri.base.hasQuery ? '?${Uri.base.query}' : ''}',
   redirect: (context, state) async {
     final location = state.uri.path;
+    final isPublicDetailDeepLink =
+        kIsWeb && RegExp(r'^/(clinic|doctor)/[^/]+$').hasMatch(location);
     final configDone =
         await SharedPrefHelper.getBool(key: AppConstants.configurationKey) ??
         false;
-    if (!configDone && location != Routes.configuration) {
+    if (!configDone &&
+        location != Routes.configuration &&
+        !isPublicDetailDeepLink) {
       return Routes.configuration;
     }
     final onboardingDone =
@@ -89,7 +94,8 @@ final GoRouter appRouter = GoRouter(
         false;
     if (!onboardingDone &&
         location != Routes.configuration &&
-        location != Routes.onboarding) {
+        location != Routes.onboarding &&
+        !isPublicDetailDeepLink) {
       return Routes.onboarding;
     }
     if (location == Routes.dashBoard) return Routes.home;

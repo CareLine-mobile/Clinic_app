@@ -1,12 +1,12 @@
 // lib/features/map_locations/presentation/widgets/map_clinic_summary_sheet.dart
 
 import 'package:clinic_app/core/routes/routes.dart';
+import 'package:clinic_app/core/routes/route_navigation.dart';
 import 'package:clinic_app/core/theme/colors.dart';
 import 'package:clinic_app/core/widgets/custom_network_image.dart';
 import 'package:clinic_app/features/home/domain/entities/clinic_summary.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -347,7 +347,10 @@ class _ClinicSummaryPageState extends State<_ClinicSummaryPage> {
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.pop(context); // close sheet
-                            context.push(Routes.clinic(widget.clinic.id));
+                            navigateToDetail(
+                              context,
+                              Routes.clinic(widget.clinic.id),
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(vertical: 14.h),

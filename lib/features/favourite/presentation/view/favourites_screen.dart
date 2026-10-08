@@ -1,4 +1,5 @@
 import 'package:clinic_app/core/routes/routes.dart';
+import 'package:clinic_app/core/routes/route_navigation.dart';
 import 'package:clinic_app/core/theme/colors.dart';
 import 'package:clinic_app/core/utils/enums.dart';
 import 'package:clinic_app/core/widgets/custom_app_bar.dart';
@@ -131,7 +132,7 @@ class _ClinicListSliver extends StatelessWidget {
   }
 
   void _openDetails(BuildContext context, ClinicSummary clinic) {
-    context.push(Routes.clinic(clinic.id));
+    navigateToDetail(context, Routes.clinic(clinic.id));
   }
 }
 

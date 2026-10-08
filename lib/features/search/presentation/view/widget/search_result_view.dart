@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/routes/routes.dart';
+import '../../../../../core/routes/route_navigation.dart';
 import '../../../../../core/utils/enums.dart';
 import '../../../../../core/widgets/card/clinic_card.dart';
 import '../../../../home/domain/entities/clinic_summary.dart';
@@ -32,7 +32,7 @@ class SearchResultsView extends StatelessWidget {
                 clinic: clinic,
                 layout: ClinicCardLayout.list,
                 onTap: () {
-                  context.push(Routes.clinic(clinic.id));
+                  navigateToDetail(context, Routes.clinic(clinic.id));
                 },
                 onFavoriteToggle: () =>
                     context.read<SearchCubit>().toggleFavorite(clinic.id),

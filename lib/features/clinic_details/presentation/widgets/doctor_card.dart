@@ -6,13 +6,13 @@
 // ══════════════════════════════════════════════════════════════════════════════
 
 import 'package:clinic_app/core/routes/routes.dart';
+import 'package:clinic_app/core/routes/route_navigation.dart';
 import 'package:clinic_app/core/theme/colors.dart';
 import 'package:clinic_app/features/clinic_details/domain/entites/time_slot_entity.dart';
 import 'package:clinic_app/features/clinic_details/presentation/cubit/clinic_details_cubit.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../domain/entites/doctor_entity.dart';
@@ -187,7 +187,7 @@ class DoctorCard extends StatelessWidget {
                             onTap: () {
                               final id = int.tryParse(doctor.id);
                               if (id != null) {
-                                context.push(Routes.doctor(id));
+                                navigateToDetail(context, Routes.doctor(id));
                               }
                             },
                             child: Container(
@@ -250,7 +250,9 @@ class DoctorCard extends StatelessWidget {
                     TextButton.icon(
                       onPressed: () {
                         final id = int.tryParse(doctor.id);
-                        if (id != null) context.push(Routes.doctor(id));
+                        if (id != null) {
+                          navigateToDetail(context, Routes.doctor(id));
+                        }
                       },
                       icon: Icon(Icons.person_outline_rounded, size: 16.sp),
                       label: Text('settings.account.profile'.tr()),

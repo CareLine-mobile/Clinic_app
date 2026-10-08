@@ -4,6 +4,7 @@ import 'package:clinic_app/core/errors/failures.dart';
 import 'package:clinic_app/core/utils/location/location_error_handler.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:clinic_app/core/routes/routes.dart';
+import 'package:clinic_app/core/routes/route_navigation.dart';
 import 'package:clinic_app/core/utils/enums.dart';
 import 'package:clinic_app/core/widgets/card/clinic_card.dart';
 import 'package:clinic_app/core/widgets/card/clinic_list.dart';
@@ -362,7 +363,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // ── Event handlers ────────────────────────────────────────────────────────
 
   void _navigateToClinicDetails(ClinicSummary clinic) {
-    context.push(Routes.clinic(clinic.id));
+    navigateToDetail(context, Routes.clinic(clinic.id));
   }
 
   void _toggleFavorite(ClinicSummary clinic) =>
